@@ -1,5 +1,8 @@
 const mongoose = require('mongoose')
-mongoose.connect(`mongodb://localhost/${process.env.DB_NAME}`, {useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true, useUnifiedTopology: true})
+mongoose.connect(`mongodb://localhost/${process.env.DB_NAME}`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
 
 const db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
