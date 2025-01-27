@@ -10,19 +10,14 @@ const app = express()
 
 app.use(require(`body-parser`).json())
 app.use(require(`cors`)({credentials: true, origin: process.env.LOCAL_HOST}))
-app.use(express.json())
 
 
 // Routers
-// app.use(require(`./routes/cars`))
-app.use('./routes/cars', (req, res, next) => {
-    console.log('Middleware for ./routes/cars');
-    next();
-});
+app.use(require(`./routes/cars`))
 
 
 // Port
-app.listen(process.env.SERVER_PORT, () => 
+app.listen(process.env.SERVER_PORT, () =>
 {
     console.log(`Connected to port ` + process.env.SERVER_PORT)
 })
@@ -35,7 +30,7 @@ app.use((req, res, next) => {next(createError(404))})
 app.use(function (err, req, res, next)
 {
     console.error(err.message)
-    if (!err.statusCode) 
+    if (!err.statusCode)
     {
         err.statusCode = 500
     }
