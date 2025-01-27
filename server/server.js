@@ -10,10 +10,15 @@ const app = express()
 
 app.use(require(`body-parser`).json())
 app.use(require(`cors`)({credentials: true, origin: process.env.LOCAL_HOST}))
+app.use(express.json())
 
 
 // Routers
-app.use(require(`./routes/cars`))
+// app.use(require(`./routes/cars`))
+app.use('./routes/cars', (req, res, next) => {
+    console.log('Middleware for ./routes/cars');
+    next();
+});
 
 
 // Port
