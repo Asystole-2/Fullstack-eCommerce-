@@ -1,30 +1,30 @@
-import React from 'react';
+import React from 'react'
 
 class Login extends React.Component {
     constructor(props) {
-        super(props);
+        super(props)
         this.state = {
             loginEmail: '',
             loginPassword: '',
             registerEmail: '',
             registerPassword: '',
             confirmPassword: '',
-        };
+        }
     }
 
     handleLogin = (e) => {
-        e.preventDefault();
-        console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+        e.preventDefault()
+        console.log('Login with:', this.state.loginEmail, this.state.loginPassword)
         // Add login logic here
     }
 
     handleRegister = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         if (this.state.registerPassword !== this.state.confirmPassword) {
-            alert('Passwords do not match');
-            return;
+            alert('Passwords do not match')
+            return
         }
-        console.log('Register with:', this.state.registerEmail, this.state.registerPassword);
+        console.log('Register with:', this.state.registerEmail, this.state.registerPassword)
         // Add registration logic here
     }
 
@@ -67,8 +67,8 @@ class Login extends React.Component {
                     <button type="submit">Register</button>
                 </form>
             </div>
-        );
+        )
     }
 }
 
-export default Login;
+export default Login
