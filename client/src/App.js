@@ -1,47 +1,30 @@
-// import React, {Component} from "react"
-// import {BrowserRouter, Switch, Route} from "react-router-dom"
-//
-// import "bootstrap/dist/css/bootstrap.css"
-// import "./css/App.css"
-//
-// import AddCar from "./components/AddCar"
-// import EditCar from "./components/EditCar"
-// import DeleteCar from "./components/DeleteCar"
-// import DisplayAllCars from "./components/DisplayAllCars"
-//
-//
-// export default class App extends Component
-// {
-//     render()
-//     {
-//         return (
-//             <BrowserRouter>
-//                 <Switch>
-//                     <Route exact path="/" component={DisplayAllCars} />
-//                     <Route exact path="/AddCar" component={AddCar} />
-//                     <Route exact path="/EditCar/:id" component={EditCar} />
-//                     <Route exact path="/DeleteCar/:id" component={DeleteCar} />
-//                     <Route exact path="/DisplayAllCars" component={DisplayAllCars}/>
-//                     <Route path="*" component={DisplayAllCars}/>
-//                 </Switch>
-//             </BrowserRouter>
-//         )
-//     }
-// }
+import React, { Component } from "react";
+import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
+import MainPage from "./components/MainPage";
+import Login from "./components/Login";
+import "./css/App.css";
 
-import React, {Component} from "react"
-import {BrowserRouter, Switch, Route} from "react-router-dom"
-import MainPage from "./components/MainPage"
-import "./css/App.css"
-
-export default class App extends Component{
+export default class App extends Component {
     render() {
         return (
             <BrowserRouter>
-                <Switch>
-                    <Route exact path="/MainPage" component={MainPage} />
+                <div>
+                    <header>
+                        <Link to="/MainPage">
+                            Home
+                        </Link>
+                        <Link to="/login">
+                            Login
+                        </Link>
+                    </header>
+
+                    <Switch>
+                        <Route exact path="/MainPage" component={MainPage} />
+                        <Route exact path="/login" component={Login} />
+                        <Route component={MainPage} />
                     </Switch>
+                </div>
             </BrowserRouter>
-        )
+        );
     }
 }
