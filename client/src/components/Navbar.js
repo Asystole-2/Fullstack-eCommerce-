@@ -10,7 +10,7 @@ export default class Navbar extends Component {
                         <h1>Sīrən</h1>
                     </div>
                     <div className="nav-links">
-                        <Link to="/account">
+                        <Link to="/Login">
                             <i className="icon-user">👤</i>
                         </Link>
                         <Link to="/basket">
