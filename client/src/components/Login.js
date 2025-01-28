@@ -15,7 +15,6 @@ class Login extends React.Component {
     handleLogin = (e) => {
         e.preventDefault()
         console.log('Login with:', this.state.loginEmail, this.state.loginPassword)
-        // Add login logic here
     }
 
     handleRegister = (e) => {
@@ -25,13 +24,11 @@ class Login extends React.Component {
             return
         }
         console.log('Register with:', this.state.registerEmail, this.state.registerPassword)
-        // Add registration logic here
     }
 
     render() {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
-                {/* Login Form */}
                 <form onSubmit={this.handleLogin}>
                     <h2>Login</h2>
                     <label>
@@ -49,7 +46,6 @@ class Login extends React.Component {
                     <a href="#">Lost your password?</a>
                 </form>
 
-                {/* Register Form */}
                 <form onSubmit={this.handleRegister}>
                     <h2>Register</h2>
                     <label>
