@@ -9,18 +9,9 @@ export default class App extends Component {
         return (
             <BrowserRouter>
                 <div>
-                    <header>
-                        <Link to="/MainPage">
-                            Home
-                        </Link>
-                        <Link to="/login">
-                            Login
-                        </Link>
-                    </header>
-
                     <Switch>
                         <Route exact path="/MainPage" component={MainPage} />
-                        <Route exact path="/login" component={Login} />
+                        <Route exact path="/Login" component={Login} />
                         <Route component={MainPage} />
                     </Switch>
                 </div>
