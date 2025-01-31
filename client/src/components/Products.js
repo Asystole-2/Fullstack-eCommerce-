@@ -1,9 +1,6 @@
 import React, { Component } from "react"
-<<<<<<< bens-branch
 import AddInstrument from "./AddInstrument"
-=======
->>>>>>> main
-import instrument from "./Instrument"
+import Instrument from "./Instrument"
 
 import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
