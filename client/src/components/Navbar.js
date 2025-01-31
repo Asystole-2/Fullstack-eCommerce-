@@ -16,6 +16,9 @@ export default class Navbar extends Component {
                         <Link to="/basket">
                             <i className="icon-basket">🛒</i>
                         </Link>
+                        <Link to="/AdminLogin">
+                            <i className="icon-smiley">😀</i>
+                        </Link>
                     </div>
                 </nav>
             )
