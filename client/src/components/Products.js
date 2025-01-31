@@ -1,5 +1,8 @@
 import React, { Component } from "react"
-import addInstrument from "./AddInstrument"
+<<<<<<< bens-branch
+import AddInstrument from "./AddInstrument"
+=======
+>>>>>>> main
 import instrument from "./Instrument"
 
 import {SERVER_HOST} from "../config/global_constants"
@@ -37,20 +40,22 @@ export default class Products extends Component {
 
     componentDidMount()
     {
-        axios.get(`${SERVER_HOST}/cars`)
+        axios.get(`${SERVER_HOST}/instruments`)
             .then(res =>
             {
                 if(res.data)
                 {
-                    if (res.data.errorMessage)
-                    {
-                        console.log(res.data.errorMessage)
-                    }
-                    else
-                    {
-                        console.log("Records read")
-                        this.setState({cars: res.data})
-                    }
+                    // console.log(res.data)
+                    console.table(res.data)
+                    // if (res.data.errorMessage)
+                    // {
+                    //     console.log(res.data.errorMessage)
+                    // }
+                    // else
+                    // {
+                    //     console.log("Records read")
+                    //     this.setState({cars: res.data})
+                    // }
                 }
                 else
                 {
@@ -62,7 +67,7 @@ export default class Products extends Component {
     render() {
         return (
             <div className="product-list">
-                <addInstrument onAddProduct={this.handleAddProduct} />
+                <AddInstrument onAddProduct={this.handleAddProduct} />
                 <div className="grid">
                     {this.state.products.map((product) => (
                         <instrument
