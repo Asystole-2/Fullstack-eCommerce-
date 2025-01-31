@@ -1,6 +1,6 @@
 import React, { Component } from "react"
-import addInstrument from "./addInstrument"
-import instrument from "./instrument"
+import addInstrument from "./AddInstrument"
+import instrument from "./Instrument"
 
 import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"

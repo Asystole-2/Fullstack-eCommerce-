@@ -17,7 +17,7 @@ app.use(require(`./routes/cars`))
 
 
 // Port
-app.listen(process.env.SERVER_PORT, () => 
+app.listen(process.env.SERVER_PORT, () =>
 {
     console.log(`Connected to port ` + process.env.SERVER_PORT)
 })
