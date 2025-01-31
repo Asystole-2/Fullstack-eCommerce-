@@ -26,7 +26,11 @@ export default class AddInstrument extends Component {
 
 
     componentDidMount() {
+<<<<<<< bens-branch
         // this.inputToFocus.focus()
+=======
+    
+>>>>>>> main
     }
 
 

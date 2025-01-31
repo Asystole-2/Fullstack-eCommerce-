@@ -137,25 +137,224 @@
 /*}*/
 /*!*end of table of cars *!*/
 
-body {
-    font-family: Arial, sans-serif;
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.login{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background: white;
+    padding: 2rem;
+    width: 350px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    font-size: 14px;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #764ba2;
+    box-shadow: 0px 0px 5px rgba(118, 75, 162, 0.5);
+}
+
+.login button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #667eea;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login button:hover {
+    background: #564ab1;
+}
+
+.switch {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+switch a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.switch a:hover {
+    text-decoration: underline;
+}
+
+/* Base styling */
+select {
+    width: 100%; /* Make it full width */
+    padding: 10px;
+    border: 2px solid #3498db; /* Blue border */
+    border-radius: 5px;
+    background-color: white;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+/* Hover effect */
+select:hover {
+    border-color: #2980b9; /* Darker blue */
+}
+
+/* Focus (when clicked) */
+select:focus {
+    border-color: #2ecc71; /* Green */
+    box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+}
+
+/* Dropdown arrow customization (optional) */
+select::-ms-expand {
+    display: none; /* Hide default arrow in IE */
+}
+
+/* Style dropdown options */
+option {
+    padding: 10px;
+    background: white;
+    color: #333;
+}
+
+/* On selection */
+select:active, select:focus {
+    background-color: #f8f8f8;
 }
 
 .navbar {
     display: flex;
     justify-content: space-between;
-    padding: 1rem 2rem;
-    background-color: #333;
+    align-items: center;
+    background: #222;
+    padding: 15px 30px;
     color: white;
 }
 
-.nav-links a {
-    color: white;
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
     text-decoration: none;
-    margin: 0 1rem;
+    font-family: "Poppins", sans-serif;
+    padding: 10px 20px;
+    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
+
+.logo:hover {
+    color: #f4b400; /* Change color on hover */
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Search box */
+.search-box {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 20px;
+    padding: 5px;
+    width: 250px;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    padding: 5px;
+    width: 100%;
+    border-radius: 20px;
+}
+
+.search-box button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Icons section */
+.nav-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-icons a {
+    color: white;
+    font-size: 20px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-icons a:hover {
+    color: #f0a500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-box {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .nav-icons {
+        margin-top: 10px;
+    }
+}
+
 
 .product-list .grid {
     display: grid;

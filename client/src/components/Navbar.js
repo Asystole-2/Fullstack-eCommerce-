@@ -6,16 +6,19 @@ export default class Navbar extends Component {
 
             return (
                 <nav className="navbar">
-                    <div className="logo">
-                        <h1>Sīrən</h1>
+                    <Link to="/MainPage">
+                        <div className="logo">MyShop</div>
+                    </Link>
+
+                    <div className="search-box">
+                        <input type="text" placeholder="Search..."/>
+                        <button><i className="fas fa-search"></i></button>
                     </div>
-                    <div className="nav-links">
-                        <Link to="/account">
-                            <i className="icon-user">👤</i>
-                        </Link>
-                        <Link to="/basket">
-                            <i className="icon-basket">🛒</i>
-                        </Link>
+
+                    <div className="nav-icons">
+                        <Link to="/"><i className="fas fa-heart"></i></Link>
+                        <Link to="/"><i className="fas fa-shopping-cart"></i></Link>
+                        <Link to="Login"><i className="fas fa-user"></i></Link>
                     </div>
                 </nav>
             )
