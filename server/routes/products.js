@@ -2,7 +2,7 @@ const router = require("express").Router()
 
 // let uniqueId = instruments.length
 
-const Instruments = require('./models/Instruments')
+const Instruments = require(`../models/Instruments`)
 
 // Read all items from instruments JSON
 router.get(`/instruments`, (req, res) => {
