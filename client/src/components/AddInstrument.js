@@ -26,7 +26,7 @@ export default class AddInstrument extends Component {
 
 
     componentDidMount() {
-        this.inputToFocus.focus()
+        // this.inputToFocus.focus()
     }
 
 
