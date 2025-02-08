@@ -1,8 +1,7 @@
 import React, { Component } from "react"
 import AddInstrument from "./AddInstrument"
 import Instrument from "./Instrument"
-
-import {SERVER_HOST} from "../config/global_constants"
+import { SERVER_HOST } from "../config/global_constants"
 import axios from "axios"
 
 export default class Products extends Component {
@@ -24,38 +23,24 @@ export default class Products extends Component {
 
     handleDeleteProduct = (id) => {
         this.setState({
-            products: this.state.products.filter((product) => product.id !== id)
+            products: this.state.products.filter((product) => product._id !== id)
         })
     }
 
     handleUpdateProduct = (updatedProduct) => {
         const updatedProducts = this.state.products.map((product) =>
-            product.id === updatedProduct.id ? updatedProduct : product
+            product._id === updatedProduct._id ? updatedProduct : product
         )
         this.setState({ products: updatedProducts })
     }
 
-    componentDidMount()
-    {
+    componentDidMount() {
         axios.get(`${SERVER_HOST}/instruments`)
-            .then(res =>
-            {
-                if(res.data)
-                {
-                    // console.log(res.data)
+            .then(res => {
+                if (res.data) {
                     console.table(res.data)
-                    if (res.data.errorMessage)
-                    {
-                        console.log(res.data.errorMessage)
-                    }
-                    else
-                    {
-                        console.log("Records read")
-                        this.setState({products: res.data})
-                    }
-                }
-                else
-                {
+                    this.setState({ products: res.data })
+                } else {
                     console.log("Record not found")
                 }
             })
@@ -68,7 +53,7 @@ export default class Products extends Component {
                 <div className="grid">
                     {this.state.products.map((product) => (
                         <Instrument
-                            key={product.id}
+                            key={product._id}
                             product={product}
                             onDelete={this.handleDeleteProduct}
                             onUpdate={this.handleUpdateProduct}
@@ -79,4 +64,3 @@ export default class Products extends Component {
         )
     }
 }
-

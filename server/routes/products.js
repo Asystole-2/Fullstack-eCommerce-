@@ -99,14 +99,10 @@ router.get("/instruments/:id", async (req, res) => {
 
 // Add new instrument
 router.post("/instruments", async (req, res) => {
-    try {
-        const newInstrument = new Instruments(req.body)
-        const savedInstrument = await newInstrument.save()
-        res.json(savedInstrument)
-    } catch (error) {
-        console.error("Error adding instrument:", error)
-        res.status(500).json({ error: "Internal Server Error" })
-    }
+    Instruments.create(req.body, (error, data) =>
+    {
+        res.json(data)
+    })
 })
 
 // Update instrument

@@ -1,13 +1,7 @@
 import React, {Component} from "react"
-import {Redirect, Link} from "react-router-dom"
-import Form from "react-bootstrap/Form"
-
+import {Redirect }from "react-router-dom"
 import axios from "axios"
-
-import LinkInClass from "../components/LinkInClass"
-
 import {SERVER_HOST} from "../config/global_constants"
-
 
 export default class AddInstrument extends Component {
     constructor(props) {
@@ -18,101 +12,97 @@ export default class AddInstrument extends Component {
             price: "",
             stock: "",
             description: "",
-            image: ""
-        }
-        this.handleInputChange = this.handleInputChange.bind(this)
-        this.handleSubmit = this.handleSubmit.bind(this)
-    }
-
-
-    componentDidMount() {
-        // this.inputToFocus.focus()
-    }
-
-
-    handleInputChange(event) {
-        const {name, value} = event.target
-        this.setState({[name]: value})
-    }
-
-    handleSubmit(event) {
-        event.preventDefault()
-        const newProduct = {...this.state, id: Date.now()}
-        this.props.onAddProduct(newProduct)
-
-        // Reset the form
-        this.setState({
-            name: "",
-            price: "",
-            description: "",
-            stock: "",
             image: "",
-        })
+            redirectToDisplayAllInstruments: false
+        }
+
     }
 
-    // axios.post(`${SERVER_HOST}/cars`, carObject)
-    //     .then(res =>
-    //     {
-    //         if(res.data)
-    //         {
-    //             if (res.data.errorMessage)
-    //             {
-    //                 console.log(res.data.errorMessage)
-    //             }
-    //             else
-    //             {
-    //                 console.log("Record added")
-    //                 this.setState({redirectToDisplayAllCars:true})
-    //             }
-    //         }
-    //         else
-    //         {
-    //             console.log("Record not added")
-    //         }
-    //     })
+    handleChange = (e) => {
+        this.setState({[e.target.name]: e.target.value})
+    }
 
+    handleSubmit = (e) => {
+        e.preventDefault()
+
+        const instrumentObject = {
+            name: this.state.name,
+            price: Number(this.state.price),
+            stock: Number(this.state.stock),
+            description: this.state.description,
+            image: this.state.image
+        }
+        axios.post(`${SERVER_HOST}/instruments`, instrumentObject)
+            .then(res => {
+                if (res.data) {
+                    if (res.data.errorMessage) {
+                        console.log(res.data.errorMessage)
+                    } else {
+                        console.log("Record added")
+                        this.setState({
+                            name: "",
+                            price: "",
+                            stock: "",
+                            description: "",
+                            image: "",
+                        })
+                        this.setState({redirectToDisplayAllInstruments: true})
+                    }
+                } else {
+                    console.log("Record not added")
+                }
+            })
+            .catch(error => console.error("Error adding instrument:", error))
+
+    }
 
     render() {
-        return (
-            <form onSubmit={this.handleSubmit}>
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    value={this.state.name}
-                    onChange={this.handleInputChange}
-                />
-                <input
-                    type="text"
-                    name="price"
-                    placeholder="Price"
-                    value={this.state.price}
-                    onChange={this.handleInputChange}
-                />
-                <input
-                    type="text"
-                    name="description"
-                    placeholder="Description"
-                    value={this.state.description}
-                    onChange={this.handleInputChange}
-                />
-                <input
-                    type="text"
-                    name="stock"
-                    placeholder="Stock"
-                    value={this.state.stock}
-                    onChange={this.handleInputChange}
-                />
-                <input
-                    type="text"
-                    name="image"
-                    placeholder="Image URL"
-                    value={this.state.image}
-                    onChange={this.handleInputChange}
-                />
-                <button type="submit">Add Instrument</button>
-            </form>
-        )
+
+            if (this.state.redirectToDisplayAllInstruments) {
+                return <Redirect to="/instruments"/>
+            }
+            return (
+                <div className="form-container">
+                    <form onSubmit={this.handleSubmit}>
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Name"
+                            value={this.state.name}
+                            onChange={this.handleChange}
+                        />
+                        <input
+                            type="text"
+                            name="price"
+                            placeholder="Price"
+                            value={this.state.price}
+                            onChange={this.handleChange}
+                        />
+                        <input
+                            type="text"
+                            name="description"
+                            placeholder="Description"
+                            value={this.state.description}
+                            onChange={this.handleChange}
+                        />
+                        <input
+                            type="text"
+                            name="stock"
+                            placeholder="Stock"
+                            value={this.state.stock}
+                            onChange={this.handleChange}
+                        />
+                        <input
+                            type="text"
+                            name="image"
+                            placeholder="Image URL"
+                            value={this.state.image}
+                            onChange={this.handleChange}
+                        />
+                        <button type="submit">Add Instrument</button>
+                    </form>
+                </div>
+            )
+        }
     }
-}
 
