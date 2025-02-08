@@ -8,7 +8,7 @@ export default class  MainPage extends Component {
             <div className="main-page">
                 <Navbar />
                 <div className="content">
-                    {/*<Products />*/}
+                    <Products />
                 </div>
             </div>
         )

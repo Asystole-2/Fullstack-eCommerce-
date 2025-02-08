@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import AddInstrument from "./AddInstrument"
-import instrument from "./Instrument"
+import Instrument from "./Instrument"
 
 import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
@@ -44,15 +44,15 @@ export default class Products extends Component {
                 {
                     // console.log(res.data)
                     console.table(res.data)
-                    // if (res.data.errorMessage)
-                    // {
-                    //     console.log(res.data.errorMessage)
-                    // }
-                    // else
-                    // {
-                    //     console.log("Records read")
-                    //     this.setState({cars: res.data})
-                    // }
+                    if (res.data.errorMessage)
+                    {
+                        console.log(res.data.errorMessage)
+                    }
+                    else
+                    {
+                        console.log("Records read")
+                        this.setState({products: res.data})
+                    }
                 }
                 else
                 {
@@ -67,7 +67,7 @@ export default class Products extends Component {
                 <AddInstrument onAddProduct={this.handleAddProduct} />
                 <div className="grid">
                     {this.state.products.map((product) => (
-                        <instrument
+                        <Instrument
                             key={product.id}
                             product={product}
                             onDelete={this.handleDeleteProduct}
