@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {Component} from "react"
 
-class Register extends React.Component {
+
+class Register extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -22,7 +23,7 @@ class Register extends React.Component {
     render() {
         return (
             <div>
-                {/* Register Form */}
+                //Register Form
                 <form onSubmit={this.handleRegister}>
                     <h2>Register</h2>
                     <label>
