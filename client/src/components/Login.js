@@ -1,6 +1,7 @@
 import React from 'react'
 import Navbar from "./Navbar";
 import axios from "axios";
+import {Link} from "react-router-dom";
 
 class Login extends React.Component {
     constructor(props) {
@@ -71,7 +72,7 @@ class Login extends React.Component {
                                         account.</p>
                                     <br/>
                                     <p className="switch">Don't have an account?</p>
-                                    <a href="/Register.js">Register</a>
+                                    <Link to='Register'>Register</Link>
                                 </div>
                             )}
                             {this.state.role === 'admin' && (
