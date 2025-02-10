@@ -26,7 +26,7 @@ app.use(cors());
 
 app.use(require(`body-parser`).json())
 
-app.use(cors({ origin: "http://localhost:3000" }));
+
 
 // Routers
 app.use(require(`./routes/products`))

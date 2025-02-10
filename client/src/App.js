@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import MainPage from "./components/MainPage";
 import Login from "./components/Login";
-import "./css/App.css";
 import Register from "./components/Register";
+import "./css/App.css";
 
 export default class App extends Component {
     render() {
