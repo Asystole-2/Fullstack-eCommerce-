@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require("bcrypt");
 
-const uri = 'mongodb://localhost/fullStack_ecommerce';
+const uri = 'mongodb://localhost/fullstack_ecommerce';
 
 mongoose.connect(uri)
     .then(() => console.log('Connected to MongoDB'))
