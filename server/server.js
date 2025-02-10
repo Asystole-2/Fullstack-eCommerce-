@@ -1,9 +1,4 @@
-// Server-side global variables
-require(`dotenv`).config({path:`./config/.env`})
-
-//mongoose stuff
-require(`./config/db`)
-
+// Mongoose
 const mongoose = require('mongoose');
 
 // Cors
@@ -18,6 +13,16 @@ const jwt = require('jsonwebtoken')
 // Express
 const express = require(`express`)
 const app = express()
+
+// Server-side global variables
+require(`dotenv`).config({path:`./config/.env`})
+
+//mongoose stuff
+require(`./config/db`)
+
+// Middleware
+app.use(express.json());
+app.use(cors());
 
 app.use(require(`body-parser`).json())
 
