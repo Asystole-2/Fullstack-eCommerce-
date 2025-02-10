@@ -53,7 +53,7 @@ export default class Products extends Component {
                 <div className="grid">
                     {this.state.products.map((product) => (
                         <Instrument
-                            key={product._id}
+                            key={product.id}
                             product={product}
                             onDelete={this.handleDeleteProduct}
                             onUpdate={this.handleUpdateProduct}
