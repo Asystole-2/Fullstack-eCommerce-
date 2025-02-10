@@ -1,7 +1,8 @@
-import React from 'react'
+import React, {Component} from "react"
 import Navbar from "./Navbar";
+import {Link} from "react-router-dom";
 
-class Login extends React.Component {
+class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -22,16 +23,6 @@ class Login extends React.Component {
 
     handleRoleChange = e => {
         this.setState({role: e.target.value})
-    }
-
-    handleRegister = (e) => {
-        e.preventDefault()
-        if (this.state.registerPassword !== this.state.confirmPassword) {
-            alert('Passwords do not match')
-            return
-        }
-        console.log('Register with:', this.state.registerEmail, this.state.registerPassword)
-        // Add registration logic here
     }
 
     render() {
@@ -74,7 +65,7 @@ class Login extends React.Component {
                                 <p className="switch">Access your personalized dashboard and manage your account.</p>
                                 <br/>
                                 <p className="switch">Don't have an account?</p>
-                                <a href="/Register.js">Register</a>
+                                <Link to="/Register">Register</Link>
                             </div>
                         )}
                         {this.state.role === 'admin' && (
