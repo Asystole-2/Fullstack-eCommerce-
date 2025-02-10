@@ -23,33 +23,33 @@ class Register extends React.Component {
     render() {
         return (
             <div>
-                <Navbar />
-            <div className="login">
-                <div className="login-container">
-                {/* Register Form */}
-                    <div className="input-group">
-                        <form onSubmit={this.handleRegister}>
-                            <h2>Register</h2>
-                            <label>
-                                Email Address *
-                                <input type="email" value={this.state.registerEmail}
-                                       onChange={e => this.setState({registerEmail: e.target.value})} required/>
-                            </label>
-                            <label>
-                                Password *
-                                <input type="password" value={this.state.registerPassword}
-                                       onChange={e => this.setState({registerPassword: e.target.value})} required/>
-                            </label>
-                            <label>
-                                Confirm Password *
-                                <input type="password" value={this.state.confirmPassword}
-                                       onChange={e => this.setState({confirmPassword: e.target.value})} required/>
-                            </label>
-                            <button type="submit">Register</button>
-                        </form>
+                <Navbar/>
+                <div className="login">
+                    <div className="login-container">
+                        {/* Register Form */}
+                        <div className="input-group">
+                            <form onSubmit={this.handleRegister}>
+                                <h2>Register</h2>
+                                <label>
+                                    Email Address *
+                                    <input type="email" value={this.state.registerEmail}
+                                           onChange={e => this.setState({registerEmail: e.target.value})} required/>
+                                </label>
+                                <label>
+                                    Password *
+                                    <input type="password" value={this.state.registerPassword}
+                                           onChange={e => this.setState({registerPassword: e.target.value})} required/>
+                                </label>
+                                <label>
+                                    Confirm Password *
+                                    <input type="password" value={this.state.confirmPassword}
+                                           onChange={e => this.setState({confirmPassword: e.target.value})} required/>
+                                </label>
+                                <button type="submit">Register</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
         );
     }
