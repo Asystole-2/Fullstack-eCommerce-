@@ -10,7 +10,9 @@ mongoose.connect(uri)
 
 const db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
-db.once('open', () => {console.log("connected to", db.client.s.url)})
+db.once('open', () => {
+    console.log("connected to", db.client.s.url)
+})
 
 
 async function connectDB() {

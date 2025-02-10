@@ -81,7 +81,7 @@ router.get("/instruments", async (req, res) => {
         res.json(instruments)
     } catch (error) {
         console.error("Error fetching instruments:", error)
-        res.status(500).json({ error: "Internal Server Error" })
+        res.status(500).json({error: "Internal Server Error"})
     }
 })
 
@@ -89,18 +89,17 @@ router.get("/instruments", async (req, res) => {
 router.get("/instruments/:id", async (req, res) => {
     try {
         const instrument = await Instruments.findById(req.params.id)
-        if (!instrument) return res.status(404).json({ error: "Instrument not found" })
+        if (!instrument) return res.status(404).json({error: "Instrument not found"})
         res.json(instrument)
     } catch (error) {
         console.error("Error fetching instrument:", error)
-        res.status(500).json({ error: "Internal Server Error" })
+        res.status(500).json({error: "Internal Server Error"})
     }
 })
 
 // Add new instrument
 router.post("/instruments", async (req, res) => {
-    Instruments.create(req.body, (error, data) =>
-    {
+    Instruments.create(req.body, (error, data) => {
         res.json(data)
     })
 })
@@ -111,13 +110,13 @@ router.put("/instruments/:id", async (req, res) => {
         const updatedInstrument = await Instruments.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true }
+            {new: true}
         )
-        if (!updatedInstrument) return res.status(404).json({ error: "Instrument not found" })
+        if (!updatedInstrument) return res.status(404).json({error: "Instrument not found"})
         res.json(updatedInstrument)
     } catch (error) {
         console.error("Error updating instrument:", error)
-        res.status(500).json({ error: "Internal Server Error" })
+        res.status(500).json({error: "Internal Server Error"})
     }
 })
 
@@ -125,11 +124,11 @@ router.put("/instruments/:id", async (req, res) => {
 router.delete("/instruments/:id", async (req, res) => {
     try {
         const deletedInstrument = await Instruments.findByIdAndDelete(req.params.id)
-        if (!deletedInstrument) return res.status(404).json({ error: "Instrument not found" })
-        res.json({ message: "Instrument deleted successfully" })
+        if (!deletedInstrument) return res.status(404).json({error: "Instrument not found"})
+        res.json({message: "Instrument deleted successfully"})
     } catch (error) {
         console.error("Error deleting instrument:", error)
-        res.status(500).json({ error: "Internal Server Error" })
+        res.status(500).json({error: "Internal Server Error"})
     }
 })
 

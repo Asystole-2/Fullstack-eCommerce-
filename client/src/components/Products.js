@@ -1,7 +1,7 @@
-import React, { Component } from "react"
+import React, {Component} from "react"
 import AddInstrument from "./AddInstrument"
 import Instrument from "./Instrument"
-import { SERVER_HOST } from "../config/global_constants"
+import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
 
 export default class Products extends Component {
@@ -18,7 +18,7 @@ export default class Products extends Component {
     }
 
     handleAddProduct = (newProduct) => {
-        this.setState({ products: [...this.state.products, newProduct] })
+        this.setState({products: [...this.state.products, newProduct]})
     }
 
     handleDeleteProduct = (id) => {
@@ -31,7 +31,7 @@ export default class Products extends Component {
         const updatedProducts = this.state.products.map((product) =>
             product._id === updatedProduct._id ? updatedProduct : product
         )
-        this.setState({ products: updatedProducts })
+        this.setState({products: updatedProducts})
     }
 
     componentDidMount() {
@@ -39,7 +39,7 @@ export default class Products extends Component {
             .then(res => {
                 if (res.data) {
                     console.table(res.data)
-                    this.setState({ products: res.data })
+                    this.setState({products: res.data})
                 } else {
                     console.log("Record not found")
                 }
@@ -49,7 +49,7 @@ export default class Products extends Component {
     render() {
         return (
             <div className="product-list">
-                <AddInstrument onAddProduct={this.handleAddProduct} />
+                <AddInstrument onAddProduct={this.handleAddProduct}/>
                 <div className="grid">
                     {this.state.products.map((product) => (
                         <Instrument

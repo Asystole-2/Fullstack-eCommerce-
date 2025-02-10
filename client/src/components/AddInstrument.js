@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import {Redirect }from "react-router-dom"
+import {Redirect} from "react-router-dom"
 import axios from "axios"
 import {SERVER_HOST} from "../config/global_constants"
 
@@ -58,51 +58,51 @@ export default class AddInstrument extends Component {
 
     render() {
 
-            if (this.state.redirectToDisplayAllInstruments) {
-                return <Redirect to="/instruments"/>
-            }
-            return (
-                <div className="form-container">
-                    <form onSubmit={this.handleSubmit}>
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Name"
-                            value={this.state.name}
-                            onChange={this.handleChange}
-                        />
-                        <input
-                            type="text"
-                            name="price"
-                            placeholder="Price"
-                            value={this.state.price}
-                            onChange={this.handleChange}
-                        />
-                        <input
-                            type="text"
-                            name="description"
-                            placeholder="Description"
-                            value={this.state.description}
-                            onChange={this.handleChange}
-                        />
-                        <input
-                            type="text"
-                            name="stock"
-                            placeholder="Stock"
-                            value={this.state.stock}
-                            onChange={this.handleChange}
-                        />
-                        <input
-                            type="text"
-                            name="image"
-                            placeholder="Image URL"
-                            value={this.state.image}
-                            onChange={this.handleChange}
-                        />
-                        <button type="submit">Add Instrument</button>
-                    </form>
-                </div>
-            )
+        if (this.state.redirectToDisplayAllInstruments) {
+            return <Redirect to="/instruments"/>
         }
+        return (
+            <div className="form-container">
+                <form onSubmit={this.handleSubmit}>
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Name"
+                        value={this.state.name}
+                        onChange={this.handleChange}
+                    />
+                    <input
+                        type="text"
+                        name="price"
+                        placeholder="Price"
+                        value={this.state.price}
+                        onChange={this.handleChange}
+                    />
+                    <input
+                        type="text"
+                        name="description"
+                        placeholder="Description"
+                        value={this.state.description}
+                        onChange={this.handleChange}
+                    />
+                    <input
+                        type="text"
+                        name="stock"
+                        placeholder="Stock"
+                        value={this.state.stock}
+                        onChange={this.handleChange}
+                    />
+                    <input
+                        type="text"
+                        name="image"
+                        placeholder="Image URL"
+                        value={this.state.image}
+                        onChange={this.handleChange}
+                    />
+                    <button type="submit">Add Instrument</button>
+                </form>
+            </div>
+        )
     }
+}
 
