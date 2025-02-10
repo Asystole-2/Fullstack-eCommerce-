@@ -1,5 +1,6 @@
 import React, {Component} from "react"
 import Navbar from "./Navbar";
+import axios from "axios";
 import {Link} from "react-router-dom";
 
 class Login extends Component {
@@ -8,17 +9,22 @@ class Login extends Component {
         this.state = {
             loginEmail: '',
             loginPassword: '',
-            registerEmail: '',
-            registerPassword: '',
-            confirmPassword: '',
             role: 'user',
         }
     }
 
-    handleLogin = (e) => {
+    handleLogin = async (e) => {
         e.preventDefault()
         console.log('Login with:', this.state.loginEmail, this.state.loginPassword)
         // Add login logic here
+        try {
+            const res = await axios.post('http://localhost:3000/login', this.state.loginEmail, this.state.loginPassword)
+            localStorage.setItem('token', res.data.token)
+            this.setState({role: res.data.role})
+            alert('Login successfully')
+        } catch (error) {
+            alert('Login failed.')
+        }
     }
 
     handleRoleChange = e => {
