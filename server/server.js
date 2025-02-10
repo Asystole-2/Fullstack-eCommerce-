@@ -98,6 +98,6 @@ app.post('/Login', async (req, res) => {
 })
 
 app.get('/Admin', verifyToken, (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({error: 'Access Denied'})
+    if (req.user.role !== 'admin@gmail.com') return res.status(403).json({error: 'Access Denied'})
     res.json({message: 'Welcome Admin!'});
 })
