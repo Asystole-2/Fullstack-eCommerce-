@@ -19,6 +19,9 @@ export default class Instrument extends Component {
                 <button onClick={() => onUpdate({...product, stock: product.stock - 1})}>
                     Decrease Stock
                 </button>
+                <button onClick={() => onUpdate({...product, stock: product.stock + 1})}>
+                    Increase Stock
+                </button>
                 <button onClick={this.handleDeleteClick}>Delete</button>
             </div>
         )
