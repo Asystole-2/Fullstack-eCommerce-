@@ -1,7 +1,8 @@
 import React, {Component} from "react"
-import {Redirect} from "react-router-dom"
+import {Redirect, Link} from "react-router-dom"
 import axios from "axios"
 import {SERVER_HOST} from "../config/global_constants"
+import LinkInClass from "./LinkInClass";
 
 export default class AddInstrument extends Component {
     constructor(props) {
@@ -17,6 +18,10 @@ export default class AddInstrument extends Component {
         }
 
     }
+
+    // componentDidMount() {
+    //     this.inputToFocus.focus()
+    // }
 
     handleChange = (e) => {
         this.setState({[e.target.name]: e.target.value})
@@ -39,13 +44,6 @@ export default class AddInstrument extends Component {
                         console.log(res.data.errorMessage)
                     } else {
                         console.log("Record added")
-                        this.setState({
-                            name: "",
-                            price: "",
-                            stock: "",
-                            description: "",
-                            image: "",
-                        })
                         this.setState({redirectToDisplayAllInstruments: true})
                     }
                 } else {
@@ -57,13 +55,11 @@ export default class AddInstrument extends Component {
     }
 
     render() {
-
-        if (this.state.redirectToDisplayAllInstruments) {
-            return <Redirect to="/instruments"/>
-        }
         return (
             <div className="form-container">
-                <form onSubmit={this.handleSubmit}>
+                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments" /> : null}
+
+                <form>
                     <input
                         type="text"
                         name="name"
@@ -99,7 +95,10 @@ export default class AddInstrument extends Component {
                         value={this.state.image}
                         onChange={this.handleChange}
                     />
-                    <button type="submit">Add Instrument</button>
+
+                    <LinkInClass value="Add" className="green-button" onClick={this.handleSubmit}/>
+
+                    <Link className="red-button" to={"/MainPage"}>Cancel</Link>
                 </form>
             </div>
         )
