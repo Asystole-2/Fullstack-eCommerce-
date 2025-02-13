@@ -23,6 +23,7 @@ export default class Instrument extends Component {
                     Increase Stock
                 </button>
                 <button onClick={this.handleDeleteClick}>Delete</button>
+                <button onClick={this.handleDeleteClick}>Edit</button>
             </div>
         )
     }
