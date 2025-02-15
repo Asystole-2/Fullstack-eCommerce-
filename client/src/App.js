@@ -18,7 +18,7 @@ export default class App extends Component {
                         <Route exact path="/Login" component={Login}/>
                         <Route exact path="/Register" component={Register}/>
                         <Route exact path="/AddInstrument" component={AddInstrument}/>
-                        <Route exact path="/EditInstrument" component={EditInstrument}/>
+                        <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
                         <Route component={MainPage}/>
                     </Switch>
                 </div>
