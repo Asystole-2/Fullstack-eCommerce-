@@ -11,11 +11,11 @@ export default class EditInstrument extends Component {
         super(props)
 
         this.state = {
-            name: "",
-            price: "",
-            stock: "",
-            description: "",
-            image: "",
+            name: ``,
+            price: ``,
+            stock: ``,
+            description: ``,
+            image: ``,
             redirectToDisplayAllInstruments: false
         }
     }
@@ -30,11 +30,11 @@ export default class EditInstrument extends Component {
                     console.log(res.data.errorMessage)
                 }else{
                     this.setState({
-                        name: res.data.name,
-                        price: res.data.price,
-                        stock: res.data.stock,
-                        description: res.data.description,
-                        image: res.data.image,
+                        name: res.data.name || ``,
+                        price: res.data.price || ``,
+                        stock: res.data.stock || ``,
+                        description: res.data.description || ``,
+                        image: res.data.image || ``,
                     })
                 }
             }else {
