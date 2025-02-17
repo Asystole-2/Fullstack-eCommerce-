@@ -25,6 +25,8 @@ app.use(cors({ origin: "http://localhost:3000" }));
 
 // Routers
 app.use(require(`./routes/products`))
+app.use(require(`./routes/users`))
+
 
 
 // Port
