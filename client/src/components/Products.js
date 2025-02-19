@@ -9,7 +9,8 @@ export default class Products extends Component {
         super(props)
 
         this.state = {
-            products: []
+            products: [],
+            searchTerm: '',
         }
 
         this.handleAddProduct = this.handleAddProduct.bind(this)
@@ -47,18 +48,54 @@ export default class Products extends Component {
     }
 
     render() {
+
+        const {searchTerm, products} = this.state
+
+        const filteredProducts = products.filter(product => {
+            return (
+                (product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    product.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    product.price?.toString().includes(searchTerm) ||
+                    product.rating?.toString().includes(searchTerm) ||
+                    product.reviews?.toString().includes(searchTerm)
+                )
+            )
+        })
         return (
             <div className="product-list">
+                <div className="searchBar">
+                    <input
+                        type="text"
+                        placeholder="Search product name, price or description"
+                        value={searchTerm}
+                        onChange={e => this.setState({searchTerm: e.target.value})}
+                    />
+                </div>
                 <AddInstrument onAddProduct={this.handleAddProduct}/>
+                {/*<div className="grid">*/}
+                {/*    {this.state.products.map((product) => (*/}
+                {/*        <Instrument*/}
+                {/*            key={product._id}*/}
+                {/*            product={product}*/}
+                {/*            onDelete={this.handleDeleteProduct}*/}
+                {/*            onUpdate={this.handleUpdateProduct}*/}
+                {/*        />*/}
+                {/*    ))}*/}
+                {/*</div>*/}
                 <div className="grid">
-                    {this.state.products.map((product) => (
-                        <Instrument
-                            key={product._id}
-                            product={product}
-                            onDelete={this.handleDeleteProduct}
-                            onUpdate={this.handleUpdateProduct}
-                        />
-                    ))}
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map((product) => (
+                            <Instrument
+                                key={product._id}
+                                product={product}
+                                onDelete={this.handleDeleteProduct}
+                                onUpdate={this.handleUpdateProduct}
+                            />
+                        ))
+                    ) : (
+                        <p>No products found.</p>
+                    )}
                 </div>
             </div>
         )

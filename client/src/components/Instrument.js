@@ -12,7 +12,10 @@ export default class Instrument extends Component {
             <div className="product-card">
                 <img src={product.image} alt={product.name}/>
                 <h2>{product.name}</h2>
+                <p>Brand: {product.brand}</p>
                 <p>{product.description}</p>
+                <p>Rating: {product.rating}</p>
+                <p>Reviews: {product.reviews}</p>
                 <p>Price: ${product.price.toFixed(2)}</p>
                 <p>Stock: {product.stock}</p>
 
