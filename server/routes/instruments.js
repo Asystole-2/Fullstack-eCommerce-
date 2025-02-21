@@ -72,7 +72,7 @@
 // module.exports = router
 const express = require("express")
 const router = express.Router()
-const Instruments = require("../models/Instruments")
+const Instruments = require("../models/instruments"); // Import the Product model
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
@@ -97,11 +97,15 @@ router.get("/instruments/:id", async (req, res) => {
     }
 })
 
-// Add new instrument
+// ✅ Add new record
 router.post("/instruments", async (req, res) => {
-    Instruments.create(req.body, (error, data) => {
-        res.json(data)
-    })
+    try {
+        const newInstrument = await Instruments.create(req.body)
+        res.status(201).json(newInstrument)
+    }catch (error) {
+        console.error("Error adding instrument:", error)
+        res.status(500).json({error: "Internal Server Error"})
+    }
 })
 
 // Update instrument

@@ -3,6 +3,7 @@ import AddInstrument from "./AddInstrument"
 import Instrument from "./Instrument"
 import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
+import {Link} from "react-router-dom";
 
 export default class Products extends Component {
     constructor(props) {
@@ -49,7 +50,9 @@ export default class Products extends Component {
     render() {
         return (
             <div className="product-list">
-                <AddInstrument onAddProduct={this.handleAddProduct}/>
+                <div className="add-new-product">
+                    <Link className="blue-button" to={"/AddInstrument"}>Add New Instrument</Link>
+                </div>
                 <div className="grid">
                     {this.state.products.map((product) => (
                         <Instrument

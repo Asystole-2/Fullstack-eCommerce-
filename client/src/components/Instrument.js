@@ -1,4 +1,5 @@
 import React, {Component} from "react"
+import {Link} from "react-router-dom";
 
 export default class Instrument extends Component {
     handleDeleteClick = () => {
@@ -23,6 +24,7 @@ export default class Instrument extends Component {
                     Increase Stock
                 </button>
                 <button onClick={this.handleDeleteClick}>Delete</button>
+                <Link to={"/EditInstrument/" + product._id}>Edit</Link>
             </div>
         )
     }

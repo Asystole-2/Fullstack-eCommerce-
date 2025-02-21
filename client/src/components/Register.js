@@ -24,8 +24,8 @@ class Register extends React.Component {
         return (
             <div>
                 <Navbar/>
-                <div className="login">
-                    <div className="login-container">
+                <div className="register">
+                    <div className="register-container">
                         {/* Register Form */}
                         <div className="input-group">
                             <form onSubmit={this.handleRegister}>

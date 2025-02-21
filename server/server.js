@@ -28,7 +28,7 @@ app.use(require(`body-parser`).json())
 
 
 // Routers
-app.use(require(`./routes/products`))
+app.use(require(`./routes/instruments`))
 
 
 // Port
