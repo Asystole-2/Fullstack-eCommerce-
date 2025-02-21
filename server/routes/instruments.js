@@ -102,7 +102,7 @@ router.post("/instruments", async (req, res) => {
     try {
         const newInstrument = await Instruments.create(req.body)
         res.status(201).json(newInstrument)
-    }catch (error) {
+    } catch (error) {
         console.error("Error adding instrument:", error)
         res.status(500).json({error: "Internal Server Error"})
     }

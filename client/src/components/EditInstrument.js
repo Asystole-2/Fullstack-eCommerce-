@@ -1,5 +1,5 @@
-import React, { Component } from "react"
-import { Redirect, Link } from "react-router-dom"
+import React, {Component} from "react"
+import {Redirect, Link} from "react-router-dom"
 import axios from "axios"
 
 import LinkInClass from "../components/LinkInClass"
@@ -24,23 +24,23 @@ export default class EditInstrument extends Component {
         // this.inputToFocus.focus()
 
         axios.get(`${SERVER_HOST}/instruments/${this.props.match.params.id}`)
-        .then(res => {
-            if(res.data){
-                if(res.data.errorMessage){
-                    console.log(res.data.errorMessage)
-                }else{
-                    this.setState({
-                        name: res.data.name || ``,
-                        price: res.data.price || ``,
-                        stock: res.data.stock || ``,
-                        description: res.data.description || ``,
-                        image: res.data.image || ``,
-                    })
+            .then(res => {
+                if (res.data) {
+                    if (res.data.errorMessage) {
+                        console.log(res.data.errorMessage)
+                    } else {
+                        this.setState({
+                            name: res.data.name || ``,
+                            price: res.data.price || ``,
+                            stock: res.data.stock || ``,
+                            description: res.data.description || ``,
+                            image: res.data.image || ``,
+                        })
+                    }
+                } else {
+                    console.log("Record not found")
                 }
-            }else {
-                console.log("Record not found")
-            }
-        })
+            })
     }
 
     handleChange = (e) => {
@@ -60,14 +60,14 @@ export default class EditInstrument extends Component {
 
         axios.put(`${SERVER_HOST}/instruments/${this.props.match.params.id}`, instrumentObject)
             .then(res => {
-                if(res.data){
-                    if (res.data.errorMessage){
+                if (res.data) {
+                    if (res.data.errorMessage) {
                         console.log(res.data.errorMessage)
-                    }else{
+                    } else {
                         console.log("Record updated")
                         this.setState({redirectToDisplayAllInstruments: true})
                     }
-                }else {
+                } else {
                     console.log("Record not updated")
                 }
             })
@@ -77,7 +77,7 @@ export default class EditInstrument extends Component {
         return (
             <div className="form-container">
 
-                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments" /> : null}
+                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments"/> : null}
 
                 <form>
                     <label>Name</label>

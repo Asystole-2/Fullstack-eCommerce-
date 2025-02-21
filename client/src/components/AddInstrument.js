@@ -57,7 +57,7 @@ export default class AddInstrument extends Component {
     render() {
         return (
             <div className="form-container">
-                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments" /> : null}
+                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments"/> : null}
 
                 <form>
                     <input
