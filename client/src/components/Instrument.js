@@ -9,12 +9,13 @@ export default class Instrument extends Component {
 
     render() {
         const {product, onUpdate} = this.props
+        const value = product.price || 0
         return (
             <div className="product-card">
                 <img src={product.image} alt={product.name}/>
                 <h2>{product.name}</h2>
                 <p>{product.description}</p>
-                <p>Price: ${product.price.toFixed(2)}</p>
+                <p>Price: ${value.toFixed(2)}</p>
                 <p>Stock: {product.stock}</p>
 
                 <button onClick={() => onUpdate({...product, stock: product.stock - 1})}>
