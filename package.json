@@ -10,7 +10,8 @@
   "dependencies": {
     "async": "^3.2.6",
     "jsonwebtoken": "^9.0.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "mongoose": "^8.10.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
