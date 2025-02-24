@@ -10,11 +10,11 @@ export default class Products extends Component {
         super(props)
 
         this.state = {
-            products: []
+            products: [],
         }
 
         this.handleAddProduct = this.handleAddProduct.bind(this)
-        this.handleDeleteProduct = this.handleDeleteProduct.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
         this.handleUpdateProduct = this.handleUpdateProduct.bind(this)
     }
 
@@ -22,11 +22,29 @@ export default class Products extends Component {
         this.setState({products: [...this.state.products, newProduct]})
     }
 
-    handleDeleteProduct = (id) => {
-        this.setState({
-            products: this.state.products.filter((product) => product._id !== id)
-        })
-    }
+    // Handle DELETE request
+    handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this instrument?")) return;
+
+        try {
+            const response = await fetch(`${SERVER_HOST}/api/instruments/${id}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                alert("Instrument deleted successfully!");
+                if (this.state.products) {
+                    this.setState({
+                        products: this.state.products.filter(item => item._id !== id)
+                    });
+                }
+            } else {
+                alert("Error deleting instrument");
+            }
+        } catch (error) {
+            console.error("Error deleting instrument:", error);
+        }
+    };
 
     handleUpdateProduct = (updatedProduct) => {
         const updatedProducts = this.state.products.map((product) =>
@@ -58,7 +76,7 @@ export default class Products extends Component {
                         <Instrument
                             key={product._id}
                             product={product}
-                            onDelete={this.handleDeleteProduct}
+                            onDelete={this.handleDelete}
                             onUpdate={this.handleUpdateProduct}
                         />
                     ))}

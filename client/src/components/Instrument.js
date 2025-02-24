@@ -8,7 +8,7 @@ export default class Instrument extends Component {
     }
 
     render() {
-        const {product, onUpdate} = this.props
+        const {product, onUpdate, onDelete} = this.props
         const value = product.price || 0
         return (
             <div className="product-card">
@@ -24,7 +24,7 @@ export default class Instrument extends Component {
                 <button onClick={() => onUpdate({...product, stock: product.stock + 1})}>
                     Increase Stock
                 </button>
-                <button onClick={this.handleDeleteClick}>Delete</button>
+                <button onClick={() => onDelete(product._id)}>Delete</button>
                 <Link to={"/EditInstrument/" + product._id}>Edit</Link>
             </div>
         )
