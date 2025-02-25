@@ -18,7 +18,7 @@ export default class Instrument extends Component {
                 <p>{product.description}</p>
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
-                <p>Price: ${product.price.toFixed(2)}</p>
+                {/*<p>Price: ${product.price.toFixed(2)}</p>*/}
                 <p>Price: ${value.toFixed(2)}</p>
                 <p>Stock: {product.stock}</p>
 
