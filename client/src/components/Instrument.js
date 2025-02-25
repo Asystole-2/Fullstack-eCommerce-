@@ -25,7 +25,9 @@ export default class Instrument extends Component {
                     Increase Stock
                 </button>
                 <button onClick={() => onDelete(product._id)}>Delete</button>
+                <button>
                 <Link to={"/EditInstrument/" + product._id}>Edit</Link>
+                </button>
             </div>
         )
     }
