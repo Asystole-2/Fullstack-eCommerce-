@@ -72,6 +72,6 @@ router.delete("/api/instruments/:id", async (req, res) => {
         console.error("Server error:", error);
         res.status(500).json({ message: "Server error", error });
     }
-});
+});s
 
 module.exports = router
