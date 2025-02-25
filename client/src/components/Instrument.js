@@ -2,10 +2,6 @@ import React, {Component} from "react"
 import {Link} from "react-router-dom";
 
 export default class Instrument extends Component {
-    handleDeleteClick = () => {
-        const {product, onDelete} = this.props
-        onDelete(product._id)
-    }
 
     render() {
         const {product, onUpdate, onDelete} = this.props
