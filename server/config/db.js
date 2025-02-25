@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const uri = 'mongodb://localhost/fullStack_ecommerce';
+const uri = 'mongodb://localhost/fullstack_ecommerce';
 
 mongoose.connect(uri)
     .then(() => console.log('Connected to MongoDB'))

@@ -1,5 +1,6 @@
 import React, {Component} from "react"
 import {Link} from "react-router-dom";
+import {ACCESS_LEVEL_ADMIN} from "../config/global_constants";
 
 export default class Instrument extends Component {
     handleDeleteClick = () => {
@@ -14,7 +15,11 @@ export default class Instrument extends Component {
             <div className="product-card">
                 <img src={product.image} alt={product.name}/>
                 <h2>{product.name}</h2>
+                <p>Brand: {product.brand}</p>
                 <p>{product.description}</p>
+                <p>Rating: {product.rating}</p>
+                <p>Reviews: {product.reviews}</p>
+                <p>Price: ${product.price.toFixed(2)}</p>
                 <p>Price: ${value.toFixed(2)}</p>
                 <p>Stock: {product.stock}</p>
 
@@ -25,7 +30,7 @@ export default class Instrument extends Component {
                     Increase Stock
                 </button>
                 <button onClick={this.handleDeleteClick}>Delete</button>
-                <Link to={"/EditInstrument/" + product._id}>Edit</Link>
+                {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <Link to={"/EditInstrument/" + product._id}>Edit</Link> : null}
             </div>
         )
     }
