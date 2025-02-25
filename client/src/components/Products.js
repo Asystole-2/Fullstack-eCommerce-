@@ -7,6 +7,7 @@ import SortProducts from "./SortProducts"
 
 import { SERVER_HOST } from "../config/global_constants"
 import axios from "axios"
+import {Link} from "react-router-dom";
 
 export default class Products extends Component {
     constructor(props) {
@@ -33,7 +34,7 @@ export default class Products extends Component {
     }
 
     handleAddProduct(newProduct) {
-        this.setState({ products: [...this.state.products, newProduct] })
+        this.setState({products: [...this.state.products, newProduct]})
     }
 
     handleDeleteProduct(id) {
@@ -46,7 +47,7 @@ export default class Products extends Component {
         const updatedProducts = this.state.products.map((product) =>
             product._id === updatedProduct._id ? updatedProduct : product
         )
-        this.setState({ products: updatedProducts })
+        this.setState({products: updatedProducts})
     }
 
     componentDidMount() {
@@ -72,19 +73,19 @@ export default class Products extends Component {
     }
 
     handleCategoryChange(e) {
-        this.setState({ selectedCategory: e.target.value })
+        this.setState({selectedCategory: e.target.value})
     }
 
     handleBrandChange(e) {
-        this.setState({ selectedBrand: e.target.value })
+        this.setState({selectedBrand: e.target.value})
     }
 
     handleSortChange(order) {
-        this.setState({ sortOrder: order })
+        this.setState({sortOrder: order})
     }
 
     render() {
-        const { searchTerm, products, selectedBrand, selectedCategory, sortOrder  } = this.state
+        const {searchTerm, products, selectedBrand, selectedCategory, sortOrder} = this.state
 
         var filteredProducts = products.filter(product => {
             return (
@@ -123,20 +124,22 @@ export default class Products extends Component {
                         type="text"
                         placeholder="Search product name, price or description"
                         value={searchTerm}
-                        onChange={e => this.setState({ searchTerm: e.target.value })}
+                        onChange={e => this.setState({searchTerm: e.target.value})}
                     />
                 </div>
 
-                <CategoryDropDown categories={this.state.categories} handleCategoryChange={this.handleCategoryChange} />
-                <BrandDropDown brands={this.state.brands} handleBrandChange={this.handleBrandChange} />
+                <CategoryDropDown categories={this.state.categories} handleCategoryChange={this.handleCategoryChange}/>
+                <BrandDropDown brands={this.state.brands} handleBrandChange={this.handleBrandChange}/>
 
-                <AddInstrument onAddProduct={this.handleAddProduct} />
+                <div className="add-new-product">
+                    <Link className="blue-button" to={"/AddInstrument"}>Add New Instrument</Link>
+                </div>
                 <div>
-                    <SortProducts sortOrder={this.state.sortOrder} handleSortChange={this.handleSortChange} />
+                    <SortProducts sortOrder={this.state.sortOrder} handleSortChange={this.handleSortChange}/>
                     <div className="grid">
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map(product => (
-                                <Instrument key={product._id} product={product} />
+                                <Instrument key={product._id} product={product}/>
                             ))
                         ) : (
                             <p>No products found.</p>
@@ -144,6 +147,8 @@ export default class Products extends Component {
                     </div>
                 </div>
             </div>
+
         )
     }
+
 }

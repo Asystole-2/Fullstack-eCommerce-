@@ -1,4 +1,5 @@
 import React, {Component} from "react"
+import {Link} from "react-router-dom";
 
 export default class Instrument extends Component {
     handleDeleteClick = () => {
@@ -8,6 +9,7 @@ export default class Instrument extends Component {
 
     render() {
         const {product, onUpdate} = this.props
+        const value = product.price || 0
         return (
             <div className="product-card">
                 <img src={product.image} alt={product.name}/>
@@ -17,6 +19,7 @@ export default class Instrument extends Component {
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
                 <p>Price: ${product.price.toFixed(2)}</p>
+                <p>Price: ${value.toFixed(2)}</p>
                 <p>Stock: {product.stock}</p>
 
                 <button onClick={() => onUpdate({...product, stock: product.stock - 1})}>
@@ -26,6 +29,7 @@ export default class Instrument extends Component {
                     Increase Stock
                 </button>
                 <button onClick={this.handleDeleteClick}>Delete</button>
+                <Link to={"/EditInstrument/" + product._id}>Edit</Link>
             </div>
         )
     }
