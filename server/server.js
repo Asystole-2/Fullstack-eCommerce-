@@ -8,7 +8,7 @@ const cors = require('cors')
 const bcrypt = require('bcrypt')
 
 // jsonwebtoken
-const jwt = require('jsonwebtoken')
+// const jwt = require('jsonwebtoken')
 
 // Express
 const express = require(`express`)
