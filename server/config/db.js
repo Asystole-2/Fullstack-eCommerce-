@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const uri = 'mongodb://localhost/fullStack_ecommerce';
+const uri = 'mongodb://localhost/fullstack_ecommerce';
 
 mongoose.connect(uri)
     .then(() => console.log('Connected to MongoDB'))
@@ -11,7 +11,6 @@ db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', () => {
     console.log("connected to", db.client.s.url)
 })
-
 
 async function connectDB() {
     try {
