@@ -1,5 +1,4 @@
 import React, {Component} from "react"
-import AddInstrument from "./AddInstrument"
 import Instrument from "./Instrument"
 import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
@@ -17,15 +16,18 @@ export default class Products extends Component {
             products: [],
             searchTerm: '',
             brands: [],
-            selectedBrand: 'All',
+            selectedBrand: 'All Brands',
             categories: [],
-            selectedCategory: 'All',
-            sortOrder: 'default',
+            selectedCategory: 'All Categories',
+            sortOrder: 'nameAZ',
         }
 
         this.handleAddProduct = this.handleAddProduct.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
         this.updateStock = this.updateStock.bind(this)
+        this.handleCategoryChange = this.handleCategoryChange.bind(this)
+        this.handleBrandChange = this.handleBrandChange.bind(this)
+        this.handleSortChange = this.handleSortChange.bind(this)
     }
 
     handleAddProduct = (newProduct) => {
@@ -80,8 +82,8 @@ export default class Products extends Component {
                     console.table(res.data)
 
                     this.originalProducts = res.data
-                    const categories = ["All", ...new Set(res.data.map(item => item.category).filter(Boolean))]
-                    const brands = ["All", ...new Set(res.data.map(item => item.brand).filter(Boolean))]
+                    const categories = ["All Categories", ...new Set(res.data.map(item => item.category).filter(Boolean))]
+                    const brands = ["All Brands", ...new Set(res.data.map(item => item.brand).filter(Boolean))]
 
                     this.setState({
                         products: res.data,
@@ -110,7 +112,7 @@ export default class Products extends Component {
     render() {
         const {searchTerm, products, selectedBrand, selectedCategory, sortOrder} = this.state
 
-        var filteredProducts = products.filter(product => {
+        let filteredProducts = this.state.products.filter(product => {
             return (
                 (searchTerm === '' ||
                     product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,8 +121,8 @@ export default class Products extends Component {
                     product.price?.toString().includes(searchTerm) ||
                     product.rating?.toString().includes(searchTerm) ||
                     product.reviews?.toString().includes(searchTerm)) &&
-                (selectedCategory === "All" || product.category?.toLowerCase() === selectedCategory.toLowerCase()) &&
-                (selectedBrand === "All" || product.brand?.toLowerCase() === selectedBrand.toLowerCase())
+                (selectedCategory === "All Categories" || product.category?.toLowerCase() === selectedCategory.toLowerCase()) &&
+                (selectedBrand === "All Brands" || product.brand?.toLowerCase() === selectedBrand.toLowerCase())
             )
         })
 
@@ -151,8 +153,8 @@ export default class Products extends Component {
                     />
                 </div>
 
-                <CategoryDropDown categories={this.state.categories} handleCategoryChange={this.handleCategoryChange}/>
-                <BrandDropDown brands={this.state.brands} handleBrandChange={this.handleBrandChange}/>
+                <CategoryDropDown categories={this.state.categories} handleCategoryChange={this.handleCategoryChange} selectedCategory={this.state.selectedCategory}  />
+                <BrandDropDown brands={this.state.brands} handleBrandChange={this.handleBrandChange} selectedBrand={this.state.selectedBrand}  />
 
                 <div className="add-new-product">
                     <Link className="blue-button" to={"/AddInstrument"}>Add New Instrument</Link>
@@ -179,3 +181,6 @@ export default class Products extends Component {
         )
     }
 }
+
+
+
