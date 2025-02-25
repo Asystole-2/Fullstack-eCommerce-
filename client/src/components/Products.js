@@ -137,7 +137,7 @@ export default class Products extends Component {
         } else if (sortOrder === "reviewsLowToHigh") {
             filteredProducts.sort((a, b) => a.reviews - b.reviews)
         } else if (sortOrder === "default") {
-            filteredProducts = [...this.originalProducts]; // Reset to original order
+            // filteredProducts = [...this.originalProducts]; // Reset to original order
         }
 
         return (
