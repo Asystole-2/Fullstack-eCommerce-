@@ -1,4 +1,4 @@
-import React, { Component, createContext} from "react";
+import React, {Component, createContext} from "react";
 
 // Create Context
 const SearchContext = createContext()
@@ -18,8 +18,8 @@ export class SearchProvider extends Component {
         return (
             <SearchContext.Provider
                 value={{
-                searchQuery: this.state.searchQuery,
-                setSearchQuery: this.setSearchQuery,
+                    searchQuery: this.state.searchQuery,
+                    setSearchQuery: this.setSearchQuery,
                 }}
             >
                 {this.props.children}

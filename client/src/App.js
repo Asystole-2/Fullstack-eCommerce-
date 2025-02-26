@@ -7,7 +7,7 @@ import AddInstrument from "./components/AddInstrument";
 import Admin from "./components/Admin";
 import "./css/App.css";
 import EditInstrument from "./components/EditInstrument";
-import { SearchProvider } from "./components/SearchContext";
+import {SearchProvider} from "./components/SearchContext";
 import Products from "./components/Products";
 import Navbar from "./components/Navbar";
 
@@ -15,19 +15,19 @@ export default class App extends Component {
     render() {
         return (
             <SearchProvider>
-            <BrowserRouter>
-                <div>
-                    <Switch>
-                        <Route exact path="/MainPage" component={MainPage}/>
-                        <Route exact path="/Login" component={Login}/>
-                        <Route exact path="/Register" component={Register}/>
-                        <Route exact path="/AddInstrument" component={AddInstrument}/>
-                        <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
-                        <Route component={MainPage}/>
-                    </Switch>
-                </div>
-            </BrowserRouter>
-    </SearchProvider>
+                <BrowserRouter>
+                    <div>
+                        <Switch>
+                            <Route exact path="/MainPage" component={MainPage}/>
+                            <Route exact path="/Login" component={Login}/>
+                            <Route exact path="/Register" component={Register}/>
+                            <Route exact path="/AddInstrument" component={AddInstrument}/>
+                            <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
+                            <Route component={MainPage}/>
+                        </Switch>
+                    </div>
+                </BrowserRouter>
+            </SearchProvider>
         );
     }
 }

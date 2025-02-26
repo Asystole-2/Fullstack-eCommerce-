@@ -10,38 +10,30 @@ class Register extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name:"",
-            email:"",
-            password:"",
-            confirmPassword:"",
-            isRegistered:false
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            isRegistered: false
         }
     }
-    handleChange = (e) =>
-    {
+
+    handleChange = (e) => {
         this.setState({[e.target.name]: e.target.value})
     }
-    handleSubmit =(e)=>
-    {
+    handleSubmit = (e) => {
         e.preventDefault();
         axios.post(`${SERVER_HOST}/users/register/${this.state.name}/${this.state.email}/${this.state.password}`)
 
-            .then(res =>
-            {
-                if(res.data)
-                {
-                    if (res.data.errorMessage)
-                    {
+            .then(res => {
+                if (res.data) {
+                    if (res.data.errorMessage) {
                         console.log(res.data.errorMessage)
-                    }
-                    else
-                    {
+                    } else {
                         console.log("Record added")
-                        this.setState({isRegistered:true})
+                        this.setState({isRegistered: true})
                     }
-                }
-                else
-                {
+                } else {
                     console.log("Record not added")
                 }
             })

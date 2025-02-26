@@ -1,4 +1,3 @@
-
 const express = require("express")
 const router = express.Router()
 const Instruments = require("../models/instruments"); // Import the Product model
@@ -63,14 +62,14 @@ router.delete("/api/instruments/:id", async (req, res) => {
 
         if (!deletedInstrument) {
             console.log("Instrument not found with ID:", req.params.id);
-            return res.status(404).json({ message: "Instrument not found" });
+            return res.status(404).json({message: "Instrument not found"});
         }
 
         console.log("Instrument deleted successfully:", deletedInstrument);
-        res.json({ message: "Instrument deleted successfully" });
+        res.json({message: "Instrument deleted successfully"});
     } catch (error) {
         console.error("Server error:", error);
-        res.status(500).json({ message: "Server error", error });
+        res.status(500).json({message: "Server error", error});
     }
 });
 
