@@ -1,3 +1,4 @@
+
 import React, {Component} from "react"
 import AddInstrument from "./AddInstrument"
 import Instrument from "./Instrument"
@@ -8,6 +9,7 @@ import {Link} from "react-router-dom";
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
+import SearchContext, { SearchProvider } from "./SearchContext";
 
 export default class Products extends Component {
     constructor(props) {
@@ -15,17 +17,20 @@ export default class Products extends Component {
 
         this.state = {
             products: [],
-            searchTerm: '',
             brands: [],
-            selectedBrand: 'All',
+            selectedBrand: 'All Brands',
             categories: [],
-            selectedCategory: 'All',
-            sortOrder: 'default',
+            selectedCategory: 'All Categories',
+            sortOrder: 'nameAZ',
         }
 
         this.handleAddProduct = this.handleAddProduct.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
         this.updateStock = this.updateStock.bind(this)
+        this.handleUpdateProduct = this.handleUpdateProduct.bind(this)
+        this.handleCategoryChange = this.handleCategoryChange.bind(this)
+        this.handleBrandChange = this.handleBrandChange.bind(this)
+        this.handleSortChange = this.handleSortChange.bind(this)
     }
 
     handleAddProduct = (newProduct) => {
@@ -71,6 +76,12 @@ export default class Products extends Component {
         } else {
             alert("Failed to update stock.");
         }
+      
+      handleUpdateProduct(updatedProduct) {
+        const updatedProducts = this.state.products.map((product) =>
+            product._id === updatedProduct._id ? updatedProduct : product
+        )
+        this.setState({ products: updatedProducts })
     }
 
     componentDidMount() {
@@ -80,8 +91,8 @@ export default class Products extends Component {
                     console.table(res.data)
 
                     this.originalProducts = res.data
-                    const categories = ["All", ...new Set(res.data.map(item => item.category).filter(Boolean))]
-                    const brands = ["All", ...new Set(res.data.map(item => item.brand).filter(Boolean))]
+                    const categories = ["All Categories", ...new Set(res.data.map(item => item.category).filter(Boolean))]
+                    const brands = ["All Brands", ...new Set(res.data.map(item => item.brand).filter(Boolean))]
 
                     this.setState({
                         products: res.data,
@@ -96,31 +107,34 @@ export default class Products extends Component {
     }
 
     handleCategoryChange(e) {
-        this.setState({selectedCategory: e.target.value})
+        this.setState({ selectedCategory: e.target.value })
     }
 
     handleBrandChange(e) {
-        this.setState({selectedBrand: e.target.value})
+        this.setState({ selectedBrand: e.target.value })
     }
 
     handleSortChange(order) {
-        this.setState({sortOrder: order})
+        this.setState({ sortOrder: order })
     }
 
-    render() {
-        const {searchTerm, products, selectedBrand, selectedCategory, sortOrder} = this.state
+    static contextType = SearchContext
 
-        var filteredProducts = products.filter(product => {
+    render() {
+        const { products, selectedBrand, selectedCategory, sortOrder  } = this.state
+        const { searchQuery } = this.context
+
+        let filteredProducts = products.filter(product => {
             return (
-                (searchTerm === '' ||
-                    product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    product.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    product.price?.toString().includes(searchTerm) ||
-                    product.rating?.toString().includes(searchTerm) ||
-                    product.reviews?.toString().includes(searchTerm)) &&
-                (selectedCategory === "All" || product.category?.toLowerCase() === selectedCategory.toLowerCase()) &&
-                (selectedBrand === "All" || product.brand?.toLowerCase() === selectedBrand.toLowerCase())
+                (searchQuery === '' ||
+                    product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.price?.toString().includes(searchQuery) ||
+                    product.rating?.toString().includes(searchQuery) ||
+                    product.reviews?.toString().includes(searchQuery)) &&
+                (selectedCategory === "All Categories" || product.category?.toLowerCase() === selectedCategory.toLowerCase()) &&
+                (selectedBrand === "All Brands" || product.brand?.toLowerCase() === selectedBrand.toLowerCase())
             )
         })
 
@@ -135,38 +149,34 @@ export default class Products extends Component {
         } else if (sortOrder === "reviewsHighToLow") {
             filteredProducts.sort((a, b) => b.reviews - a.reviews)
         } else if (sortOrder === "reviewsLowToHigh") {
-            filteredProducts.sort((a, b) => a.reviews - b.reviews)
-        } else if (sortOrder === "default") {
-            // filteredProducts = [...this.originalProducts]; // Reset to original order
-        }
+
+           filteredProducts.sort((a, b) => a.reviews - b.reviews)}
+        // } else if (sortOrder === "default") {
+        //     filteredProducts = [...products]; // Reset to original order
+        // }
 
         return (
             <div className="product-list">
-                <div className="searchBar">
-                    <input
-                        type="text"
-                        placeholder="Search product name, price or description"
-                        value={searchTerm}
-                        onChange={e => this.setState({searchTerm: e.target.value})}
-                    />
-                </div>
 
-                <CategoryDropDown categories={this.state.categories} handleCategoryChange={this.handleCategoryChange}/>
-                <BrandDropDown brands={this.state.brands} handleBrandChange={this.handleBrandChange}/>
+                <CategoryDropDown categories={this.state.categories} handleCategoryChange={this.handleCategoryChange} selectedCategory={this.state.selectedCategory}  />
+                <BrandDropDown brands={this.state.brands} handleBrandChange={this.handleBrandChange} selectedBrand={this.state.selectedBrand}  />
 
+                {/*<AddInstrument onAddProduct={this.handleAddProduct} />*/}
                 <div className="add-new-product">
                     <Link className="blue-button" to={"/AddInstrument"}>Add New Instrument</Link>
                 </div>
                 <div>
-                    <SortProducts sortOrder={this.state.sortOrder} handleSortChange={this.handleSortChange}/>
+                    <SortProducts sortOrder={this.state.sortOrder} handleSortChange={this.handleSortChange} />
                     <div className="grid">
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map(product => (
+
                                 <Instrument
                                     key={product._id}
                                     product={product}
                                     onDelete={this.handleDelete}
                                     onUpdate={this.updateStock}
+      onUpdate={this.handleUpdateProduct}/>
                                 />
                             ))
                         ) : (
@@ -175,7 +185,6 @@ export default class Products extends Component {
                     </div>
                 </div>
             </div>
-
         )
     }
 }
