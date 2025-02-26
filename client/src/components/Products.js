@@ -1,13 +1,15 @@
-import React, { Component } from "react"
+
+import React, {Component} from "react"
+import AddInstrument from "./AddInstrument"
 import Instrument from "./Instrument"
+import {SERVER_HOST} from "../config/global_constants"
+import axios from "axios"
+import {Link} from "react-router-dom";
+
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
 import SearchContext, { SearchProvider } from "./SearchContext";
-
-import { SERVER_HOST } from "../config/global_constants"
-import axios from "axios"
-import {Link} from "react-router-dom";
 
 export default class Products extends Component {
     constructor(props) {
@@ -23,29 +25,59 @@ export default class Products extends Component {
         }
 
         this.handleAddProduct = this.handleAddProduct.bind(this)
-        this.handleDeleteProduct = this.handleDeleteProduct.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
+        this.updateStock = this.updateStock.bind(this)
         this.handleUpdateProduct = this.handleUpdateProduct.bind(this)
         this.handleCategoryChange = this.handleCategoryChange.bind(this)
         this.handleBrandChange = this.handleBrandChange.bind(this)
         this.handleSortChange = this.handleSortChange.bind(this)
-
     }
 
-    handleAddProduct(newProduct) {
-        this.setState({ products: [...this.state.products, newProduct] })
+    handleAddProduct = (newProduct) => {
+        this.setState({products: [...this.state.products, newProduct]})
     }
 
-    handleDeleteProduct(id) {
-        this.setState(prevState => {
-            const updatedProducts = prevState.products.filter(product => product._id !== id)
-            return {
-                products: updatedProducts,
-                originalProducts: updatedProducts
+    // Handle DELETE request
+    handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this instrument?")) return;
+
+        try {
+            const response = await fetch(`${SERVER_HOST}/api/instruments/${id}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                alert("Instrument deleted successfully!");
+                if (this.state.products) {
+                    this.setState({
+                        products: this.state.products.filter(item => item._id !== id)
+                    });
+                }
+            } else {
+                alert("Error deleting instrument");
             }
-        })
-    }
+        } catch (error) {
+            console.error("Error deleting instrument:", error);
+        }
+    };
 
-    handleUpdateProduct(updatedProduct) {
+    async updateStock(productId, newStockLevel) {
+        const response = await fetch(`/api/update-stock`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({productId, stock: newStockLevel}),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert("Stock updated successfully!");
+        } else {
+            alert("Failed to update stock.");
+        }
+      
+      handleUpdateProduct(updatedProduct) {
         const updatedProducts = this.state.products.map((product) =>
             product._id === updatedProduct._id ? updatedProduct : product
         )
@@ -117,7 +149,8 @@ export default class Products extends Component {
         } else if (sortOrder === "reviewsHighToLow") {
             filteredProducts.sort((a, b) => b.reviews - a.reviews)
         } else if (sortOrder === "reviewsLowToHigh") {
-            filteredProducts.sort((a, b) => a.reviews - b.reviews)}
+
+           filteredProducts.sort((a, b) => a.reviews - b.reviews)}
         // } else if (sortOrder === "default") {
         //     filteredProducts = [...products]; // Reset to original order
         // }
@@ -137,9 +170,14 @@ export default class Products extends Component {
                     <div className="grid">
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map(product => (
-                                <Instrument key={product._id} product={product}
-                                            onDelete={this.handleDeleteProduct}
-                                            onUpdate={this.handleUpdateProduct}/>
+
+                                <Instrument
+                                    key={product._id}
+                                    product={product}
+                                    onDelete={this.handleDelete}
+                                    onUpdate={this.updateStock}
+      onUpdate={this.handleUpdateProduct}/>
+                                />
                             ))
                         ) : (
                             <p>No products found.</p>

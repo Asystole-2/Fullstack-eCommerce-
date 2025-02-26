@@ -12,7 +12,6 @@ db.once('open', () => {
     console.log("connected to", db.client.s.url)
 })
 
-
 async function connectDB() {
     try {
         await mongoose.connect(uri); // No need for useNewUrlParser or useUnifiedTopology

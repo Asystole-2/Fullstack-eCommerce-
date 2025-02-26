@@ -1,78 +1,8 @@
-// const router = require("express").Router()
-//
-// const Instruments = require('../models/Instruments')
-//
-// // Read all items from instruments JSON
-// router.get(`/instruments`, (req, res) => {
-//     Instruments.find({}, (err, data) => {
-//         res.json(data)
-//     })
-// })
-//
-// // Read one item from instruments JSON
-// router.get(`/instruments/:id`, (req, res) => {
-//     const selectedInstrument = instruments.find(
-//         (instrument) => instrument._id === parseInt(req.params.id)
-//     )
-//
-//     if (!selectedInstrument) {
-//         return res.status(404).json({ error: "Instrument not found" })
-//     }
-//
-//     res.json(selectedInstrument)
-// })
-//
-// // Add new item to instruments JSON
-// router.post(`/instruments`, (req, res) =>
-// {
-//   Instruments.create(req.body, (err, data) =>
-//   {
-//       res.json(data)
-//   })
-// })
-//
-// // Update one item in instruments JSON
-// router.put(`/instruments/:id`, (req, res) => {
-//     const updatedInstrument = req.body
-//     let found = false
-//
-//     instruments.map((instrument) => {
-//         if (instrument._id === req.params.id) {
-//             instrument.name = updatedInstrument.name
-//             instrument.price = updatedInstrument.price
-//             instrument.stock = updatedInstrument.stock
-//             instrument.description = updatedInstrument.description
-//             instrument.image = updatedInstrument.image
-//             found = true
-//         }
-//     })
-//
-//     if (!found) {
-//         return res.status(404).json({ error: "Instrument not found" })
-//     }
-//
-//     res.json(instruments)
-// })
-//
-// // Delete one item from instruments JSON
-// router.delete(`/instruments/:id`, (req, res) => {
-//     const instrumentIndex = instruments.findIndex(
-//         (instrument) => instrument._id === parseInt(req.params.id)
-//     )
-//
-//     if (instrumentIndex === -1) {
-//         return res.status(404).json({ error: "Instrument not found" })
-//     }
-//
-//     instruments.splice(instrumentIndex, 1)
-//
-//     res.json(instruments)
-// })
-//
-// module.exports = router
+
 const express = require("express")
 const router = express.Router()
 const Instruments = require("../models/instruments"); // Import the Product model
+console.log("Instrument model: ", Instruments)
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
@@ -125,15 +55,23 @@ router.put("/instruments/:id", async (req, res) => {
 })
 
 // Delete instrument
-router.delete("/instruments/:id", async (req, res) => {
+router.delete("/api/instruments/:id", async (req, res) => {
     try {
-        const deletedInstrument = await Instruments.findByIdAndDelete(req.params.id)
-        if (!deletedInstrument) return res.status(404).json({error: "Instrument not found"})
-        res.json({message: "Instrument deleted successfully"})
+        console.log("Attempting to delete instrument with ID:", req.params.id);
+
+        const deletedInstrument = await Instruments.findByIdAndDelete(req.params.id);
+
+        if (!deletedInstrument) {
+            console.log("Instrument not found with ID:", req.params.id);
+            return res.status(404).json({ message: "Instrument not found" });
+        }
+
+        console.log("Instrument deleted successfully:", deletedInstrument);
+        res.json({ message: "Instrument deleted successfully" });
     } catch (error) {
-        console.error("Error deleting instrument:", error)
-        res.status(500).json({error: "Internal Server Error"})
+        console.error("Server error:", error);
+        res.status(500).json({ message: "Server error", error });
     }
-})
+});
 
 module.exports = router
