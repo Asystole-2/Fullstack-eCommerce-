@@ -3,6 +3,7 @@ import Instrument from "./Instrument"
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
+import SearchContext, { SearchProvider } from "./SearchContext";
 
 import { SERVER_HOST } from "../config/global_constants"
 import axios from "axios"
@@ -14,7 +15,6 @@ export default class Products extends Component {
 
         this.state = {
             products: [],
-            searchTerm: '',
             brands: [],
             selectedBrand: 'All Brands',
             categories: [],
@@ -86,18 +86,21 @@ export default class Products extends Component {
         this.setState({ sortOrder: order })
     }
 
-    render() {
-        const { searchTerm, products, selectedBrand, selectedCategory, sortOrder  } = this.state
+    static contextType = SearchContext
 
-        let filteredProducts = this.state.products.filter(product => {
+    render() {
+        const { products, selectedBrand, selectedCategory, sortOrder  } = this.state
+        const { searchQuery } = this.context
+
+        let filteredProducts = products.filter(product => {
             return (
-                (searchTerm === '' ||
-                    product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    product.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    product.price?.toString().includes(searchTerm) ||
-                    product.rating?.toString().includes(searchTerm) ||
-                    product.reviews?.toString().includes(searchTerm)) &&
+                (searchQuery === '' ||
+                    product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.price?.toString().includes(searchQuery) ||
+                    product.rating?.toString().includes(searchQuery) ||
+                    product.reviews?.toString().includes(searchQuery)) &&
                 (selectedCategory === "All Categories" || product.category?.toLowerCase() === selectedCategory.toLowerCase()) &&
                 (selectedBrand === "All Brands" || product.brand?.toLowerCase() === selectedBrand.toLowerCase())
             )
@@ -121,14 +124,6 @@ export default class Products extends Component {
 
         return (
             <div className="product-list">
-                <div className="searchBar">
-                    <input
-                        type="text"
-                        placeholder="Search product name, price or description"
-                        value={searchTerm}
-                        onChange={e => this.setState({ searchTerm: e.target.value.trim() })}
-                    />
-                </div>
 
                 <CategoryDropDown categories={this.state.categories} handleCategoryChange={this.handleCategoryChange} selectedCategory={this.state.selectedCategory}  />
                 <BrandDropDown brands={this.state.brands} handleBrandChange={this.handleBrandChange} selectedBrand={this.state.selectedBrand}  />
