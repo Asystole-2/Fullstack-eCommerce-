@@ -1,7 +1,14 @@
 import React, {Component} from "react"
 import {Link} from "react-router-dom"
+import SearchContext from "./SearchContext"
 
 export default class Navbar extends Component {
+    static contextType = SearchContext;
+
+    handleSearch = (event) => {
+        this.context.setSearchQuery(event.target.value)
+    }
+
     render() {
 
         return (
@@ -9,10 +16,15 @@ export default class Navbar extends Component {
                 <Link to="/MainPage">
                     <div className="logo">MyShop</div>
                 </Link>
-
                 <div className="search-box">
-                    <input type="text" placeholder="Search..."/>
-                    <button><i className="fas fa-search"></i></button>
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        onChange={this.handleSearch}
+                    />
+                    <button>
+                        <i className="fas fa-search"></i>
+                    </button>
                 </div>
 
                 <div className="nav-icons">

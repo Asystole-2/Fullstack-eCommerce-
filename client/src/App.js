@@ -7,10 +7,14 @@ import AddInstrument from "./components/AddInstrument";
 import Admin from "./components/Admin";
 import "./css/App.css";
 import EditInstrument from "./components/EditInstrument";
+import { SearchProvider } from "./components/SearchContext";
+import Products from "./components/Products";
+import Navbar from "./components/Navbar";
 
 export default class App extends Component {
     render() {
         return (
+            <SearchProvider>
             <BrowserRouter>
                 <div>
                     <Switch>
@@ -23,6 +27,7 @@ export default class App extends Component {
                     </Switch>
                 </div>
             </BrowserRouter>
+    </SearchProvider>
         );
     }
 }
