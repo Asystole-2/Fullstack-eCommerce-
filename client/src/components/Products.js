@@ -1,6 +1,5 @@
 
 import React, {Component} from "react"
-import AddInstrument from "./AddInstrument"
 import Instrument from "./Instrument"
 import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
@@ -27,6 +26,7 @@ export default class Products extends Component {
         this.handleAddProduct = this.handleAddProduct.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
         this.updateStock = this.updateStock.bind(this)
+
         this.handleUpdateProduct = this.handleUpdateProduct.bind(this)
         this.handleCategoryChange = this.handleCategoryChange.bind(this)
         this.handleBrandChange = this.handleBrandChange.bind(this)
@@ -133,6 +133,7 @@ export default class Products extends Component {
                     product.price?.toString().includes(searchQuery) ||
                     product.rating?.toString().includes(searchQuery) ||
                     product.reviews?.toString().includes(searchQuery)) &&
+
                 (selectedCategory === "All Categories" || product.category?.toLowerCase() === selectedCategory.toLowerCase()) &&
                 (selectedBrand === "All Brands" || product.brand?.toLowerCase() === selectedBrand.toLowerCase())
             )
@@ -188,3 +189,6 @@ export default class Products extends Component {
         )
     }
 }
+
+
+
