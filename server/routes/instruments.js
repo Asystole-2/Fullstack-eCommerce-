@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const InstrumentModel = require("../models/instruments"); // Import the Product model
 console.log("Instrument model: ", InstrumentModel)
+const mongoose = require("mongoose")
 
 class Instrument {
     constructor(id) {
@@ -100,38 +101,65 @@ router.delete("/api/instruments/:id", async (req, res) => {
     }
 });
 
-// Increase Stock Route
-router.put("/instruments/increase/:id", async (req, res) => {
+// ✅ Fixed Increase Stock Route
+router.put("/instruments/:id/increase", async (req, res) => {
     try {
+        const { id } = req.params;
         const { amount } = req.body;
-        if (!amount || amount <= 0) return res.status(400).json({ error: "Invalid amount" });
 
-        const instrument = new Instrument(req.params.id);
-        const updatedInstrument = await instrument.increaseStock(amount);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid instrument ID" });
+        }
 
-        res.json({ message: "Stock increased successfully", stock: updatedInstrument.stock });
+        if (!amount || amount <= 0) {
+            return res.status(400).json({ error: "Invalid amount" });
+        }
+
+        const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
+            id,
+            { $inc: { stock: amount } }, // ✅ Atomic increment
+            { new: true }
+        );
+
+        if (!updatedInstrument) return res.status(404).json({ error: "Instrument not found" });
+
+        res.json({ message: "Stock increased", stock: updatedInstrument.stock });
 
     } catch (error) {
-        console.error("Increase Stock Error:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Decrease Stock Route
-router.put("/instruments/decrease/:id", async (req, res) => {
+// ✅ Fixed Decrease Stock Route
+router.put("/instruments/:id/decrease", async (req, res) => {
     try {
+        const { id } = req.params;
         const { amount } = req.body;
-        if (!amount || amount <= 0) return res.status(400).json({ error: "Invalid amount" });
 
-        const instrument = new Instrument(req.params.id);
-        const updatedInstrument = await instrument.decreaseStock(amount);
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid instrument ID" });
+        }
 
-        res.json({ message: "Stock decreased successfully", stock: updatedInstrument.stock });
+        if (!amount || amount <= 0) {
+            return res.status(400).json({ error: "Invalid amount" });
+        }
+
+        const instrument = await InstrumentModel.findById(id);
+        if (!instrument) return res.status(404).json({ error: "Instrument not found" });
+
+        if (instrument.stock < amount) {
+            return res.status(400).json({ error: "Stock cannot be negative" });
+        }
+
+        instrument.stock -= amount;
+        await instrument.save();
+
+        res.json({ message: "Stock decreased", stock: instrument.stock });
 
     } catch (error) {
-        console.error("Decrease Stock Error:", error);
         res.status(500).json({ error: error.message });
     }
 });
+
 
 module.exports = router
