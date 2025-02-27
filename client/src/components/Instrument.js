@@ -1,39 +1,34 @@
 import React, {Component} from "react"
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import InstrumentAPI from "../services/InstrumentAPI";
 
 export default class Instrument extends Component {
-
     handleStockChange = async (change) => {
         const { product, onUpdate } = this.props;
-        const newStock = product.stock + change;
 
-        if (newStock < 0) return; // Prevent negative stock
+        if (!product._id || product._id.length !== 24) {
+            alert("Invalid instrument ID");
+            return;
+        }
+
+        if (change < 0 && product.stock + change < 0) {
+            alert("Stock cannot be negative");
+            return;
+        }
 
         try {
-            // Define the endpoint dynamically based on whether we're increasing or decreasing stock
-            const endpoint = change > 0
-                ? `http://localhost:4000/instruments/increase/${product._id}` // Increase stock
-                : `http://localhost:4000/instruments/decrease/${product._id}`; // Decrease stock
+            console.log("Updating stock for ID:", product._id); // Debugging
+            const action = change > 0 ? "increase" : "decrease";
+            const updatedProduct = await InstrumentAPI.updateStock(product._id, Math.abs(change), action);
 
-            // Make a PUT request with the amount in the body
-            const response = await fetch(endpoint, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: Math.abs(change) }) // Send positive amount for both increase and decrease
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Stock update failed");
+            if (!updatedProduct || updatedProduct.stock === undefined) {
+                throw new Error("Failed to update stock.");
             }
 
-            // Parse and update the product stock if the update was successful
-            const updatedProduct = await response.json();
-            onUpdate({ ...product, stock: updatedProduct.stock }); // Update product UI
+            onUpdate({ ...product, stock: updatedProduct.stock });
 
         } catch (error) {
-            console.error("Stock Update Error:", error.message);
-            alert("Failed to update stock: " + error.message);
+            alert("Failed to update stock: " + (error.message || "Unknown error"));
         }
     };
 
@@ -48,7 +43,6 @@ export default class Instrument extends Component {
                 <p>{product.description}</p>
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
-                {/*<p>Price: ${product.price.toFixed(2)}</p>*/}
                 <p>Price: ${value.toFixed(2)}</p>
                 <p>Stock: {product.stock}</p>
 

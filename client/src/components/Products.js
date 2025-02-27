@@ -24,7 +24,7 @@ export default class Products extends Component {
 
         this.handleAddProduct = this.handleAddProduct.bind(this)
         this.handleDelete = this.handleDelete.bind(this)
-        this.updateStock = this.updateStock.bind(this)
+        this.updateInstrument = this.updateInstrument.bind(this)
 
         this.handleUpdateProduct = this.handleUpdateProduct.bind(this)
         this.handleCategoryChange = this.handleCategoryChange.bind(this)
@@ -60,23 +60,13 @@ export default class Products extends Component {
         }
     };
 
-    async updateStock(productId, newStockLevel) {
-        const response = await fetch(`/api/update-stock`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({productId, stock: newStockLevel}),
-        });
-
-        const result = await response.json();
-        if (result.success) {
-            alert("Stock updated successfully!");
-        } else {
-            alert("Failed to update stock.");
-        }
-
-    }
+    updateInstrument = (updatedInstrument) => {
+        this.setState((prevState) => ({
+            products: prevState.products.map(inst =>
+                inst._id === updatedInstrument._id ? updatedInstrument : inst
+            )
+        }));
+    };
 
     handleUpdateProduct(updatedProduct) {
         const updatedProducts = this.state.products.map((product) =>
@@ -180,7 +170,7 @@ export default class Products extends Component {
                                     key={product._id}
                                     product={product}
                                     onDelete={this.handleDelete}
-                                    onUpdate={this.updateStock}
+                                    onUpdate={this.updateInstrument}
                                 />
                             ))
                         ) : (
