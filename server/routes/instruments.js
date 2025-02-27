@@ -1,12 +1,39 @@
 const express = require("express")
 const router = express.Router()
-const Instruments = require("../models/instruments"); // Import the Product model
-console.log("Instrument model: ", Instruments)
+const InstrumentModel = require("../models/instruments"); // Import the Product model
+console.log("Instrument model: ", InstrumentModel)
+
+class Instrument {
+    constructor(id) {
+        this.id = id;
+    }
+
+    async getInstrument() {
+        return await InstrumentModel.findById(this.id);
+    }
+
+    async increaseStock(amount) {
+        const instrument = await this.getInstrument();
+        if (!instrument) throw new Error("Instrument not found");
+        instrument.stock += amount;
+        await instrument.save();
+        return instrument;
+    }
+
+    async decreaseStock(amount) {
+        const instrument = await this.getInstrument();
+        if (!instrument) throw new Error("Instrument not found");
+        if (instrument.stock < amount) throw new Error("Insufficient stock");
+        instrument.stock -= amount;
+        await instrument.save();
+        return instrument;
+    }
+}
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
     try {
-        const instruments = await Instruments.find()
+        const instruments = await InstrumentModel.find()
         res.json(instruments)
     } catch (error) {
         console.error("Error fetching instruments:", error)
@@ -17,7 +44,7 @@ router.get("/instruments", async (req, res) => {
 // Read one instrument by ID
 router.get("/instruments/:id", async (req, res) => {
     try {
-        const instrument = await Instruments.findById(req.params.id)
+        const instrument = await InstrumentModel.findById(req.params.id)
         if (!instrument) return res.status(404).json({error: "Instrument not found"})
         res.json(instrument)
     } catch (error) {
@@ -29,7 +56,7 @@ router.get("/instruments/:id", async (req, res) => {
 // ✅ Add new record
 router.post("/instruments", async (req, res) => {
     try {
-        const newInstrument = await Instruments.create(req.body)
+        const newInstrument = await InstrumentModel.create(req.body)
         res.status(201).json(newInstrument)
     } catch (error) {
         console.error("Error adding instrument:", error)
@@ -40,7 +67,7 @@ router.post("/instruments", async (req, res) => {
 // Update instrument
 router.put("/instruments/:id", async (req, res) => {
     try {
-        const updatedInstrument = await Instruments.findByIdAndUpdate(
+        const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             req.params.id,
             req.body,
             {new: true}
@@ -58,7 +85,7 @@ router.delete("/api/instruments/:id", async (req, res) => {
     try {
         console.log("Attempting to delete instrument with ID:", req.params.id);
 
-        const deletedInstrument = await Instruments.findByIdAndDelete(req.params.id);
+        const deletedInstrument = await InstrumentModel.findByIdAndDelete(req.params.id);
 
         if (!deletedInstrument) {
             console.log("Instrument not found with ID:", req.params.id);
@@ -70,6 +97,40 @@ router.delete("/api/instruments/:id", async (req, res) => {
     } catch (error) {
         console.error("Server error:", error);
         res.status(500).json({message: "Server error", error});
+    }
+});
+
+// Increase Stock Route
+router.put("/instruments/increase/:id", async (req, res) => {
+    try {
+        const { amount } = req.body;
+        if (!amount || amount <= 0) return res.status(400).json({ error: "Invalid amount" });
+
+        const instrument = new Instrument(req.params.id);
+        const updatedInstrument = await instrument.increaseStock(amount);
+
+        res.json({ message: "Stock increased successfully", stock: updatedInstrument.stock });
+
+    } catch (error) {
+        console.error("Increase Stock Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Decrease Stock Route
+router.put("/instruments/decrease/:id", async (req, res) => {
+    try {
+        const { amount } = req.body;
+        if (!amount || amount <= 0) return res.status(400).json({ error: "Invalid amount" });
+
+        const instrument = new Instrument(req.params.id);
+        const updatedInstrument = await instrument.decreaseStock(amount);
+
+        res.json({ message: "Stock decreased successfully", stock: updatedInstrument.stock });
+
+    } catch (error) {
+        console.error("Decrease Stock Error:", error);
+        res.status(500).json({ error: error.message });
     }
 });
 
