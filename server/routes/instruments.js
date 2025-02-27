@@ -4,32 +4,6 @@ const InstrumentModel = require("../models/instruments"); // Import the Product 
 console.log("Instrument model: ", InstrumentModel)
 const mongoose = require("mongoose")
 
-class Instrument {
-    constructor(id) {
-        this.id = id;
-    }
-
-    async getInstrument() {
-        return await InstrumentModel.findById(this.id);
-    }
-
-    async increaseStock(amount) {
-        const instrument = await this.getInstrument();
-        if (!instrument) throw new Error("Instrument not found");
-        instrument.stock += amount;
-        await instrument.save();
-        return instrument;
-    }
-
-    async decreaseStock(amount) {
-        const instrument = await this.getInstrument();
-        if (!instrument) throw new Error("Instrument not found");
-        if (instrument.stock < amount) throw new Error("Insufficient stock");
-        instrument.stock -= amount;
-        await instrument.save();
-        return instrument;
-    }
-}
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
