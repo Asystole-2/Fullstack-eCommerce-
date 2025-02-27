@@ -23,13 +23,13 @@ export default class Instrument extends Component {
                 <p>Price: ${value.toFixed(2)}</p>
                 <p>Stock: {product.stock}</p>
 
-                <button onClick={() => onUpdate({...product, stock: product.stock - 1})}>
+                {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <button onClick={() => onUpdate({...product, stock: product.stock - 1})}>
                     Decrease Stock
-                </button>
-                <button onClick={() => onUpdate({...product, stock: product.stock + 1})}>
+                </button> : null}
+                {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <button onClick={() => onUpdate({...product, stock: product.stock + 1})}>
                     Increase Stock
-                </button>
-                <button onClick={this.handleDeleteClick}>Delete</button>
+                </button> : null}
+                {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <button onClick={this.handleDeleteClick}>Delete</button> : null}
                 {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <Link to={"/EditInstrument/" + product._id}>Edit</Link> : null}
             </div>
         )
