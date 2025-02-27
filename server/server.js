@@ -20,8 +20,11 @@ app.use(require(`body-parser`).json())
 
 
 // Routers
-app.use(require(`./routes/instruments`))
-app.use(require(`./routes/users`))
+const instrumentsRoutes = require(`./routes/instruments`)
+app.use(instrumentsRoutes)
+
+const userRoutes = require(`./routes/users`)
+app.use("/api", userRoutes);
 
 
 // Port

@@ -1,15 +1,13 @@
 import React, {Component} from "react";
-import {BrowserRouter, Switch, Route, Link} from "react-router-dom";
+import {BrowserRouter, Switch, Route } from "react-router-dom";
 import MainPage from "./components/MainPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import AddInstrument from "./components/AddInstrument";
-import Admin from "./components/Admin";
 import "./css/App.css";
 import EditInstrument from "./components/EditInstrument";
 import {SearchProvider} from "./components/SearchContext";
-import Products from "./components/Products";
-import Navbar from "./components/Navbar";
+import UsersList from "./components/UsersLists";
 
 export default class App extends Component {
     render() {
@@ -25,6 +23,7 @@ export default class App extends Component {
                             <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
                             <Route component={MainPage}/>
                         </Switch>
+                        <UsersList/>
                     </div>
                 </BrowserRouter>
             </SearchProvider>

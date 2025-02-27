@@ -4,6 +4,31 @@ const bcrypt = require(`bcrypt`)
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const cors = require('cors')
+const UserModel = require("../models/users");
+
+// Get all users
+router.get("/users", async (req, res) => {
+    try {
+        const users = await UserModel.find({}, { password: 0 }); // Exclude password for security
+        res.json(users);
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+// Get a single user by ID
+router.get("/users/:id", async (req, res) => {
+    try {
+        const user = await UserModel.findById(req.params.id, { password: 0 }); // Exclude password
+        if (!user) return res.status(404).json({ error: "User not found" });
+        res.json(user);
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 router.post(`/users/register/:name/:email/:password`, (req, res) => {
     console.log(req.params.name);
