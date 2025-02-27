@@ -7,7 +7,14 @@ import AddInstrument from "./components/AddInstrument";
 import Admin from "./components/Admin";
 import "./css/App.css";
 import EditInstrument from "./components/EditInstrument";
+import LoggedInRoute from "./components/LoggedInRoute";
+import {ACCESS_LEVEL_GUEST} from "./config/global_constants";
 
+if (typeof sessionStorage.accessLevel === "undefined")
+{
+    sessionStorage.name = "GUEST"
+    sessionStorage.accessLevel = ACCESS_LEVEL_GUEST;
+}
 export default class App extends Component {
     render() {
         return (
@@ -16,9 +23,9 @@ export default class App extends Component {
                     <Switch>
                         <Route exact path="/MainPage" component={MainPage}/>
                         <Route exact path="/Login" component={Login}/>
-                        <Route exact path="/Register" component={Register}/>
-                        <Route exact path="/AddInstrument" component={AddInstrument}/>
-                        <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
+                        <LoggedInRoute exact path="/Register" component={Register}/>
+                        <LoggedInRoute exact path="/AddInstrument" component={AddInstrument}/>
+                        <LoggedInRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
                         <Route component={MainPage}/>
                     </Switch>
                 </div>
