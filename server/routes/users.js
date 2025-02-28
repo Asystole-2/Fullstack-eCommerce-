@@ -6,6 +6,26 @@ const jwt = require("jsonwebtoken");
 const cors = require('cors')
 const UserModel = require("../models/users");
 
+// Delete user
+router.delete("/api/user/:id", async (req, res) => {
+    try {
+        console.log("Attempting to delete user with ID:", req.params.id);
+
+        const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
+
+        if (!deletedUser) {
+            console.log("User not found with ID:", req.params.id);
+            return res.status(400).json({message: "User not found"});
+        }
+
+        console.log("User deleted successfully:", deletedUser);
+        res.json({message: "User deleted successfully"});
+    } catch (error) {
+        console.error("Server error:", error);
+        res.status(500).json({message: "Server error", error});
+    }
+});
+
 // Get all users
 router.get("/users", async (req, res) => {
     try {

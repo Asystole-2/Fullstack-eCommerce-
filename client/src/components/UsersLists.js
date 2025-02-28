@@ -7,6 +7,8 @@ export default class UsersList extends Component {
     constructor(props) {
         super(props);
         this.state = { users: [] };
+
+        this.handleDelete = this.handleDelete.bind(this)
     }
 
     componentDidMount() {
@@ -25,6 +27,32 @@ export default class UsersList extends Component {
             .catch(error => console.error("Error fetching instruments:", error))
     }
 
+    // Handle DELETE request
+    handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+        console.log("Deleting user with ID:", id);
+
+        try {
+            const response = await fetch(`http://localhost:4000/api/user/${id}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                alert("User deleted successfully!");
+                if (this.state.users) {
+                    this.setState({
+                        users: this.state.users.filter(user => user._id !== id)
+                    });
+                }
+            } else {
+                alert("Error deleting user");
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        }
+    };
+
     render() {
         return (
             <div>
@@ -41,6 +69,11 @@ export default class UsersList extends Component {
                         <tr key={user._id}>
                             <td>{user.name}</td>
                             <td>{user.email}</td>
+                            <td>
+                                <button onClick={() => this.handleDelete(user._id)}>
+                                    Delete
+                                </button>
+                            </td>
                         </tr>
                     ))}
                     </tbody>
