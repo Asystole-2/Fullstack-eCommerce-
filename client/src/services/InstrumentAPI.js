@@ -1,10 +1,10 @@
-const BASE_URL = "http://localhost:4000/instruments";
+const url = "http://localhost:4000/instruments";
 
 export default class InstrumentAPI {
     static async updateStock(id, amount, action) {
         console.log(`Updating ${action} stock for ID:`, id); // Debugging
 
-        const endpoint = `${BASE_URL}/${id}/${action}`;
+        const endpoint = `${url}/${id}/${action}`;
 
         try {
             const response = await fetch(endpoint, {

@@ -28,7 +28,7 @@ router.get("/instruments/:id", async (req, res) => {
     }
 })
 
-// ✅ Add new record
+// Add new record
 router.post("/instruments", async (req, res) => {
     try {
         const newInstrument = await InstrumentModel.create(req.body)
@@ -75,7 +75,7 @@ router.delete("/api/instruments/:id", async (req, res) => {
     }
 });
 
-// ✅ Fixed Increase Stock Route
+// Increase Stock Route
 router.put("/instruments/:id/increase", async (req, res) => {
     try {
         const { id } = req.params;
@@ -91,7 +91,7 @@ router.put("/instruments/:id/increase", async (req, res) => {
 
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             id,
-            { $inc: { stock: amount } }, // ✅ Atomic increment
+            { $inc: { stock: amount } }, // Atomic increment
             { new: true }
         );
 
@@ -104,7 +104,7 @@ router.put("/instruments/:id/increase", async (req, res) => {
     }
 });
 
-// ✅ Fixed Decrease Stock Route
+// Decrease Stock Route
 router.put("/instruments/:id/decrease", async (req, res) => {
     try {
         const { id } = req.params;
