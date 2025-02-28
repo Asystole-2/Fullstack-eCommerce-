@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import {SERVER_HOST} from "../config/global_constants";
-// import UserAPI from "../services/UserAPI";
+import UserAPI from "../services/UserAPI";
 
 export default class UsersList extends Component {
     constructor(props) {
@@ -41,7 +41,6 @@ export default class UsersList extends Component {
                         <tr key={user._id}>
                             <td>{user.name}</td>
                             <td>{user.email}</td>
-                            <td>{user.password}</td>
                         </tr>
                     ))}
                     </tbody>
