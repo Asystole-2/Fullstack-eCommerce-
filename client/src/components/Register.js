@@ -73,7 +73,7 @@ export default class Register extends Component
 
     validateName = (e) =>
     {
-        return this.state.name.trim() !== "";
+        return this.state.name.trim() !== "";//
     }
 
     validateEmail = (e) =>
