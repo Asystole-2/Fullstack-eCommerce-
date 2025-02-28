@@ -33,7 +33,7 @@ export default class Instrument extends Component {
     };
 
     render() {
-        const {product, onUpdate, onDelete} = this.props
+        const {product, onDelete} = this.props
         const value = product.price || 0
         return (
             <div className="product-card">

@@ -23,7 +23,7 @@ export default class App extends Component {
                             <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
                             <Route component={MainPage}/>
                         </Switch>
-                        <UsersList/>
+                        {/*<UsersList/>*/}
                     </div>
                 </BrowserRouter>
             </SearchProvider>

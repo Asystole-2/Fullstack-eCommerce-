@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import UserAPI from "../services/UserAPI";
+import axios from "axios";
+import {SERVER_HOST} from "../config/global_constants";
+// import UserAPI from "../services/UserAPI";
 
 export default class UsersList extends Component {
     constructor(props) {
@@ -7,9 +9,20 @@ export default class UsersList extends Component {
         this.state = { users: [] };
     }
 
-    async componentDidMount() {
-        const users = await UserAPI.getUsers();
-        this.setState({ users });
+    componentDidMount() {
+        axios.get(`${SERVER_HOST}/users`)
+            .then(res => {
+                if ((res.data)) {
+                    console.table(res.data)
+
+                    this.setState({
+                        users: res.data,
+                    })
+                } else {
+                    console.log("Record not found")
+                }
+            })
+            .catch(error => console.error("Error fetching instruments:", error))
     }
 
     render() {
@@ -28,6 +41,7 @@ export default class UsersList extends Component {
                         <tr key={user._id}>
                             <td>{user.name}</td>
                             <td>{user.email}</td>
+                            <td>{user.password}</td>
                         </tr>
                     ))}
                     </tbody>
