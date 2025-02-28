@@ -1,83 +1,14 @@
-// const router = require("express").Router()
-//
-// const Instruments = require('../models/Instruments')
-//
-// // Read all items from instruments JSON
-// router.get(`/instruments`, (req, res) => {
-//     Instruments.find({}, (err, data) => {
-//         res.json(data)
-//     })
-// })
-//
-// // Read one item from instruments JSON
-// router.get(`/instruments/:id`, (req, res) => {
-//     const selectedInstrument = instruments.find(
-//         (instrument) => instrument._id === parseInt(req.params.id)
-//     )
-//
-//     if (!selectedInstrument) {
-//         return res.status(404).json({ error: "Instrument not found" })
-//     }
-//
-//     res.json(selectedInstrument)
-// })
-//
-// // Add new item to instruments JSON
-// router.post(`/instruments`, (req, res) =>
-// {
-//   Instruments.create(req.body, (err, data) =>
-//   {
-//       res.json(data)
-//   })
-// })
-//
-// // Update one item in instruments JSON
-// router.put(`/instruments/:id`, (req, res) => {
-//     const updatedInstrument = req.body
-//     let found = false
-//
-//     instruments.map((instrument) => {
-//         if (instrument._id === req.params.id) {
-//             instrument.name = updatedInstrument.name
-//             instrument.price = updatedInstrument.price
-//             instrument.stock = updatedInstrument.stock
-//             instrument.description = updatedInstrument.description
-//             instrument.image = updatedInstrument.image
-//             found = true
-//         }
-//     })
-//
-//     if (!found) {
-//         return res.status(404).json({ error: "Instrument not found" })
-//     }
-//
-//     res.json(instruments)
-// })
-//
-// // Delete one item from instruments JSON
-// router.delete(`/instruments/:id`, (req, res) => {
-//     const instrumentIndex = instruments.findIndex(
-//         (instrument) => instrument._id === parseInt(req.params.id)
-//     )
-//
-//     if (instrumentIndex === -1) {
-//         return res.status(404).json({ error: "Instrument not found" })
-//     }
-//
-//     instruments.splice(instrumentIndex, 1)
-//
-//     res.json(instruments)
-// })
-//
-// module.exports = router
 const express = require("express")
 const router = express.Router()
-const Instruments = require("../models/instruments"); // Import the Product model
+const InstrumentModel = require("../models/instruments"); // Import the Product model
+console.log("Instrument model: ", InstrumentModel)
+const mongoose = require("mongoose")
+
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
     try {
-        const instruments = await Instruments.find()
+        const instruments = await InstrumentModel.find()
         res.json(instruments)
     } catch (error) {
         console.error("Error fetching instruments:", error)
@@ -88,7 +19,7 @@ router.get("/instruments", async (req, res) => {
 // Read one instrument by ID
 router.get("/instruments/:id", async (req, res) => {
     try {
-        const instrument = await Instruments.findById(req.params.id)
+        const instrument = await InstrumentModel.findById(req.params.id)
         if (!instrument) return res.status(404).json({error: "Instrument not found"})
         res.json(instrument)
     } catch (error) {
@@ -100,7 +31,7 @@ router.get("/instruments/:id", async (req, res) => {
 // ✅ Add new record
 router.post("/instruments", async (req, res) => {
     try {
-        const newInstrument = await Instruments.create(req.body)
+        const newInstrument = await InstrumentModel.create(req.body)
         res.status(201).json(newInstrument)
     } catch (error) {
         console.error("Error adding instrument:", error)
@@ -111,7 +42,7 @@ router.post("/instruments", async (req, res) => {
 // Update instrument
 router.put("/instruments/:id", async (req, res) => {
     try {
-        const updatedInstrument = await Instruments.findByIdAndUpdate(
+        const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             req.params.id,
             req.body,
             {new: true}
@@ -125,15 +56,84 @@ router.put("/instruments/:id", async (req, res) => {
 })
 
 // Delete instrument
-router.delete("/instruments/:id", async (req, res) => {
+router.delete("/api/instruments/:id", async (req, res) => {
     try {
-        const deletedInstrument = await Instruments.findByIdAndDelete(req.params.id)
-        if (!deletedInstrument) return res.status(404).json({error: "Instrument not found"})
-        res.json({message: "Instrument deleted successfully"})
+        console.log("Attempting to delete instrument with ID:", req.params.id);
+
+        const deletedInstrument = await InstrumentModel.findByIdAndDelete(req.params.id);
+
+        if (!deletedInstrument) {
+            console.log("Instrument not found with ID:", req.params.id);
+            return res.status(404).json({message: "Instrument not found"});
+        }
+
+        console.log("Instrument deleted successfully:", deletedInstrument);
+        res.json({message: "Instrument deleted successfully"});
     } catch (error) {
-        console.error("Error deleting instrument:", error)
-        res.status(500).json({error: "Internal Server Error"})
+        console.error("Server error:", error);
+        res.status(500).json({message: "Server error", error});
     }
-})
+});
+
+// ✅ Fixed Increase Stock Route
+router.put("/instruments/:id/increase", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { amount } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid instrument ID" });
+        }
+
+        if (!amount || amount <= 0) {
+            return res.status(400).json({ error: "Invalid amount" });
+        }
+
+        const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
+            id,
+            { $inc: { stock: amount } }, // ✅ Atomic increment
+            { new: true }
+        );
+
+        if (!updatedInstrument) return res.status(404).json({ error: "Instrument not found" });
+
+        res.json({ message: "Stock increased", stock: updatedInstrument.stock });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ✅ Fixed Decrease Stock Route
+router.put("/instruments/:id/decrease", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { amount } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid instrument ID" });
+        }
+
+        if (!amount || amount <= 0) {
+            return res.status(400).json({ error: "Invalid amount" });
+        }
+
+        const instrument = await InstrumentModel.findById(id);
+        if (!instrument) return res.status(404).json({ error: "Instrument not found" });
+
+        if (instrument.stock < amount) {
+            return res.status(400).json({ error: "Stock cannot be negative" });
+        }
+
+        instrument.stock -= amount;
+        await instrument.save();
+
+        res.json({ message: "Stock decreased", stock: instrument.stock });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 module.exports = router

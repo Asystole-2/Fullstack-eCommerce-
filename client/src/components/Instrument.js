@@ -1,15 +1,39 @@
 import React, {Component} from "react"
-import {Link} from "react-router-dom";
-import {ACCESS_LEVEL_ADMIN} from "../config/global_constants";
+import { Link } from "react-router-dom";
+import InstrumentAPI from "../services/InstrumentAPI";
 
 export default class Instrument extends Component {
-    handleDeleteClick = () => {
-        const {product, onDelete} = this.props
-        onDelete(product._id)
-    }
+    handleStockChange = async (change) => {
+        const { product, onUpdate } = this.props;
+
+        if (!product._id || product._id.length !== 24) {
+            alert("Invalid instrument ID");
+            return;
+        }
+
+        if (change < 0 && product.stock + change < 0) {
+            alert("Stock cannot be negative");
+            return;
+        }
+
+        try {
+            console.log("Updating stock for ID:", product._id); // Debugging
+            const action = change > 0 ? "increase" : "decrease";
+            const updatedProduct = await InstrumentAPI.updateStock(product._id, Math.abs(change), action);
+
+            if (!updatedProduct || updatedProduct.stock === undefined) {
+                throw new Error("Failed to update stock.");
+            }
+
+            onUpdate({ ...product, stock: updatedProduct.stock });
+
+        } catch (error) {
+            alert("Failed to update stock: " + (error.message || "Unknown error"));
+        }
+    };
 
     render() {
-        const {product, onUpdate} = this.props
+        const {product, onUpdate, onDelete} = this.props
         const value = product.price || 0
         return (
             <div className="product-card">
@@ -19,18 +43,19 @@ export default class Instrument extends Component {
                 <p>{product.description}</p>
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
-                <p>Price: ${product.price.toFixed(2)}</p>
                 <p>Price: ${value.toFixed(2)}</p>
                 <p>Stock: {product.stock}</p>
 
-                {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <button onClick={() => onUpdate({...product, stock: product.stock - 1})}>
+                <button onClick={() => this.handleStockChange(-1)} disabled={product.stock <= 0}>
                     Decrease Stock
-                </button> : null}
-                {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <button onClick={() => onUpdate({...product, stock: product.stock + 1})}>
+                </button>
+                <button onClick={() => this.handleStockChange(1)}>
                     Increase Stock
-                </button> : null}
-                {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <button onClick={this.handleDeleteClick}>Delete</button> : null}
-                {sessionStorage.accessLevel >= ACCESS_LEVEL_ADMIN ? <Link to={"/EditInstrument/" + product._id}>Edit</Link> : null}
+                </button>
+                <button onClick={() => onDelete(product._id)}>Delete</button>
+                <button>
+                    <Link to={"/EditInstrument/" + product._id}>Edit</Link>
+                </button>
             </div>
         )
     }

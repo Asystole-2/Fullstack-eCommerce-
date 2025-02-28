@@ -96,7 +96,9 @@ export default class AddInstrument extends Component {
                         onChange={this.handleChange}
                     />
 
-                    <LinkInClass value="Add" className="green-button" onClick={this.handleSubmit}/>
+                    <button>
+                        <LinkInClass value="Add" className="green-button" onClick={this.handleSubmit}/>
+                    </button>
 
                     <Link className="red-button" to={"/MainPage"}>Cancel</Link>
                 </form>
