@@ -59,18 +59,18 @@ router.post('/Register', async (req, res) => {
 })
 
 router.post('/Login', async (req, res) => {
-    const {username, password} = req.body
+    const { email, password } = req.body;
 
-    const user = await User.findOne({username})
-    if (!user) return res.status(400).json({error: 'User not found'})
+    const user = await usersModel.findOne({ email });
+    if (!user) return res.status(400).json({ error: 'User not found' });
 
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) return res.status(400).json({error: 'Wrong Password'})
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ error: 'Wrong Password' });
 
-    const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
-    res.json({token, role: user.role});
-    res.json({message: 'Registered successfully'})
-})
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token, role: user.role });
+});
+
 
 router.get('/Admin', verifyToken, (req, res) => {
     if (req.user.role !== 'admin@gmail.com') return res.status(403).json({error: 'Access Denied'})

@@ -6,6 +6,9 @@ const cors = require('cors')
 const express = require(`express`)
 const app = express()
 
+
+const cartRoutes = require('./routes/cart');
+app.use('/api', cartRoutes);
 // Server-side global variables
 require(`dotenv`).config({path: `./config/.env`})
 
@@ -22,6 +25,7 @@ app.use(require(`body-parser`).json())
 // Routers
 app.use(require(`./routes/instruments`))
 app.use(require(`./routes/users`))
+
 
 
 // Port

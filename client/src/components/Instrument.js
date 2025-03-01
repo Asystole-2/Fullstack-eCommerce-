@@ -1,49 +1,40 @@
-import React, {Component} from "react"
+import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import axios from 'axios';
 import InstrumentAPI from "../services/InstrumentAPI";
 
 export default class Instrument extends Component {
-    handleStockChange = async (change) => {
-        const { product, onUpdate } = this.props;
+    handleAddToCart = async () => {
+        const { product } = this.props
+        const userId = localStorage.getItem('userId')
 
-        if (!product._id || product._id.length !== 24) {
-            alert("Invalid instrument ID");
-            return;
-        }
-
-        if (change < 0 && product.stock + change < 0) {
-            alert("Stock cannot be negative");
-            return;
+        // Check if userId exists before making the request
+        if (!userId) {
+            alert('You must be logged in to add items to the cart.')
+            return
         }
 
         try {
-            console.log("Updating stock for ID:", product._id); // Debugging
-            const action = change > 0 ? "increase" : "decrease";
-            const updatedProduct = await InstrumentAPI.updateStock(product._id, Math.abs(change), action);
-
-            if (!updatedProduct || updatedProduct.stock === undefined) {
-                throw new Error("Failed to update stock.");
-            }
-
-            onUpdate({ ...product, stock: updatedProduct.stock });
-
+            await axios.post(`/api/cart/${userId}/add`, { productId: product._id, quantity: 1 })
+            alert('Added to cart!')
         } catch (error) {
-            alert("Failed to update stock: " + (error.message || "Unknown error"));
+            console.error('Failed to add to cart:', error)
+            alert('Failed to add to cart')
         }
     };
 
     render() {
-        const {product, onUpdate, onDelete} = this.props
-        const value = product.price || 0
+        const { product } = this.props
         return (
             <div className="product-card">
-                <img src={product.image} alt={product.name}/>
+                <img src={product.image} alt={product.name} />
                 <h2>{product.name}</h2>
                 <p>Brand: {product.brand}</p>
                 <p>{product.description}</p>
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
-                <p>Price: ${value.toFixed(2)}</p>
+                <p>Price: ${product.price.toFixed(2)}</p>
+                <button onClick={this.handleAddToCart}>Add to Cart</button>
                 <p>Stock: {product.stock}</p>
 
                 <button onClick={() => this.handleStockChange(-1)} disabled={product.stock <= 0}>
@@ -52,9 +43,9 @@ export default class Instrument extends Component {
                 <button onClick={() => this.handleStockChange(1)}>
                     Increase Stock
                 </button>
-                <button onClick={() => onDelete(product._id)}>Delete</button>
+                <button onClick={() => this.props.onDelete(product._id)}>Delete</button>
                 <button>
-                    <Link to={"/EditInstrument/" + product._id}>Edit</Link>
+                    <Link to={`/EditInstrument/${product._id}`}>Edit</Link>
                 </button>
             </div>
         )

@@ -8,6 +8,7 @@ import Admin from "./components/Admin";
 import "./css/App.css";
 import EditInstrument from "./components/EditInstrument";
 import {SearchProvider} from "./components/SearchContext";
+import CartPage from './components/CartPage'; // Adjust path if needed
 import Products from "./components/Products";
 import Navbar from "./components/Navbar";
 
@@ -23,6 +24,7 @@ export default class App extends Component {
                             <Route exact path="/Register" component={Register}/>
                             <Route exact path="/AddInstrument" component={AddInstrument}/>
                             <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
+                            <Route exact path="/cart" component={CartPage} />
                             <Route component={MainPage}/>
                         </Switch>
                     </div>
