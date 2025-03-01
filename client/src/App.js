@@ -11,7 +11,15 @@ import {SearchProvider} from "./components/SearchContext";
 import CartPage from './components/CartPage'; // Adjust path if needed
 import Products from "./components/Products";
 import Navbar from "./components/Navbar";
+import {ACCESS_LEVEL_GUEST} from "./config/global_constants";
 
+
+if (typeof sessionStorage.accessLevel === "undefined")
+{
+    sessionStorage.name = "GUEST"
+    sessionStorage.accessLevel = ACCESS_LEVEL_GUEST;
+
+}
 export default class App extends Component {
     render() {
         return (
@@ -24,7 +32,7 @@ export default class App extends Component {
                             <Route exact path="/Register" component={Register}/>
                             <Route exact path="/AddInstrument" component={AddInstrument}/>
                             <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
-                            <Route exact path="/cart" component={CartPage} />
+                            <Route exact path="/cart" component={CartPage}/>
                             <Route component={MainPage}/>
                         </Switch>
                     </div>
