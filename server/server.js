@@ -16,7 +16,7 @@ require(`dotenv`).config({path: `./config/.env`})
 require(`./config/db`)
 
 // Middleware
-app.use(express.json());
+app.use(express.json())
 app.use(cors());
 
 app.use(require(`body-parser`).json())
