@@ -7,7 +7,7 @@ import {Link} from "react-router-dom";
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
-import SearchContext, {SearchProvider} from "./SearchContext";
+import SearchContext from "./SearchContext";
 
 export default class Products extends Component {
     constructor(props) {
@@ -113,7 +113,7 @@ export default class Products extends Component {
 
     render() {
         const {products, selectedBrand, selectedCategory, sortOrder} = this.state
-        const {searchQuery} = this.context
+        const { searchQuery = "" } = this.context || {};
 
         let filteredProducts = products.filter(product => {
             return (

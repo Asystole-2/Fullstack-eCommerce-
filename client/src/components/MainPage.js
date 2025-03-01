@@ -1,6 +1,7 @@
 import React, {Component} from "react"
 import Navbar from "./Navbar"
 import Products from "./Products"
+import {SearchProvider} from "./SearchContext";
 
 export default class MainPage extends Component {
     render() {
@@ -8,7 +9,9 @@ export default class MainPage extends Component {
             <div className="main-page">
                 <Navbar/>
                 <div className="content">
-                    <Products/>
+                    <SearchProvider>
+                        <Products/>
+                    </SearchProvider>
                 </div>
             </div>
         )

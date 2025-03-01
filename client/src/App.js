@@ -23,7 +23,7 @@ export default class App extends Component {
                     <Switch>
                         <Route exact path="/MainPage" component={MainPage}/>
                         <Route exact path="/Login" component={Login}/>
-                        <LoggedInRoute exact path="/Register" component={Register}/>
+                        <Route exact path="/Register" component={Register}/>
                         <LoggedInRoute exact path="/AddInstrument" component={AddInstrument}/>
                         <LoggedInRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
                         <Route component={MainPage}/>

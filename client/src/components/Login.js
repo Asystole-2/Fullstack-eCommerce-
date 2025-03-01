@@ -1,40 +1,52 @@
-import React, {Component} from "react"
+import React, { Component } from "react";
 import Navbar from "./Navbar";
 import axios from "axios";
-import {Link} from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
+import { SERVER_HOST } from "../config/global_constants";
 
 class Login extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             loginEmail: '',
             loginPassword: '',
-            role: 'user',
+        };
+    }
+
+handleLogin = async (e) => {
+    e.preventDefault();
+    console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+
+    try {
+        const res = await axios.post(`${SERVER_HOST}/users/login`, {
+            email: this.state.loginEmail,
+            password: this.state.loginPassword
+        });
+
+        if (res.data.errorMessage) {
+            this.setState({ errors: { general: res.data.errorMessage } });
+        } else {
+            localStorage.setItem('token', res.data.token);
+            alert('Login successful');
+            this.setState({ isLoggedIn: true });
         }
+    } catch (error) {
+        console.error('Login error:', error.response?.data || error.message);
+        this.setState({ errors: { general: error.response?.data?.error || "Login failed. Please check your credentials." } });
     }
+};
 
-    handleLogin = async (e) => {
-        e.preventDefault()
-        console.log('Login with:', this.state.loginEmail, this.state.loginPassword)
-        // Add login logic here
-        try {
-            const res = await axios.post('http://localhost:3000/login', this.state.loginEmail, this.state.loginPassword)
-            localStorage.setItem('token', res.data.token)
-            this.setState({role: res.data.role})
-            alert('Login successfully')
-        } catch (error) {
-            alert('Login failed.')
-        }
+
+
+
+render() {
+    if (this.state.isLoggedIn)
+    {
+        return <Redirect to="/MainPage"/>;
     }
-
-    handleRoleChange = e => {
-        this.setState({role: e.target.value})
-    }
-
-    render() {
         return (
             <div>
-                <Navbar/>
+                <Navbar />
                 <div className="login">
                     <div className="login-container">
                         {/* Login Form */}
@@ -43,50 +55,43 @@ class Login extends Component {
                             <div className="input-group">
                                 <label>
                                     Email Address *
-                                    <input type="email" value={this.state.loginEmail}
-                                           onChange={e => this.setState({loginEmail: e.target.value})} required/>
+                                    <input
+                                        type="email"
+                                        value={this.state.loginEmail}
+                                        onChange={e => this.setState({ loginEmail: e.target.value })}
+                                        required
+                                    />
                                 </label>
                                 <label>
                                     Password *
-                                    <input type="password" value={this.state.loginPassword}
-                                           onChange={e => this.setState({loginPassword: e.target.value})} required/>
+                                    <input
+                                        type="password"
+                                        value={this.state.loginPassword}
+                                        onChange={e => this.setState({ loginPassword: e.target.value })}
+                                        required
+                                    />
                                 </label>
-                                <select value={this.state.role} onChange={this.handleRoleChange}>
-                                    <option value="user">User</option>
-                                    <option value="admin">Admin</option>
-                                </select>
                                 <div>
-                                    <input type="checkbox"/>Remember Me
+                                    <input type="checkbox" /> Remember Me
                                 </div>
                                 <button type="submit">Log in</button>
                                 <a href="#">Lost your password?</a>
                             </div>
                         </form>
 
-                        {/* Displaying different content based on role option */}
-                        <div style={{marginLeft: 20}}>
-                            {this.state.role === 'user' && (
-                                <div>
-                                    <h3>Welcome, User!</h3>
-                                    <p className="switch">Access your personalized dashboard and manage your
-                                        account.</p>
-                                    <br/>
-                                    <p className="switch">Don't have an account?</p>
-                                    <Link to="/Register">Register</Link>
-                                </div>
-                            )}
-                            {this.state.role === 'admin' && (
-                                <div>
-                                    <h3>Welcome, Admin!</h3>
-                                    <p>Manage users, view analytics, and configure settings.</p>
-                                </div>
-                            )}
+                        {/* Additional Links */}
+                        <div style={{ marginLeft: 20 }}>
+                            <p>Don't have an account?</p>
+                            <Link to="/Register">Register</Link>
+                            <br /><br />
+                            <p>Or, sign in as Admin</p>
+                            <Link to="/AdminLogin">Admin Login</Link>
                         </div>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
-export default Login
+export default Login;
