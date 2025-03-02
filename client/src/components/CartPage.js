@@ -1,55 +1,64 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import Navbar from "./Navbar";
 
 const CartPage = () => {
-    const [cart, setCart] = useState(null)
-    const userId = localStorage.getItem('userId')
+    const [cart, setCart] = useState([]);
 
     useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const response = await axios.get(`/api/cart/${userId}`)
-                setCart(response.data)
-            } catch (error) {
-                console.error('Error fetching cart:', error)
+        // Retrieve cart items from localStorage
+        const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+        setCart(storedCart);
+    }, []);
+
+    const handleRemoveFromCart = (productId) => {
+        // Filter out the item to be removed
+        const updatedCart = cart.filter(item => item.productId !== productId);
+        setCart(updatedCart);
+        // Update localStorage
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
+
+    const handleQuantityChange = (productId, delta) => {
+        const updatedCart = cart.map(item => {
+            if (item.productId === productId) {
+                return { ...item, quantity: Math.max(1, item.quantity + delta) };
             }
-        }
-        fetchCart();
-    }, [userId])
+            return item;
+        });
+        setCart(updatedCart);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+    };
 
-    const handleRemoveFromCart = async (productId) => {
-        try {
-            await axios.delete(`/api/cart/${userId}/remove/${productId}`)
-            setCart((prevCart) => ({
-                ...prevCart,
-                items: prevCart.items.filter(item => item.productId._id !== productId),
-            }))
-        } catch (error) {
-            console.error('Error removing item from cart:', error)
-        }
+    if (!cart.length) {
+        return (
+            <>
+                <Navbar />
+                <div>
+                    <p>Your cart is empty.</p>
+                </div>
+            </>
+        );
     }
-
-    if (!cart) return <p>Loading...</p>
 
     return (
         <div>
+            <Navbar />
             <h1>Shopping Cart</h1>
             <Link to="/MainPage">Continue Shopping</Link>
-            {cart.items.length === 0 ? (
-                <p>Your cart is empty.</p>
-            ) : (
-                <ul>
-                    {cart.items.map(item => (
-                        <li key={item.productId._id}>
-                            {item.productId.name} - {item.quantity} x ${item.price.toFixed(2)}
-                            <button onClick={() => handleRemoveFromCart(item.productId._id)}>Remove</button>
-                        </li>
-                    ))}
-                </ul>
-            )}
+            <ul>
+                {cart.map(item => (
+                    <li key={item.productId}>
+                        {item.product.name} - {item.quantity} x ${item.product.price.toFixed(2)}
+                        <button onClick={() => handleQuantityChange(item.productId, -1)} disabled={item.quantity <= 1}>-</button>
+                        <button onClick={() => handleQuantityChange(item.productId, 1)}>+</button>
+                        <button onClick={() => handleRemoveFromCart(item.productId)}>Remove</button>
+                    </li>
+                ))}
+            </ul>
+            <p>Total: ${cart.reduce((total, item) => total + item.product.price * item.quantity, 0).toFixed(2)}</p>
         </div>
-    )
-}
+    );
+};
 
-export default CartPage
+export default CartPage;

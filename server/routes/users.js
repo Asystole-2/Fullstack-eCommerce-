@@ -5,10 +5,10 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const cors = require('cors')
 
-const multer  = require('multer')
-const upload = multer({dest: `${process.env.UPLOADED_FILES_FOLDER}`})
-
-const emptyFolder = require('empty-folder')
+// const multer  = require('multer')
+// const upload = multer({dest: `${process.env.UPLOADED_FILES_FOLDER}`})
+//
+// const emptyFolder = require('empty-folder')
 
 router.post(`/users/register/:name/:email/:password`, (req, res) => {
     console.log(req.params.name);

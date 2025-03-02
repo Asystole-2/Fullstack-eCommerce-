@@ -144,9 +144,6 @@ export default class Products extends Component {
 
             filteredProducts.sort((a, b) => a.reviews - b.reviews)
         }
-        // } else if (sortOrder === "default") {
-        //     filteredProducts = [...products]; // Reset to original order
-        // }
 
         return (
             <div className="product-list">
