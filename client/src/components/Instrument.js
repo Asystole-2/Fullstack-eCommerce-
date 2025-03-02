@@ -1,6 +1,7 @@
 import React, {Component} from "react"
 import {Link} from "react-router-dom"
 import axios from 'axios'
+import InstrumentAPI from "../services/InstrumentAPI";
 
 export default class Instrument extends Component {
     handleAddToCart = () => {
@@ -25,6 +26,35 @@ export default class Instrument extends Component {
 
         alert('Added to cart!')
     }
+
+    handleStockChange = async (change) => {
+        const { product, onUpdate } = this.props;
+
+        if (!product._id || product._id.length !== 24) {
+            alert("Invalid instrument ID");
+            return;
+        }
+
+        if (change < 0 && product.stock + change < 0) {
+            alert("Stock cannot be negative");
+            return;
+        }
+
+        try {
+            console.log("Updating stock for ID:", product._id); // Debugging
+            const action = change > 0 ? "increase" : "decrease";
+            const updatedProduct = await InstrumentAPI.updateStock(product._id, Math.abs(change), action);
+
+            if (!updatedProduct || updatedProduct.stock === undefined) {
+                throw new Error("Failed to update stock.");
+            }
+
+            onUpdate({ ...product, stock: updatedProduct.stock });
+
+        } catch (error) {
+            alert("Failed to update stock: " + (error.message || "Unknown error"));
+        }
+    };
 
     render() {
         const {product, onDelete} = this.props
