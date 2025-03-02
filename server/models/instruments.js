@@ -7,10 +7,10 @@ const ProductSchema = new mongoose.Schema({
     description: {type: String},
     price: {type: Number},
     stock: {type: Number},
-    image: {type: String}  // Image may not be required
+    image: [{type: String}]  // Image may not be required
 }, {
     collection: "products",
 });
 
-const Instruments = mongoose.model("instruments", ProductSchema);
-module.exports = Instruments;
+const Instruments = mongoose.model("instruments", ProductSchema)
+module.exports = Instruments
