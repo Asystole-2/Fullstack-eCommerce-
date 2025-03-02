@@ -1,30 +1,33 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
-import InstrumentAPI from "../services/InstrumentAPI";
 
 export default class Instrument extends Component {
-    handleAddToCart = async () => {
-        const { product } = this.props
-        const userId = localStorage.getItem('userId')
+    handleAddToCart = () => {
+        const { product } = this.props;
 
-        // Check if userId exists before making the request
-        if (!userId) {
-            alert('You must be logged in to add items to the cart.')
-            return
+        // Retrieve existing cart from localStorage or initialize an empty array
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Check if the product is already in the cart
+        const existingItem = cart.find(item => item.productId === product._id);
+
+        if (existingItem) {
+            // If the product is already in the cart, update the quantity
+            existingItem.quantity += 1;
+        } else {
+            // If the product is not in the cart, add it with quantity 1
+            cart.push({ productId: product._id, quantity: 1, product });
         }
 
-        try {
-            await axios.post(`/api/cart/${userId}/add`, { productId: product._id, quantity: 1 })
-            alert('Added to cart!')
-        } catch (error) {
-            console.error('Failed to add to cart:', error)
-            alert('Failed to add to cart')
-        }
+        // Save the updated cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        alert('Added to cart!');
     };
 
     render() {
-        const { product } = this.props
+        const { product } = this.props;
         return (
             <div className="product-card">
                 <img src={product.image} alt={product.name} />
@@ -48,6 +51,6 @@ export default class Instrument extends Component {
                     <Link to={`/EditInstrument/${product._id}`}>Edit</Link>
                 </button>
             </div>
-        )
+        );
     }
 }
