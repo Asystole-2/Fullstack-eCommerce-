@@ -1,36 +1,58 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import axios from 'axios';
+import React, {Component} from "react"
+import {Link} from "react-router-dom"
+import axios from 'axios'
 
 export default class Instrument extends Component {
     handleAddToCart = () => {
-        const { product } = this.props;
+        const {product} = this.props
 
         // Retrieve existing cart from localStorage or initialize an empty array
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cart = JSON.parse(localStorage.getItem('cart')) || []
 
         // Check if the product is already in the cart
-        const existingItem = cart.find(item => item.productId === product._id);
+        const existingItem = cart.find(item => item.productId === product._id)
 
         if (existingItem) {
             // If the product is already in the cart, update the quantity
-            existingItem.quantity += 1;
+            existingItem.quantity += 1
         } else {
             // If the product is not in the cart, add it with quantity 1
-            cart.push({ productId: product._id, quantity: 1, product });
+            cart.push({productId: product._id, quantity: 1, product})
         }
 
         // Save the updated cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(cart));
+        localStorage.setItem('cart', JSON.stringify(cart))
 
-        alert('Added to cart!');
-    };
+        alert('Added to cart!')
+    }
 
     render() {
-        const { product } = this.props;
+        const {product} = this.props
         return (
             <div className="product-card">
-                <img src={product.image} alt={product.name} />
+                <div className="image-gallery">
+                    {product.images?.length > 0 ? (
+                        <>
+                            <img
+                                src={product.images[0]}
+                                alt={product.name}
+                                className="main-image"
+                            />
+                            <div className="thumbnail-container">
+                                {product.images.map((img, index) => (
+                                    <img
+                                        key={index}
+                                        src={img}
+                                        alt={`${product.name} thumbnail ${index}`}
+                                        className="thumbnail"
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    ) : (
+                        <div className="no-image">No Image Available</div>
+                    )}
+                </div>
                 <h2>{product.name}</h2>
                 <p>Brand: {product.brand}</p>
                 <p>{product.description}</p>
@@ -51,6 +73,6 @@ export default class Instrument extends Component {
                     <Link to={`/EditInstrument/${product._id}`}>Edit</Link>
                 </button>
             </div>
-        );
+        )
     }
 }
