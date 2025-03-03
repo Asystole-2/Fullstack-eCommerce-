@@ -29,8 +29,8 @@ export default class Navbar extends Component {
 
                 <div className="nav-icons">
                     <Link to="/"><i className="fas fa-heart"></i></Link>
-                    <Link to="/"><i className="fas fa-shopping-cart"></i></Link>
-                    <Link to="Login"><i className="fas fa-user"></i></Link>
+                    <Link to="/cart"><i className="fas fa-shopping-cart"></i></Link>
+                    <Link to="/Login"><i className="fas fa-user"></i></Link>
                 </div>
             </nav>
         )

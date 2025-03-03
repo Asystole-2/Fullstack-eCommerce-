@@ -13,37 +13,37 @@ class Login extends Component {
         };
     }
 
-handleLogin = async (e) => {
-    e.preventDefault();
-    console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+    handleLogin = async (e) => {
+        e.preventDefault();
+        console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
 
-    try {
-        const res = await axios.post(`${SERVER_HOST}/users/login`, {
-            email: this.state.loginEmail,
-            password: this.state.loginPassword
-        });
+        try {
+            const res = await axios.post(`${SERVER_HOST}/users/login`, {
+                email: this.state.loginEmail,
+                password: this.state.loginPassword
+            });
 
-        if (res.data.errorMessage) {
-            this.setState({ errors: { general: res.data.errorMessage } });
-        } else {
-            localStorage.setItem('token', res.data.token);
-            alert('Login successful');
-            this.setState({ isLoggedIn: true });
+            if (res.data.errorMessage) {
+                this.setState({ errors: { general: res.data.errorMessage } });
+            } else {
+                localStorage.setItem('token', res.data.token);
+                alert('Login successful');
+                this.setState({ isLoggedIn: true });
+            }
+        } catch (error) {
+            console.error('Login error:', error.response?.data || error.message);
+            this.setState({ errors: { general: error.response?.data?.error || "Login failed. Please check your credentials." } });
         }
-    } catch (error) {
-        console.error('Login error:', error.response?.data || error.message);
-        this.setState({ errors: { general: error.response?.data?.error || "Login failed. Please check your credentials." } });
-    }
-};
+    };
 
 
 
 
-render() {
-    if (this.state.isLoggedIn)
-    {
-        return <Redirect to="/MainPage"/>;
-    }
+    render() {
+        if (this.state.isLoggedIn)
+        {
+            return <Redirect to="/MainPage"/>;
+        }
         return (
             <div>
                 <Navbar />

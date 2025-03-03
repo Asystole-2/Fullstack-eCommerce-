@@ -1,56 +1,113 @@
-const router = require('express').Router();
-const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
+const router = require(`express`).Router()
+const usersModel = require(`../models/users`)
+const bcrypt = require(`bcrypt`)
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const cors = require('cors')
+const UserModel = require("../models/users");
 
-// Define user schema
-const UserSchema = new mongoose.Schema({
-    name: String,
-    email: { type: String, unique: true },
-    password: String,
-    role: { type: String, default: 'user' }
+// Delete user
+router.delete("/api/user/:id", async (req, res) => {
+    try {
+        console.log("Attempting to delete user with ID:", req.params.id);
+
+        const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
+
+        if (!deletedUser) {
+            console.log("User not found with ID:", req.params.id);
+            return res.status(400).json({message: "User not found"});
+        }
+
+        console.log("User deleted successfully:", deletedUser);
+        res.json({message: "User deleted successfully"});
+    } catch (error) {
+        console.error("Server error:", error);
+        res.status(500).json({message: "Server error", error});
+    }
 });
 
-const User = mongoose.model('User', UserSchema);
+// Get all users
+router.get("/users", async (req, res) => {
+    try {
+        const users = await UserModel.find({}, { password: 0 }); // Exclude password for security
+        res.json(users);
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+// Get a single user by ID
+router.get("/users/:id", async (req, res) => {
+    try {
+        const user = await UserModel.findById(req.params.id, { password: 0 }); // Exclude password
+        if (!user) return res.status(404).json({ error: "User not found" });
+        res.json(user);
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+// const multer  = require('multer')
+// const upload = multer({dest: `${process.env.UPLOADED_FILES_FOLDER}`})
+//
+// const emptyFolder = require('empty-folder')
+
+router.post(`/users/register/:name/:email/:password`, (req, res) => {
+    console.log(req.params.name);
+
+    // Check if user already exists
+    usersModel.findOne({email: req.params.email}).then(uniqueData => {
+        if (uniqueData) {
+            res.json({errorMessage: `User already exists`})
+        } else {
+            bcrypt.hash(req.params.password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
+                usersModel.create({name: req.params.name, email: req.params.email, password: hash}).then(data => {
+                    if (data) {
+                        res.json({name: data.name})
+                    } else {
+                        res.json({errorMessage: `User was not registered`})
+                    }
+                })
+            })
+        }
+    })
+})
+
+const UserSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+    role: {type: String, default: "user"}
+})
+
+const User = mongoose.model('User', UserSchema)
 
 // Middleware to verify JWT Token
 const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(401).json('Access denied');
+    const token = req.headers['Authorization']
+    if (!token) return res.status(401).json('Access denied')
 
     try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = verified;
-        next();
+        const verified = jwt.verify(token, process.env.JWT_SECRET)
+        req.user = verified
+        next()
     } catch (err) {
-        res.status(400).json({ error: 'Invalid token' });
+        res.status(400).json({error: 'Invalid token'})
     }
-};
+}
 
-// Register route
-router.post('/users/register', (req, res) => {
-    const { name, email, password } = req.body;
+router.post('/Register', async (req, res) => {
+    const {username, password, role} = req.body
+    const salt = await bcrypt.genSalt(10)
+    const hashPassword = await bcrypt.hash(password, salt)
 
-    // Check if user already exists
-    User.findOne({ email }).then(uniqueData => {
-        if (uniqueData) {
-            res.json({ errorMessage: 'User already exists' });
-        } else {
-            bcrypt.hash(password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
-                User.create({ name, email, password: hash }).then(data => {
-                    if (data) {
-                        res.json({ name: data.name });
-                    } else {
-                        res.json({ errorMessage: 'User was not registered' });
-                    }
-                });
-            });
-        }
-    });
-});
+    const user = new User({username, password: hashPassword, role})
+    await user.save()
+    res.json({message: 'Registered successfully'})
+})
 
-// Login route
 router.post('/users/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -70,10 +127,10 @@ router.post('/users/login', async (req, res) => {
 });
 
 
-// Admin route
+
 router.get('/Admin', verifyToken, (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ error: 'Access Denied' });
-    res.json({ message: 'Welcome Admin!' });
-});
+    if (req.user.role !== 'admin@gmail.com') return res.status(403).json({error: 'Access Denied'})
+    res.json({message: 'Welcome Admin!'});
+})
 
 module.exports = router;
