@@ -10,6 +10,7 @@ class Login extends Component {
         this.state = {
             loginEmail: '',
             loginPassword: '',
+            error: ''
         };
     }
 

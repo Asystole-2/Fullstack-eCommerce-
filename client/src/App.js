@@ -12,6 +12,7 @@ import Products from "./components/Products";
 import Navbar from "./components/Navbar";
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants";
 import UsersList from "./components/UsersLists";
+import Admin from "./components/Admin";
 
 
 if (typeof sessionStorage.accessLevel === "undefined")
@@ -33,6 +34,7 @@ export default class App extends Component {
                             <Route exact path="/AddInstrument" component={AddInstrument}/>
                             <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
                             <Route exact path="/cart" component={CartPage}/>
+                            <Route exact path="/Admin" component={Admin}/>
                             <Route component={MainPage}/>
                         </Switch>
                         {/*<UsersList/>*/}

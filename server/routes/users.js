@@ -126,11 +126,4 @@ router.post('/users/login', async (req, res) => {
     }
 });
 
-
-
-router.get('/Admin', verifyToken, (req, res) => {
-    if (req.user.role !== 'admin@gmail.com') return res.status(403).json({error: 'Access Denied'})
-    res.json({message: 'Welcome Admin!'});
-})
-
 module.exports = router;

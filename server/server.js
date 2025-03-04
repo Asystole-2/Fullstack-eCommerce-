@@ -29,6 +29,9 @@ app.use(instrumentsRoutes)
 const userRoutes = require(`./routes/users`)
 app.use( userRoutes );
 
+const adminRoutes = require(`./routes/admin`)
+app.use( '/api/admin', adminRoutes );
+
 
 
 // Port
