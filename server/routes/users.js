@@ -5,48 +5,30 @@ const jwt = require("jsonwebtoken");
 const cors = require('cors')
 const UserModel = require("../models/users");
 
-//Middleware to verify token
-const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization;
-    if (!token) return res.status(401).json({ error: "Access denied. No token provided." });
-
-    try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = verified;
-        next();
-    } catch (err) {
-        res.status(400).json({ error: "Invalid token" });
-    }
-};
-
 // Delete user
-router.delete("/api/user/:id", verifyToken, async (req, res) => {
-    if (!req.user.isAdmin) {
-        return res.status(403).json({ error: "Access denied. Admins only." });
-    }
-
+router.delete("/api/user/:id", async (req, res) => {
     try {
         console.log("Attempting to delete user with ID:", req.params.id);
+
         const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
 
         if (!deletedUser) {
             console.log("User not found with ID:", req.params.id);
-            return res.status(400).json({ message: "User not found" });
+            return res.status(400).json({message: "User not found"});
         }
 
         console.log("User deleted successfully:", deletedUser);
-        res.json({ message: "User deleted successfully" });
+        res.json({message: "User deleted successfully"});
     } catch (error) {
         console.error("Server error:", error);
-        res.status(500).json({ message: "Server error", error });
+        res.status(500).json({message: "Server error", error});
     }
 });
 
-
 // Get all users
-router.get("/users", verifyToken, async (req, res) => {
+router.get("/users", async (req, res) => {
     try {
-        const users = await UserModel.find({}, { password: 0 });
+        const users = await UserModel.find({}, {password: 0}); // Exclude password for security
         res.json(users);
     } catch (error) {
         console.error("Error fetching users:", error);
@@ -54,22 +36,17 @@ router.get("/users", verifyToken, async (req, res) => {
     }
 });
 
-
 // Get a single user by ID
-router.get("/users/:id", verifyToken, async (req, res) => {
-    if (req.user.id !== req.params.id && !req.user.isAdmin) {
-        return res.status(403).json({ error: "Access denied" });
-    }
+router.get("/users/:id", async (req, res) => {
     try {
-        const user = await UserModel.findById(req.params.id, { password: 0 });
-        if (!user) return res.status(404).json({ error: "User not found" });
+        const user = await UserModel.findById(req.params.id, {password: 0}); // Exclude password
+        if (!user) return res.status(404).json({error: "User not found"});
         res.json(user);
     } catch (error) {
         console.error("Error fetching user:", error);
         res.status(500).json({error: "Internal Server Error"});
     }
 });
-
 
 
 // const multer  = require('multer')
@@ -88,41 +65,78 @@ router.post(`/users/register/:name/:email/:password`, (req, res) => {
             bcrypt.hash(req.params.password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
                 UserModel.create({name: req.params.name, email: req.params.email, password: hash}).then(data => {
                     if (data) {
-                        res.json({name: data.name})
+                        const token = jwt.sign( { email: data.email, accessLevel: data.accessLevel }, process.env.JWT_SECRET, {algorithm: "HS256", expiresIn: process.env.JWT_EXPIRES });
+                        res.json({name: data.name, accessLevel: data.accessLevel, token: token});
                     } else {
                         res.json({errorMessage: `User was not registered`})
                     }
                 })
             })
-
-router.post("/users/register", async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-
-        if (!name || !email || !password) {
-            return res.status(400).json({ error: "All fields are required" });
         }
-
-const UserSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    role: {type: String, enum: ['user', 'admin'], default: 'user'}
+    })
 })
 
-const User = mongoose.model('User', UserSchema);
-        // Check if user already exists
-        const existingUser = await usersModel.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: "User already exists" });
+router.post('/users/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        console.log(`Login attempt: ${email}`);
+
+        // Find user in database
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            console.error("Login error: User not found");
+            return res.status(400).json({ error: 'User not found' });
         }
 
-        // Hash password
-        const saltRounds = parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS) || 10;
-        const hashPassword = await bcrypt.hash(password, saltRounds);
+        if (!user.role) {
+            console.error("Login error: User role is missing");
+            return res.status(400).json({ error: 'User role is missing in the database' });
+        }
 
-        // Create user
-        const newUser = new usersModel({ name, email, password: hashPassword });
-        await newUser.save();
+        // Compare password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            console.error("Login error: Wrong password");
+            return res.status(400).json({ error: 'Wrong Password' });
+        }
+
+        // Generate JWT Token
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+                role: user.role,
+            },
+            process.env.JWT_SECRET, // Secret key from `.env`
+            { algorithm: 'HS256', expiresIn: process.env.JWT_EXPIRY } // Expiry from `.env`
+        );
+
+        console.log(`User ${user.email} logged in successfully with role ${user.role}`);
+
+        // Send response with token
+        res.json({
+            message: "Login successful",
+            role: user.role,
+            token: token
+        });
+
+    } catch (error) {
+        console.error("Server Error in Login:", error);
+        res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+});
+
+
+router.post(`/users/logout/`, (req,res) =>
+{
+    res.json({})
+})
+
+// Middleware to verify JWT Token
+const verifyToken = (req, res, next) => {
+    const token = req.headers['Authorization']
+    if (!token) return res.status(401).json('Access denied')
 
     try {
         const verified = jwt.verify(token, process.env.JWT_SECRET)
@@ -136,38 +150,11 @@ const User = mongoose.model('User', UserSchema);
 router.post('/register', async (req, res) => {
     const {username, password, role} = req.body
     const salt = await bcrypt.genSalt(10)
-        res.status(201).json({ message: "User registered successfully" });
+    const hashPassword = await bcrypt.hash(password, salt)
 
-    } catch (error) {
-        console.error("Registration Error:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-});
-
-router.post("/users/login", async (req, res) => {
-    try {
-        const {email, password} = req.body;
-
-        const user = await User.findOne({email});
-        if (!user) return res.status(400).json({error: 'User not found'});
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({error: 'Wrong Password'});
-
-        if (!user.role) {
-            return res.status(400).json({error: 'User role is missing in the database'});
-        }
-
-        const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
-
-        console.log(`User Role After Login: ${user.role}`)
-
-        let redirectURL = user.role === "admin" ? "/MainPage" : "/MainPage";
-        res.json({token, role: user.role, redirectURL});
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
+    new UserModel({username, password: hashPassword, role})
+    await UserModel.save()
+    res.json({message: 'Registered successfully'})
+})
 
 module.exports = router;

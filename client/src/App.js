@@ -9,13 +9,13 @@ import EditInstrument from "./components/EditInstrument";
 import {SearchProvider} from "./components/SearchContext";
 import CartPage from './components/CartPage'; // Adjust path if needed
 import Navbar from "./components/Navbar";
-import {ACCESS_LEVEL_GUEST} from "./config/global_constants";
-import LoggedRoute from "./components/LoggedInRoute";
+// import {ACCESS_LEVEL_GUEST} from "./config/global_constants";
+import LoggedInRoute from "./components/LoggedInRoute";
 
 
 if (typeof sessionStorage.accessLevel === "undefined") {
     sessionStorage.name = "GUEST"
-    sessionStorage.accessLevel = ACCESS_LEVEL_GUEST;
+    // sessionStorage.accessLevel = ACCESS_LEVEL_GUEST;
 
 }
 export default class App extends Component {
@@ -29,9 +29,9 @@ export default class App extends Component {
                             <Route exact path="/MainPage" component={MainPage}/>
                             <Route exact path="/Login" component={Login}/>
                             <Route exact path="/Register" component={Register}/>
-                            <AdminRoute exact path="/AddInstrument" component={AddInstrument}/>
-                            <AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
-                            <LoggedRoute exact path="/cart" component={CartPage}/>
+                            {/*<AdminRoute exact path="/AddInstrument" component={AddInstrument}/>*/}
+                            {/*<AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>*/}
+                            <LoggedInRoute exact path="/cart" component={CartPage}/>
                             <Route component={MainPage}/>
                         </Switch>
                     </div>
