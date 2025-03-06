@@ -1,5 +1,4 @@
 const router = require(`express`).Router()
-const usersModel = require(`../models/users`)
 const bcrypt = require(`bcrypt`)
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -29,23 +28,23 @@ router.delete("/api/user/:id", async (req, res) => {
 // Get all users
 router.get("/users", async (req, res) => {
     try {
-        const users = await UserModel.find({}, { password: 0 }); // Exclude password for security
+        const users = await UserModel.find({}, {password: 0}); // Exclude password for security
         res.json(users);
     } catch (error) {
         console.error("Error fetching users:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 });
 
 // Get a single user by ID
 router.get("/users/:id", async (req, res) => {
     try {
-        const user = await UserModel.findById(req.params.id, { password: 0 }); // Exclude password
-        if (!user) return res.status(404).json({ error: "User not found" });
+        const user = await UserModel.findById(req.params.id, {password: 0}); // Exclude password
+        if (!user) return res.status(404).json({error: "User not found"});
         res.json(user);
     } catch (error) {
         console.error("Error fetching user:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 });
 
@@ -59,12 +58,12 @@ router.post(`/users/register/:name/:email/:password`, (req, res) => {
     console.log(req.params.name);
 
     // Check if user already exists
-    usersModel.findOne({email: req.params.email}).then(uniqueData => {
+    UserModel.findOne({email: req.params.email}).then(uniqueData => {
         if (uniqueData) {
             res.json({errorMessage: `User already exists`})
         } else {
             bcrypt.hash(req.params.password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
-                usersModel.create({name: req.params.name, email: req.params.email, password: hash}).then(data => {
+                UserModel.create({name: req.params.name, email: req.params.email, password: hash}).then(data => {
                     if (data) {
                         res.json({name: data.name})
                     } else {
@@ -79,10 +78,10 @@ router.post(`/users/register/:name/:email/:password`, (req, res) => {
 const UserSchema = new mongoose.Schema({
     username: String,
     password: String,
-    role: {type: String, default: "user"}
+    role: {type: String, enum: ['user', 'admin'], default: 'user'}
 })
 
-const User = mongoose.model('User', UserSchema)
+const User = mongoose.model('User', UserSchema);
 
 // Middleware to verify JWT Token
 const verifyToken = (req, res, next) => {
@@ -98,7 +97,7 @@ const verifyToken = (req, res, next) => {
     }
 }
 
-router.post('/Register', async (req, res) => {
+router.post('/register', async (req, res) => {
     const {username, password, role} = req.body
     const salt = await bcrypt.genSalt(10)
     const hashPassword = await bcrypt.hash(password, salt)
@@ -110,16 +109,24 @@ router.post('/Register', async (req, res) => {
 
 router.post('/users/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const {email, password} = req.body;
 
-        const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ error: 'User not found' });
+        const user = await User.findOne({email});
+        if (!user) return res.status(400).json({error: 'User not found'});
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ error: 'Wrong Password' });
+        if (!isMatch) return res.status(400).json({error: 'Wrong Password'});
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token, role: user.role });
+        if (!user.role) {
+            return res.status(400).json({error: 'User role is missing in the database'});
+        }
+
+        const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
+
+        console.log(`User Role After Login: ${user.role}`)
+
+        let redirectURL = user.role === "admin" ? "/MainPage" : "/MainPage";
+        res.json({token, role: user.role, redirectURL});
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).send('Internal Server Error');

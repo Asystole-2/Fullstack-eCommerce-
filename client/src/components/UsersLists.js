@@ -1,12 +1,11 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import axios from "axios";
 import {SERVER_HOST} from "../config/global_constants";
-import UserAPI from "../services/UserAPI";
 
 export default class UsersList extends Component {
     constructor(props) {
         super(props);
-        this.state = { users: [] };
+        this.state = {users: []};
 
         this.handleDelete = this.handleDelete.bind(this)
     }

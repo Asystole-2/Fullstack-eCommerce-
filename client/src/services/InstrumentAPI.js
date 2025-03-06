@@ -9,8 +9,8 @@ export default class InstrumentAPI {
         try {
             const response = await fetch(endpoint, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount })
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({amount})
             });
 
             if (!response.ok) {
