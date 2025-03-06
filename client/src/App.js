@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {BrowserRouter, Switch, Route } from "react-router-dom";
+import {BrowserRouter, Switch, Route} from "react-router-dom";
 import MainPage from "./components/MainPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -8,16 +8,12 @@ import "./css/App.css";
 import EditInstrument from "./components/EditInstrument";
 import {SearchProvider} from "./components/SearchContext";
 import CartPage from './components/CartPage'; // Adjust path if needed
-import Products from "./components/Products";
 import Navbar from "./components/Navbar";
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants";
-import UsersList from "./components/UsersLists";
-import AdminRoute from "./components/AdminRoute";
 import LoggedRoute from "./components/LoggedInRoute";
 
 
-if (typeof sessionStorage.accessLevel === "undefined")
-{
+if (typeof sessionStorage.accessLevel === "undefined") {
     sessionStorage.name = "GUEST"
     sessionStorage.accessLevel = ACCESS_LEVEL_GUEST;
 
@@ -27,6 +23,7 @@ export default class App extends Component {
         return (
             <SearchProvider>
                 <BrowserRouter>
+                    <Navbar/>
                     <div>
                         <Switch>
                             <Route exact path="/MainPage" component={MainPage}/>
@@ -37,7 +34,6 @@ export default class App extends Component {
                             <LoggedRoute exact path="/cart" component={CartPage}/>
                             <Route component={MainPage}/>
                         </Switch>
-                        {/*<UsersList/>*/}
                     </div>
                 </BrowserRouter>
             </SearchProvider>

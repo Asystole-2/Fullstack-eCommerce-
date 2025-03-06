@@ -1,5 +1,4 @@
 const router = require(`express`).Router()
-const usersModel = require(`../models/users`)
 const bcrypt = require(`bcrypt`)
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -51,7 +50,7 @@ router.get("/users", verifyToken, async (req, res) => {
         res.json(users);
     } catch (error) {
         console.error("Error fetching users:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 });
 
@@ -67,7 +66,7 @@ router.get("/users/:id", verifyToken, async (req, res) => {
         res.json(user);
     } catch (error) {
         console.error("Error fetching user:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 });
 
@@ -78,6 +77,24 @@ router.get("/users/:id", verifyToken, async (req, res) => {
 //
 // const emptyFolder = require('empty-folder')
 
+router.post(`/users/register/:name/:email/:password`, (req, res) => {
+    console.log(req.params.name);
+
+    // Check if user already exists
+    UserModel.findOne({email: req.params.email}).then(uniqueData => {
+        if (uniqueData) {
+            res.json({errorMessage: `User already exists`})
+        } else {
+            bcrypt.hash(req.params.password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
+                UserModel.create({name: req.params.name, email: req.params.email, password: hash}).then(data => {
+                    if (data) {
+                        res.json({name: data.name})
+                    } else {
+                        res.json({errorMessage: `User was not registered`})
+                    }
+                })
+            })
+
 router.post("/users/register", async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -86,6 +103,13 @@ router.post("/users/register", async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
+const UserSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+    role: {type: String, enum: ['user', 'admin'], default: 'user'}
+})
+
+const User = mongoose.model('User', UserSchema);
         // Check if user already exists
         const existingUser = await usersModel.findOne({ email });
         if (existingUser) {
@@ -100,6 +124,18 @@ router.post("/users/register", async (req, res) => {
         const newUser = new usersModel({ name, email, password: hashPassword });
         await newUser.save();
 
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET)
+        req.user = verified
+        next()
+    } catch (err) {
+        res.status(400).json({error: 'Invalid token'})
+    }
+}
+
+router.post('/register', async (req, res) => {
+    const {username, password, role} = req.body
+    const salt = await bcrypt.genSalt(10)
         res.status(201).json({ message: "User registered successfully" });
 
     } catch (error) {
@@ -110,27 +146,27 @@ router.post("/users/register", async (req, res) => {
 
 router.post("/users/login", async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const {email, password} = req.body;
 
-        const user = await usersModel.findOne({ email });
-        if (!user) return res.status(400).json({ error: "User not found" });
+        const user = await User.findOne({email});
+        if (!user) return res.status(400).json({error: 'User not found'});
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ error: "Wrong password" });
+        if (!isMatch) return res.status(400).json({error: 'Wrong Password'});
 
-        const isAdmin = email.endsWith("@admin.com");
+        if (!user.role) {
+            return res.status(400).json({error: 'User role is missing in the database'});
+        }
 
-        const token = jwt.sign(
-            { id: user._id, isAdmin }, // Store isAdmin flag in token
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
+        const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
 
-        res.json({ token, isAdmin });
-    }
-    catch (error) {
-        console.error("Login error:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        console.log(`User Role After Login: ${user.role}`)
+
+        let redirectURL = user.role === "admin" ? "/MainPage" : "/MainPage";
+        res.json({token, role: user.role, redirectURL});
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).send('Internal Server Error');
     }
 });
 

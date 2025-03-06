@@ -4,6 +4,27 @@ import axios from 'axios'
 import InstrumentAPI from "../services/InstrumentAPI";
 
 export default class Instrument extends Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            userRole: localStorage.getItem("role") || "guest", // Default to guest
+        };
+
+        // Bind functions to `this`
+        this.handleStockChange = this.handleStockChange.bind(this);
+        this.handleAddToCart = this.handleAddToCart.bind(this);
+    }
+
+    componentDidMount() {
+        // Listen for role changes (e.g., after login)
+        window.addEventListener("storage", this.updateUserRole);
+    }
+
+    updateUserRole = () => {
+        this.setState({userRole: localStorage.getItem("role") || "guest"});
+    };
+
     handleAddToCart = () => {
         const {product} = this.props
 
@@ -28,7 +49,7 @@ export default class Instrument extends Component {
     }
 
     handleStockChange = async (change) => {
-        const { product, onUpdate } = this.props;
+        const {product, onUpdate} = this.props;
 
         if (!product._id || product._id.length !== 24) {
             alert("Invalid instrument ID");
@@ -49,16 +70,17 @@ export default class Instrument extends Component {
                 throw new Error("Failed to update stock.");
             }
 
-            onUpdate({ ...product, stock: updatedProduct.stock });
+            onUpdate({...product, stock: updatedProduct.stock});
 
         } catch (error) {
             alert("Failed to update stock: " + (error.message || "Unknown error"));
         }
+
     };
 
     render() {
         const {product, onDelete} = this.props
-        const value = product.price || 0
+        const {userRole} = this.state
         return (
             <div className="product-card">
                 <div className="image-gallery">
@@ -90,19 +112,23 @@ export default class Instrument extends Component {
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
                 <p>Price: ${product.price.toFixed(2)}</p>
-                <button onClick={this.handleAddToCart}>Add to Cart</button>
                 <p>Stock: {product.stock}</p>
 
-                <button onClick={() => this.handleStockChange(-1)} disabled={product.stock <= 0}>
-                    Decrease Stock
-                </button>
-                <button onClick={() => this.handleStockChange(1)}>
-                    Increase Stock
-                </button>
-                <button onClick={() => this.props.onDelete(product._id)}>Delete</button>
-                <button>
-                    <Link to={`/EditInstrument/${product._id}`}>Edit</Link>
-                </button>
+                {userRole === "admin" ? (
+                    <div>
+                        <button onClick={() => this.handleStockChange(-1)} disabled={product.stock <= 0}>
+                            Decrease Stock
+                        </button>
+                        <button onClick={() => this.handleStockChange(1)}>Increase Stock</button>
+                        <button onClick={() => onDelete(product._id)}>Delete</button>
+                        <button>
+                            <Link to={`/EditInstrument/${product._id}`}>Edit</Link>
+                        </button>
+                    </div>
+                ) : (
+                    // User View
+                    <button onClick={this.handleAddToCart}>Add to Cart</button>
+                )}
             </div>
         )
     }

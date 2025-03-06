@@ -7,7 +7,8 @@ import {Link} from "react-router-dom";
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
-import SearchContext from "./SearchContext";
+import SearchContext, {SearchProvider} from "./SearchContext";
+import UsersList from "./UsersLists";
 
 export default class Products extends Component {
     constructor(props) {
@@ -144,7 +145,7 @@ export default class Products extends Component {
 
             filteredProducts.sort((a, b) => a.reviews - b.reviews)
         }
-
+        const userRole = localStorage.getItem("role");
         return (
             <div className="product-list">
 
@@ -154,9 +155,11 @@ export default class Products extends Component {
                                selectedBrand={this.state.selectedBrand}/>
 
                 {/*<AddInstrument onAddProduct={this.handleAddProduct} />*/}
-                <div className="add-new-product">
-                    <Link className="blue-button" to={"/AddInstrument"}>Add New Instrument</Link>
-                </div>
+                {userRole === "admin" && (
+                    <div className="add-new-product">
+                        <Link className="blue-button" to={"/AddInstrument"}>Add New Instrument</Link>
+                    </div>
+                )}
                 <div>
                     <SortProducts sortOrder={this.state.sortOrder} handleSortChange={this.handleSortChange}/>
                     <div className="grid">
@@ -175,6 +178,9 @@ export default class Products extends Component {
                         )}
                     </div>
                 </div>
+                {userRole === "admin" && (
+                    <UsersList/>
+                )}
             </div>
         )
     }

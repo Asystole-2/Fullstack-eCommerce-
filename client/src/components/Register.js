@@ -13,6 +13,7 @@ class Register extends React.Component {
             email: "",
             password: "",
             confirmPassword: "",
+
             isRegistered: false,
             errors: ""
         };
@@ -24,6 +25,7 @@ class Register extends React.Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
+
 
         // Check password confirmation
         if (this.state.password !== this.state.confirmPassword) {
@@ -58,7 +60,6 @@ class Register extends React.Component {
 
         return (
             <div>
-                <Navbar />
                 <div className="register">
                     <div className="register-container">
                         <div className="input-group">

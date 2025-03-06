@@ -1,4 +1,3 @@
-
 // Cors
 const cors = require('cors')
 
@@ -23,12 +22,14 @@ app.use(require(`body-parser`).json())
 
 
 // Routers
-const instrumentsRoutes = require(`./routes/instruments`)
-app.use(instrumentsRoutes)
 
+const adminRoutes = require(`./routes/admin`)
 const userRoutes = require(`./routes/users`)
-app.use( userRoutes );
+const instrumentsRoutes = require(`./routes/instruments`)
 
+app.use(instrumentsRoutes)
+app.use(userRoutes);
+app.use('/api/admin', adminRoutes);
 
 
 // Port
