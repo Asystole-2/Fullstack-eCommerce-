@@ -5,6 +5,9 @@ const jwt = require("jsonwebtoken");
 const cors = require('cors')
 const UserModel = require("../models/users");
 
+const fs = require('fs')
+const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
+
 // Delete user
 router.delete("/api/user/:id", async (req, res) => {
     try {
@@ -65,7 +68,7 @@ router.post(`/users/register/:name/:email/:password`, (req, res) => {
             bcrypt.hash(req.params.password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
                 UserModel.create({name: req.params.name, email: req.params.email, password: hash}).then(data => {
                     if (data) {
-                        const token = jwt.sign( { email: data.email, accessLevel: data.accessLevel }, process.env.JWT_SECRET, {algorithm: "HS256", expiresIn: process.env.JWT_EXPIRES });
+                        const token = jwt.sign( { email: data.email, accessLevel: data.accessLevel }, JWT_PRIVATE_KEY, {algorithm: "RS256", expiresIn: process.env.JWT_EXPIRES });
                         res.json({name: data.name, accessLevel: data.accessLevel, token: token});
                     } else {
                         res.json({errorMessage: `User was not registered`})
@@ -108,8 +111,8 @@ router.post('/users/login', async (req, res) => {
                 email: user.email,
                 role: user.role,
             },
-            process.env.JWT_SECRET, // Secret key from `.env`
-            { algorithm: 'HS256', expiresIn: process.env.JWT_EXPIRY } // Expiry from `.env`
+            JWT_PRIVATE_KEY, // Secret key from `.env`
+            { algorithm: 'RS256', expiresIn: process.env.JWT_EXPIRY } // Expiry from `.env`
         );
 
         console.log(`User ${user.email} logged in successfully with role ${user.role}`);
@@ -139,7 +142,7 @@ const verifyToken = (req, res, next) => {
     if (!token) return res.status(401).json('Access denied')
 
     try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET)
+        const verified = jwt.verify(token, JWT_PRIVATE_KEY)
         req.user = verified
         next()
     } catch (err) {

@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 const adminAuth = require('../middleware/adminAuth');
 
+const fs = require('fs')
+const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
+
 const router = express.Router();
 
 // Admin login route
@@ -23,7 +26,7 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign(
             {id: user._id, role: user.role},
-            process.env.JWT_SECRET,
+            JWT_PRIVATE_KEY,
             {expiresIn: '15m'}
         );
 

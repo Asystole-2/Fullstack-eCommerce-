@@ -3,7 +3,11 @@ const router = express.Router()
 const InstrumentModel = require("../models/instruments"); // Import the Product model
 console.log("Instrument model: ", InstrumentModel)
 const mongoose = require("mongoose")
+const jwt = require("jsonwebtoken");
+const UserModel = require("../models/users");
 
+const fs = require('fs')
+const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
@@ -19,9 +23,16 @@ router.get("/instruments", async (req, res) => {
 // Read one instrument by ID
 router.get("/instruments/:id", async (req, res) => {
     try {
-        const instrument = await InstrumentModel.findById(req.params.id)
-        if (!instrument) return res.status(404).json({error: "Instrument not found"})
-        res.json(instrument)
+        jwt.verify(req.headers.authorization, JWT_PRIVATE_KEY, {algorithm: "RS256"}, (err, decodedToken) => {
+            if (err) {
+                res.json({errorMessage:`User is not logged in`})
+            }
+            else {
+                InstrumentModel.findById(req.params.id, (error, data) => {
+                    res.json(data)
+                })
+            }
+        })
     } catch (error) {
         console.error("Error fetching instrument:", error)
         res.status(500).json({error: "Internal Server Error"})
@@ -31,13 +42,33 @@ router.get("/instruments/:id", async (req, res) => {
 // Add new record
 router.post("/instruments", async (req, res) => {
     try {
-        const newInstrument = await InstrumentModel.create(req.body)
-        res.status(201).json(newInstrument)
+        const token = req.headers.authorization;
+        if (!token) {
+            return res.status(401).json({ errorMessage: "User is not logged in" });
+        }
+
+        jwt.verify(token, JWT_PRIVATE_KEY, { algorithms: ["RS256"] }, async (err, decodedToken) => {
+            if (err) {
+                return res.status(401).json({ errorMessage: "Invalid or expired token" });
+            }
+
+            if (decodedToken.accessLevel >= process.env.ACCESS_LEVEL_ADMIN) {
+                try {
+                    const newInstrument = await InstrumentModel.create(req.body);
+                    res.status(201).json(newInstrument);
+                } catch (dbError) {
+                    console.error("Error adding instrument:", dbError);
+                    res.status(500).json({ error: "Error saving instrument to the database" });
+                }
+            } else {
+                res.status(403).json({ errorMessage: "User is not an administrator, so they cannot add new records" });
+            }
+        });
     } catch (error) {
-        console.error("Error adding instrument:", error)
-        res.status(500).json({error: "Internal Server Error"})
+        console.error("Unexpected server error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-})
+});
 
 // Update instrument
 router.put("/instruments/:id", async (req, res) => {
