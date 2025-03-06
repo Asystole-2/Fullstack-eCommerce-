@@ -8,6 +8,7 @@
   },
   "private": true,
   "dependencies": {
+    "@paypal/react-paypal-js": "^8.8.2",
     "async": "^3.2.6",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",

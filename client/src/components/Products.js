@@ -7,7 +7,7 @@ import {Link} from "react-router-dom"
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
-import SearchContext, {SearchProvider} from "./SearchContext"
+import SearchContext from "./SearchContext"
 import UsersList from "./UsersLists"
 
 export default class Products extends Component {

@@ -26,10 +26,13 @@ app.use(require(`body-parser`).json())
 const adminRoutes = require(`./routes/admin`)
 const userRoutes = require(`./routes/users`)
 const instrumentsRoutes = require(`./routes/instruments`)
+const salesRoutes = require(`./routes/sales`)
 
 app.use(instrumentsRoutes)
 app.use(userRoutes)
 app.use('/api/admin', adminRoutes)
+app.use(salesRoutes)
+
 
 
 // Port
