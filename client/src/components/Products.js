@@ -33,9 +33,33 @@ export default class Products extends Component {
         this.handleSortChange = this.handleSortChange.bind(this)
     }
 
-    handleAddProduct = (newProduct) => {
-        this.setState({products: [...this.state.products, newProduct]})
-    }
+    handleAddProduct = async () => {
+        const token = localStorage.getItem("token"); // ✅ Retrieve token
+
+        if (!token) {
+            console.error("User is not logged in"); // ✅ Log issue for debugging
+            alert("Please log in to add instruments.");
+            return;
+        }
+
+        try {
+            const response = await axios.post("http://localhost:4000/instruments", {
+                name: "Guitar",
+                brand: "Fender",
+                price: 1200,
+                stock: 5
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // ✅ Ensure token is sent
+                }
+            });
+
+            console.log("Instrument added successfully:", response.data);
+        } catch (error) {
+            console.error("Error adding instrument:", error);
+        }
+    };
 
     // Handle DELETE request
     handleDelete = async (id) => {

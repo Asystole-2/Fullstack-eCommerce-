@@ -30,7 +30,7 @@ export default class App extends Component {
                             <Route exact path="/Login" component={Login}/>
                             <Route exact path="/Register" component={Register}/>
                             <Route exact path="/AddInstrument" component={AddInstrument}/>
-                            {/*<AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>*/}
+                            <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
                             <LoggedInRoute exact path="/cart" component={CartPage}/>
                             <Route component={MainPage}/>
                         </Switch>

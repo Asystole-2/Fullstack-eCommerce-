@@ -1,11 +1,13 @@
-const router = require(`express`).Router()
-const bcrypt = require(`bcrypt`)
+const express = require("express");
+const router = express.Router();
+const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const cors = require('cors')
+const fs = require("fs");
+const path = require("path");
+const cors = require("cors");
 const UserModel = require("../models/users");
 
-const fs = require('fs')
 const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
 
 // Delete user
@@ -57,27 +59,73 @@ router.get("/users/:id", async (req, res) => {
 //
 // const emptyFolder = require('empty-folder')
 
-router.post(`/users/register/:name/:email/:password`, (req, res) => {
-    console.log(req.params.name);
+// router.post(`/users/register/:name/:email/:password`, (req, res) => {
+//     console.log(req.params.name);
+//
+//     // Check if user already exists
+//     UserModel.findOne({email: req.params.email}).then(uniqueData => {
+//         if (uniqueData) {
+//             res.json({errorMessage: `User already exists`})
+//         } else {
+//             bcrypt.hash(req.params.password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
+//                 UserModel.create({name: req.params.name, email: req.params.email, password: hash, role: req.params.role, accessLevel: req.params.role === "admin" ? 2 : 1}).then(data => {
+//                     if (data) {
+//                         const token = jwt.sign(
+//                             { email: data.email, accessLevel: data.accessLevel },
+//                             JWT_PRIVATE_KEY,
+//                             {algorithm: "RS256", expiresIn: process.env.JWT_EXPIRES });
+//                         res.json({name: data.name, accessLevel: data.accessLevel, token: token});
+//                     } else {
+//                         res.json({errorMessage: `User was not registered`})
+//                     }
+//                 })
+//             })
+//         }
+//     })
+// })
 
-    // Check if user already exists
-    UserModel.findOne({email: req.params.email}).then(uniqueData => {
-        if (uniqueData) {
-            res.json({errorMessage: `User already exists`})
-        } else {
-            bcrypt.hash(req.params.password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
-                UserModel.create({name: req.params.name, email: req.params.email, password: hash}).then(data => {
-                    if (data) {
-                        const token = jwt.sign( { email: data.email, accessLevel: data.accessLevel }, JWT_PRIVATE_KEY, {algorithm: "RS256", expiresIn: process.env.JWT_EXPIRES });
-                        res.json({name: data.name, accessLevel: data.accessLevel, token: token});
-                    } else {
-                        res.json({errorMessage: `User was not registered`})
-                    }
-                })
-            })
+router.post('/users/register', async (req, res) => {
+    const { name, email, password, role } = req.body;
+
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    try {
+        // Check if user already exists
+        const existingUser = await UserModel.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists' });
         }
-    })
-})
+
+        // Hash password
+        const saltRounds = parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS) || 10;
+        const hashPassword = await bcrypt.hash(password, saltRounds);
+
+        // Set access level based on role (default: normal user)
+        const accessLevel = role === "admin" ? 2 : 1;
+
+        // Create user
+        const newUser = new UserModel({ name, email, password: hashPassword, role, accessLevel });
+        await newUser.save();
+
+        // Generate JWT Token
+        const token = jwt.sign(
+            { id: newUser._id, email: newUser.email, accessLevel: newUser.accessLevel, role: newUser.role },
+            JWT_PRIVATE_KEY,
+            { algorithm: "RS256", expiresIn: process.env.JWT_EXPIRES || "1h" }
+        );
+
+        res.status(201).json({
+            message: "User registered successfully",
+            token,
+            user: { name: newUser.name, email: newUser.email, role: newUser.role }
+        });
+    } catch (error) {
+        console.error("Error registering user:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 
 router.post('/users/login', async (req, res) => {
     try {
@@ -108,12 +156,15 @@ router.post('/users/login', async (req, res) => {
         const token = jwt.sign(
             {
                 id: user._id,
+                accessLevel: user.accessLevel,
                 email: user.email,
                 role: user.role,
             },
             JWT_PRIVATE_KEY, // Secret key from `.env`
             { algorithm: 'RS256', expiresIn: process.env.JWT_EXPIRY } // Expiry from `.env`
         );
+
+        console.log(token);
 
         console.log(`User ${user.email} logged in successfully with role ${user.role}`);
 
@@ -134,30 +185,6 @@ router.post('/users/login', async (req, res) => {
 router.post(`/users/logout/`, (req,res) =>
 {
     res.json({})
-})
-
-// Middleware to verify JWT Token
-const verifyToken = (req, res, next) => {
-    const token = req.headers['Authorization']
-    if (!token) return res.status(401).json('Access denied')
-
-    try {
-        const verified = jwt.verify(token, JWT_PRIVATE_KEY)
-        req.user = verified
-        next()
-    } catch (err) {
-        res.status(400).json({error: 'Invalid token'})
-    }
-}
-
-router.post('/register', async (req, res) => {
-    const {username, password, role} = req.body
-    const salt = await bcrypt.genSalt(10)
-    const hashPassword = await bcrypt.hash(password, salt)
-
-    new UserModel({username, password: hashPassword, role})
-    await UserModel.save()
-    res.json({message: 'Registered successfully'})
 })
 
 module.exports = router;

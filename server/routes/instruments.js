@@ -4,10 +4,21 @@ const InstrumentModel = require("../models/instruments"); // Import the Product 
 console.log("Instrument model: ", InstrumentModel)
 const mongoose = require("mongoose")
 const jwt = require("jsonwebtoken");
-const UserModel = require("../models/users");
-
 const fs = require('fs')
-const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
+const path = require("path")
+
+const jwtPrivateKeyPath = process.env.JWT_PRIVATE_KEY_FILENAME;
+if (!jwtPrivateKeyPath) {
+    throw new Error("JWT_PRIVATE_KEY_FILENAME is not set in environment variables.");
+}
+
+let JWT_PRIVATE_KEY;
+try {
+    JWT_PRIVATE_KEY = fs.readFileSync(path.resolve(jwtPrivateKeyPath), "utf8");
+} catch (error) {
+    console.error("Error reading JWT private key file:", error.message);
+    throw new Error("Failed to read JWT private key. Check the file path.");
+}
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
@@ -39,36 +50,96 @@ router.get("/instruments/:id", async (req, res) => {
     }
 })
 
-// Add new record
-router.post("/instruments", async (req, res) => {
-    try {
-        const token = req.headers.authorization;
-        if (!token) {
-            return res.status(401).json({ errorMessage: "User is not logged in" });
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        console.error("JWT Missing in Request Headers"); // ✅ Log missing token
+        return res.status(401).json({ error: "JWT must be provided" });
+    }
+
+    const token = authHeader.split(" ")[1]; // ✅ Extract token after 'Bearer '
+
+    jwt.verify(token, JWT_PRIVATE_KEY, { algorithms: ["RS256"] }, (err, user) => {
+        if (err) {
+            console.error("JWT Verification Failed:", err.message);
+            return res.status(403).json({ error: "Invalid or expired token." });
         }
 
-        jwt.verify(token, JWT_PRIVATE_KEY, { algorithms: ["RS256"] }, async (err, decodedToken) => {
-            if (err) {
-                return res.status(401).json({ errorMessage: "Invalid or expired token" });
-            }
+        req.user = user; // ✅ Attach user info to request
+        next();
+    });
+};
 
-            if (decodedToken.accessLevel >= process.env.ACCESS_LEVEL_ADMIN) {
-                try {
-                    const newInstrument = await InstrumentModel.create(req.body);
-                    res.status(201).json(newInstrument);
-                } catch (dbError) {
-                    console.error("Error adding instrument:", dbError);
-                    res.status(500).json({ error: "Error saving instrument to the database" });
-                }
-            } else {
-                res.status(403).json({ errorMessage: "User is not an administrator, so they cannot add new records" });
-            }
-        });
-    } catch (error) {
-        console.error("Unexpected server error:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+const checkAdmin = (req, res, next) => {
+    console.log("Checking Admin Access for User:", req.user); // Debug log
+
+    const requiredAccessLevel = parseInt(process.env.ACCESS_LEVEL_ADMIN, 10);
+    if (!req.user || req.user.accessLevel === undefined) {
+        return res.status(403).json({ error: "Access denied. User access level missing." });
     }
-});
+
+    if (req.user.accessLevel < requiredAccessLevel) {
+        return res.status(403).json({ error: "User is not authorized to add instruments." });
+    }
+
+    next();
+};
+
+// Add new record
+// router.post(`/instruments`, (req, res) =>
+// {
+//     jwt.verify(req.headers.authorization, JWT_PRIVATE_KEY, {algorithm: "RS256"}, (err, decodedToken) =>
+//     {
+//         if (err)
+//         {
+//             res.json({errorMessage:`User is not logged in`})
+//         }
+//         else
+//         {
+//             if(decodedToken.accessLevel >= process.env.ACCESS_LEVEL_ADMIN)
+//             {
+//                 // Use the new car details to create a new car document
+//                 InstrumentModel.create(req.body, (error, data) =>
+//                 {
+//                     res.json(data)
+//                 })
+//             }
+//             else
+//             {
+//                 res.json({errorMessage:`User is not an administrator, so they cannot add new records`})
+//             }
+//         }
+//     })
+// })
+
+// // Add new record
+router.post("/instruments", async (req, res) => {
+
+    jwt.verify(req.headers.authorization?.split(" ")[1], JWT_PRIVATE_KEY, { algorithms: ["RS256"] }, async (err, decodedToken) => {
+        if (err) {
+            console.error("JWT Verification Failed:", err.message); // ✅ Log exact error
+            return res.status(401).json({ errorMessage: "Invalid or expired token" });
+        }
+        else
+        {
+            if(decodedToken.accessLevel >= process.env.ACCESS_LEVEL_ADMIN)
+            {
+                // Use the new car details to create a new car document
+                InstrumentModel.create(req.body, (error, data) =>
+                {
+                    res.json(data)
+                })
+            }
+            else
+            {
+                res.json({errorMessage:`User is not an administrator, so they cannot add new records`})
+            }
+        }
+        req.user = decodedToken; // ✅ Attach user info for authorization
+        next();
+    })
+})
 
 // Update instrument
 router.put("/instruments/:id", async (req, res) => {

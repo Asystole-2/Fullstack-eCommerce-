@@ -81,6 +81,7 @@ export default class Instrument extends Component {
     render() {
         const {product, onDelete} = this.props
         const {userRole} = this.state
+        const value = product.price ? product.price.toFixed(2) : 0
         return (
             <div className="product-card">
                 <div className="image-gallery">
@@ -111,7 +112,7 @@ export default class Instrument extends Component {
                 <p>{product.description}</p>
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
-                <p>Price: ${product.price.toFixed(2)}</p>
+                <p>Price: ${value}</p>
                 <p>Stock: {product.stock}</p>
 
                 {userRole === "admin" ? (
