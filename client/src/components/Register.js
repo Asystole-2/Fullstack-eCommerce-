@@ -13,25 +13,30 @@ class Register extends React.Component {
             confirmPassword: "",
             errors: {},
             isRegistered: false,
-        };
+        }
     }
 
+    // Function to handle input changes
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
-    };
+    }
 
+    // Function to validate name
     validateName = (name) => {
         return /^[a-zA-Z\s]{3,50}$/.test(name);
     }
 
+    // Function to validate email
     validateEmail = (email) => {
         return /\S+@\S+\.\S+/.test(email);
     }
 
+    // Function to validate password
     validatePassword = (password) => {
         return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
     }
 
+    // Function to handle form submission
     handleSubmit = (e) => {
         e.preventDefault();
 
@@ -50,10 +55,12 @@ class Register extends React.Component {
             errors.password = "Password must be at least 8 characters, include one uppercase letter, one lowercase letter, one number, and one special character.";
         }
 
+        //Ceck if password and confirm password match
         if (password !== confirmPassword) {
             errors.confirmPassword = "Passwords do not match.";
         }
 
+        //Check if there are any errors
         if (Object.keys(errors).length > 0) {
             this.setState({ errors });
             return;
