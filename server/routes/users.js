@@ -46,14 +46,17 @@ router.post('/users/register', async (req, res) => {
     }
 
     try {
+        //Check if user already exists
         const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ error: 'User already exists' });
         }
 
+        //Hash password
         const saltRounds = parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS) || 10;
         const hashPassword = await bcrypt.hash(password, saltRounds);
 
+        //Create new user
         const newUser = new UserModel({ name, email, password: hashPassword });
         await newUser.save();
 
