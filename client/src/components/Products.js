@@ -2,13 +2,13 @@ import React, {Component} from "react"
 import Instrument from "./Instrument"
 import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
-import {Link} from "react-router-dom";
+import {Link} from "react-router-dom"
 
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
-import SearchContext, {SearchProvider} from "./SearchContext";
-import UsersList from "./UsersLists";
+import SearchContext, {SearchProvider} from "./SearchContext"
+import UsersList from "./UsersLists"
 
 export default class Products extends Component {
     constructor(props) {
@@ -39,35 +39,35 @@ export default class Products extends Component {
 
     // Handle DELETE request
     handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this instrument?")) return;
+        if (!window.confirm("Are you sure you want to delete this instrument?")) return
 
         try {
             const response = await fetch(`${SERVER_HOST}/api/instruments/${id}`, {
                 method: "DELETE",
-            });
+            })
 
             if (response.ok) {
-                alert("Instrument deleted successfully!");
+                alert("Instrument deleted successfully!")
                 if (this.state.products) {
                     this.setState({
                         products: this.state.products.filter(item => item._id !== id)
-                    });
+                    })
                 }
             } else {
-                alert("Error deleting instrument");
+                alert("Error deleting instrument")
             }
         } catch (error) {
-            console.error("Error deleting instrument:", error);
+            console.error("Error deleting instrument:", error)
         }
-    };
+    }
 
     updateInstrument = (updatedInstrument) => {
         this.setState((prevState) => ({
             products: prevState.products.map(inst =>
                 inst._id === updatedInstrument._id ? updatedInstrument : inst
             )
-        }));
-    };
+        }))
+    }
 
     handleUpdateProduct(updatedProduct) {
         const updatedProducts = this.state.products.map((product) =>
@@ -114,7 +114,7 @@ export default class Products extends Component {
 
     render() {
         const {products, selectedBrand, selectedCategory, sortOrder} = this.state
-        const { searchQuery = "" } = this.context || {};
+        const { searchQuery = "" } = this.context || {}
 
         let filteredProducts = products.filter(product => {
             return (
@@ -132,20 +132,20 @@ export default class Products extends Component {
         })
 
         if (sortOrder === "nameAZ") {
-            filteredProducts.sort((a, b) => a.name.localeCompare(b.name))
+            filteredProducts.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
         } else if (sortOrder === "nameZA") {
-            filteredProducts.sort((a, b) => b.name.localeCompare(a.name))
+            filteredProducts.sort((a, b) => (b.name || '').localeCompare(a.name || ''))
         } else if (sortOrder === "lowToHigh") {
-            filteredProducts.sort((a, b) => a.price - b.price)
+            filteredProducts.sort((a, b) => (a.price || 0) - (b.price || 0))
         } else if (sortOrder === "highToLow") {
-            filteredProducts.sort((a, b) => b.price - a.price)
+            filteredProducts.sort((a, b) => (b.price || 0) - (a.price || 0))
         } else if (sortOrder === "reviewsHighToLow") {
-            filteredProducts.sort((a, b) => b.reviews - a.reviews)
+            filteredProducts.sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
         } else if (sortOrder === "reviewsLowToHigh") {
-
-            filteredProducts.sort((a, b) => a.reviews - b.reviews)
+            filteredProducts.sort((a, b) => (a.reviews || 0) - (b.reviews || 0))
         }
-        const userRole = localStorage.getItem("role");
+
+        const userRole = localStorage.getItem("role")
         return (
             <div className="product-list">
 

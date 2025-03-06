@@ -1,29 +1,28 @@
 import React, {Component} from "react"
 import {Link} from "react-router-dom"
-import axios from 'axios'
-import InstrumentAPI from "../services/InstrumentAPI";
+import InstrumentAPI from "../services/InstrumentAPI"
 
 export default class Instrument extends Component {
 
     constructor(props) {
-        super(props);
+        super(props)
         this.state = {
             userRole: localStorage.getItem("role") || "guest", // Default to guest
-        };
+        }
 
         // Bind functions to `this`
-        this.handleStockChange = this.handleStockChange.bind(this);
-        this.handleAddToCart = this.handleAddToCart.bind(this);
+        this.handleStockChange = this.handleStockChange.bind(this)
+        this.handleAddToCart = this.handleAddToCart.bind(this)
     }
 
     componentDidMount() {
         // Listen for role changes (e.g., after login)
-        window.addEventListener("storage", this.updateUserRole);
+        window.addEventListener("storage", this.updateUserRole)
     }
 
     updateUserRole = () => {
-        this.setState({userRole: localStorage.getItem("role") || "guest"});
-    };
+        this.setState({userRole: localStorage.getItem("role") || "guest"})
+    }
 
     handleAddToCart = () => {
         const {product} = this.props
@@ -49,34 +48,34 @@ export default class Instrument extends Component {
     }
 
     handleStockChange = async (change) => {
-        const {product, onUpdate} = this.props;
+        const {product, onUpdate} = this.props
 
         if (!product._id || product._id.length !== 24) {
-            alert("Invalid instrument ID");
-            return;
+            alert("Invalid instrument ID")
+            return
         }
 
         if (change < 0 && product.stock + change < 0) {
-            alert("Stock cannot be negative");
-            return;
+            alert("Stock cannot be negative")
+            return
         }
 
         try {
-            console.log("Updating stock for ID:", product._id); // Debugging
-            const action = change > 0 ? "increase" : "decrease";
-            const updatedProduct = await InstrumentAPI.updateStock(product._id, Math.abs(change), action);
+            console.log("Updating stock for ID:", product._id) // Debugging
+            const action = change > 0 ? "increase" : "decrease"
+            const updatedProduct = await InstrumentAPI.updateStock(product._id, Math.abs(change), action)
 
             if (!updatedProduct || updatedProduct.stock === undefined) {
-                throw new Error("Failed to update stock.");
+                throw new Error("Failed to update stock.")
             }
 
-            onUpdate({...product, stock: updatedProduct.stock});
+            onUpdate({...product, stock: updatedProduct.stock})
 
         } catch (error) {
-            alert("Failed to update stock: " + (error.message || "Unknown error"));
+            alert("Failed to update stock: " + (error.message || "Unknown error"))
         }
 
-    };
+    }
 
     render() {
         const {product, onDelete} = this.props
@@ -111,7 +110,7 @@ export default class Instrument extends Component {
                 <p>{product.description}</p>
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
-                <p>Price: ${product.price.toFixed(2)}</p>
+                <p>Price: {product.price !== undefined ? `$${product.price.toFixed(2)}` : 'Price not available'}</p>
                 <p>Stock: {product.stock}</p>
 
                 {userRole === "admin" ? (

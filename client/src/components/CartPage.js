@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react'
 import {Link} from 'react-router-dom'
-import Navbar from "./Navbar"
 
 const CartPage = () => {
     const [cart, setCart] = useState([])
@@ -33,7 +32,6 @@ const CartPage = () => {
     if (!cart.length) {
         return (
             <>
-                <Navbar/>
                 <div className="cart-page">
                     <div>
                         <p>Your cart is empty.</p>
@@ -47,7 +45,7 @@ const CartPage = () => {
     }
 
     return (
-        <><Navbar/>
+        <>
             <div className="cart-page">
                 <h1>Shopping Cart</h1>
                 <ul className="cart-list">
