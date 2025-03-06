@@ -8,6 +8,7 @@ const app = express()
 
 const cartRoutes = require('./routes/cart')
 app.use('/api', cartRoutes)
+
 // Server-side global variables
 require(`dotenv`).config({path: `./config/.env`})
 
@@ -25,14 +26,15 @@ app.use(require(`body-parser`).json())
 
 const adminRoutes = require(`./routes/admin`)
 const userRoutes = require(`./routes/users`)
-const instrumentsRoutes = require(`./routes/instruments`)
-const salesRoutes = require(`./routes/sales`)
+// const instrumentsRoutes = require(`./routes/instruments`)
+// const salesRoutes = require(`./routes/sales`)
 
-app.use(instrumentsRoutes)
+// app.use(instrumentsRoutes)
 app.use(userRoutes)
 app.use('/api/admin', adminRoutes)
-app.use(salesRoutes)
-
+// app.use(salesRoutes)
+app.use(require(`./routes/instruments`))
+app.use(require(`./routes/sales`))
 
 
 // Port

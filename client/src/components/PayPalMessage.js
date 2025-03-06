@@ -46,16 +46,15 @@ export default class PayPalMessage extends Component
         return (
             <div className="payPalMessage">
 
-                {this.state.redirectToDisplayAllProducts ? <Redirect to="/MainPage"/> : null}
+                {this.state.redirectToDisplayAllProducts ? <Redirect to="/Products"/> : null}
 
                 <h3>{this.state.heading}</h3>
+                <p>{this.props.match.params.message}</p>
                 <p>{this.state.message}</p>
 
-                {this.props.match.params.messageType === PayPalMessage.messageType.SUCCESS &&
-                    <p>Your PayPal payment confirmation is:
-                    <span id="payPalPaymentID">{this.props.match.params.payPalPaymentID}</span></p>}
+                {this.props.match.params.messageType === PayPalMessage.messageType.SUCCESS ? <p>Your PayPal payment confirmation is <span id="payPalPaymentID">{this.props.match.params.payPalPaymentID}</span></p> : null}
 
-                <p id="payPalPaymentIDButton"><Link className={this.state.buttonColour} to={"/MainPage"}>Continue</Link></p>
+                <p id="payPalPaymentIDButton"><Link className={this.state.buttonColour} to={"/Products"}>Continue</Link></p>
             </div>
         )
     }

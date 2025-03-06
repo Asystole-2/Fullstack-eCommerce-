@@ -94,7 +94,6 @@ const CartPage = () => {
                     Total: ${cart.reduce((total, item) => total + item.product.price * item.quantity, 0).toFixed(2)}
                 </p>
 
-                {/* Continue Shopping */}
                 <Link to="/MainPage" className="continue-shopping">
                     Continue Shopping
                 </Link>

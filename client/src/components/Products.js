@@ -3,7 +3,6 @@ import Instrument from "./Instrument"
 import {SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
 import {Link} from "react-router-dom"
-
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"

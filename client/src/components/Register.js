@@ -1,7 +1,5 @@
 import React from 'react';
-import Navbar from "./Navbar";
 import { Link, Redirect } from "react-router-dom";
-import LinkInClass from "./LinkInClass";
 import axios from "axios";
 import { SERVER_HOST } from "../config/global_constants";
 
