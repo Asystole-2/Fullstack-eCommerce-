@@ -85,6 +85,7 @@ class Login extends Component {
                             </div>
                         </form>
 
+
                         {/* Additional Links */}
                         <div style={{marginLeft: 20}}>
                             <p>Don't have an account?</p>
@@ -92,6 +93,7 @@ class Login extends Component {
                             <br/><br/>
                             <p>Or, sign in as Admin</p>
                             <Link to="/AdminLogin">Admin Login</Link>
+
                         </div>
                     </div>
                 </div>

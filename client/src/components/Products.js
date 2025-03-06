@@ -114,7 +114,7 @@ export default class Products extends Component {
 
     render() {
         const {products, selectedBrand, selectedCategory, sortOrder} = this.state
-        const {searchQuery} = this.context
+        const { searchQuery = "" } = this.context || {};
 
         let filteredProducts = products.filter(product => {
             return (

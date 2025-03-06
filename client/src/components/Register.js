@@ -1,10 +1,9 @@
 import React from 'react';
 import Navbar from "./Navbar";
-import {Link} from "react-router-dom";
-import {Redirect} from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import LinkInClass from "./LinkInClass";
 import axios from "axios";
-import {SERVER_HOST} from "../config/global_constants";
+import { SERVER_HOST } from "../config/global_constants";
 
 class Register extends React.Component {
     constructor(props) {
@@ -14,42 +13,58 @@ class Register extends React.Component {
             email: "",
             password: "",
             confirmPassword: "",
-            isRegistered: false
-        }
+
+            isRegistered: false,
+            errors: ""
+        };
     }
 
     handleChange = (e) => {
-        this.setState({[e.target.name]: e.target.value})
-    }
+        this.setState({ [e.target.name]: e.target.value });
+    };
+
     handleSubmit = (e) => {
         e.preventDefault();
-        axios.post(`${SERVER_HOST}/users/register/${this.state.name}/${this.state.email}/${this.state.password}`)
 
+
+        // Check password confirmation
+        if (this.state.password !== this.state.confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+
+        axios.post(`${SERVER_HOST}/users/register`, {
+            name: this.state.name,
+            email: this.state.email,
+            password: this.state.password
+        })
             .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        console.log(res.data.errorMessage)
-                    } else {
-                        console.log("Record added")
-                        this.setState({isRegistered: true})
-                    }
+                if (res.data && res.data.errorMessage) {
+                    console.log(res.data.errorMessage);
+                    this.setState({ errors: res.data.errorMessage });
                 } else {
-                    console.log("Record not added")
+                    console.log("Record added");
+                    this.setState({ isRegistered: true });
                 }
             })
-
-    }
+            .catch(error => {
+                console.error("Registration error:", error.response?.data || error.message);
+                this.setState({ errors: "Registration failed. Please try again." });
+            });
+    };
 
     render() {
+        if (this.state.isRegistered) {
+            return <Redirect to="/MainPage" />;
+        }
+
         return (
             <div>
                 <div className="register">
                     <div className="register-container">
-                        {/* Register Form */}
                         <div className="input-group">
                             <h2>Register</h2>
-                            <form className="form-container" noValidate={true} id="registerForm">
-                                {this.state.isRegistered ? <Redirect to="/MainPage"/> : null}
+                            <form className="form-container" onSubmit={this.handleSubmit}>
                                 <label>
                                     Name*
                                     <input
@@ -58,9 +73,7 @@ class Register extends React.Component {
                                         autoComplete="name"
                                         value={this.state.name}
                                         onChange={this.handleChange}
-                                        ref={(input) => {
-                                            this.inputToFocus = input
-                                        }}
+                                        required
                                     />
                                 </label>
 
@@ -68,13 +81,11 @@ class Register extends React.Component {
                                     Email*
                                     <input
                                         name="email"
-                                        type="text"
+                                        type="email"
                                         autoComplete="email"
                                         value={this.state.email}
                                         onChange={this.handleChange}
-                                        ref={(input) => {
-                                            this.inputToFocus = input
-                                        }}
+                                        required
                                     />
                                 </label>
 
@@ -83,12 +94,10 @@ class Register extends React.Component {
                                     <input
                                         name="password"
                                         type="password"
-                                        autoComplete="current-password"
+                                        autoComplete="new-password"
                                         value={this.state.password}
                                         onChange={this.handleChange}
-                                        ref={(input) => {
-                                            this.inputToFocus = input
-                                        }}
+                                        required
                                     />
                                 </label>
 
@@ -97,19 +106,17 @@ class Register extends React.Component {
                                     <input
                                         name="confirmPassword"
                                         type="password"
-                                        autoComplete="current-password"
+                                        autoComplete="new-password"
                                         value={this.state.confirmPassword}
                                         onChange={this.handleChange}
-                                        ref={(input) => {
-                                            this.inputToFocus = input
-                                        }}
+                                        required
                                     />
                                 </label>
 
-                                <LinkInClass value="Register New User" className="green-button"
-                                             onClick={this.handleSubmit}/>
-                                <Link className="red-button" to={"/Login"}>Cancel</Link>
+                                {this.state.errors && <p style={{ color: "red" }}>{this.state.errors}</p>}
 
+                                <button type="submit" className="green-button">Register New User</button>
+                                <Link className="red-button" to={"/Login"}>Cancel</Link>
                             </form>
                         </div>
                     </div>
