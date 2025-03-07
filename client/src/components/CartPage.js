@@ -1,37 +1,51 @@
-import React, {useEffect, useState} from 'react'
-import {Link} from 'react-router-dom'
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import BuyProduct from './BuyProduct'
 
-const CartPage = () => {
-    const [cart, setCart] = useState([])
+class CartPage extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            cart: []
+        }
+    }
 
-    useEffect(() => {
+    componentDidMount() {
         // Retrieve cart items from localStorage
         const storedCart = JSON.parse(localStorage.getItem('cart')) || []
-        setCart(storedCart)
-    }, [])
+        this.setState({ cart: storedCart })
+    }
 
-    const handleRemoveFromCart = (productId) => {
+    handlePurchaseSuccess = () => {
+        localStorage.removeItem('cart')
+        this.setState({ cart: [] })
+    }
+
+    handleRemoveFromCart = (productId) => {
         // Filter out the item to be removed
-        const updatedCart = cart.filter(item => item.productId !== productId)
-        setCart(updatedCart)
+        const updatedCart = this.state.cart.filter(item => item.productId !== productId)
+        this.setState({ cart: updatedCart })
         // Update localStorage
         localStorage.setItem('cart', JSON.stringify(updatedCart))
     }
 
-    const handleQuantityChange = (productId, delta) => {
-        const updatedCart = cart.map(item => {
+    handleQuantityChange = (productId, delta) => {
+        const updatedCart = this.state.cart.map(item => {
             if (item.productId === productId) {
-                return {...item, quantity: Math.max(1, item.quantity + delta)}
+                return { ...item, quantity: Math.max(1, item.quantity + delta) }
             }
             return item
         })
-        setCart(updatedCart)
+        this.setState({ cart: updatedCart })
         localStorage.setItem('cart', JSON.stringify(updatedCart))
     }
 
-    if (!cart.length) {
-        return (
-            <>
+    render() {
+        const { cart } = this.state
+        const totalAmount = cart.reduce((total, item) => total + item.product.price * item.quantity, 0).toFixed(2)
+
+        if (!cart.length) {
+            return (
                 <div className="cart-page">
                     <div>
                         <p>Your cart is empty.</p>
@@ -40,12 +54,10 @@ const CartPage = () => {
                         Continue Shopping
                     </Link>
                 </div>
-            </>
-        )
-    }
+            )
+        }
 
-    return (
-        <>
+        return (
             <div className="cart-page">
                 <h1>Shopping Cart</h1>
                 <ul className="cart-list">
@@ -54,7 +66,6 @@ const CartPage = () => {
                             {item.product.images?.length > 0 ? (
                                 <img
                                     className="cart-item-image"
-                                    key={0}
                                     src={item.product.images[0]}
                                     alt={`${item.product.name} main`}
                                 />
@@ -62,7 +73,7 @@ const CartPage = () => {
                                 <div className="no-image">No Image Available</div>
                             )}
                             <div className="product-info">
-                                <h4>Product: {item.product.name} </h4>
+                                <h4>Product: {item.product.name}</h4>
                                 <h4>Brand: {item.product.brand}</h4>
                                 <h4>Cost: {item.quantity} x ${item.product.price.toFixed(2)}</h4>
                             </div>
@@ -70,36 +81,41 @@ const CartPage = () => {
                             <div className="quantity-controls">
                                 <button
                                     className="quantity-button"
-                                    onClick={() => handleQuantityChange(item.productId, -1)}
+                                    onClick={() => this.handleQuantityChange(item.productId, -1)}
                                     disabled={item.quantity <= 1}
-                                > -
+                                >
+                                    -
                                 </button>
                                 <span>{item.quantity}</span>
                                 <button
                                     className="quantity-button"
-                                    onClick={() => handleQuantityChange(item.productId, 1)}
-                                > +
+                                    onClick={() => this.handleQuantityChange(item.productId, 1)}
+                                >
+                                    +
                                 </button>
                             </div>
                             <button
                                 className="remove-button"
-                                onClick={() => handleRemoveFromCart(item.productId)}
+                                onClick={() => this.handleRemoveFromCart(item.productId)}
                             >
                                 Remove
                             </button>
                         </li>
                     ))}
                 </ul>
-                <p className="total-price">
-                    Total: ${cart.reduce((total, item) => total + item.product.price * item.quantity, 0).toFixed(2)}
-                </p>
+                <p className="total-price">Total: ${totalAmount}</p>
 
+                <BuyProduct
+                    cartItems={cart}
+                    total={totalAmount}
+                    onSuccess={this.handlePurchaseSuccess}
+                />
                 <Link to="/MainPage" className="continue-shopping">
                     Continue Shopping
                 </Link>
             </div>
-        </>
-    )
+        )
+    }
 }
 
 export default CartPage

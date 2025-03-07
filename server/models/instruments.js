@@ -18,7 +18,7 @@ const ProductSchema = new mongoose.Schema({
     sold: {type: Boolean, default:false}
 }, {
     collection: "products",
-});
+})
 
 const Instruments = mongoose.model("instruments", ProductSchema)
 module.exports = Instruments
