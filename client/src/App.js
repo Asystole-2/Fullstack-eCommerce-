@@ -38,7 +38,7 @@ export default class App extends Component {
                             <CartPage exact path="/cart" component={CartPage}/>
                             <Route exact path="/Aboutpage" component={AboutPage}/>
                             <Route exact path="/Home" component={Home}/>
-                            <Route component={MainPage}/>
+                            <Route component={Home}/>
                         </Switch>
                     </div>
                 </BrowserRouter>

@@ -32,26 +32,48 @@ export default class MainPage extends Component {
     render() {
         return (
             <div className="home-page">
-                <div className="background-image">
-                <h1>Welcome to MyShop</h1>
-                <p>Explore some of our products:</p>
-            </div>
-                <div className="product-list">
-                    {this.state.products.length > 0 ? (
-                        this.state.products.map((product) => (
-                            <div key={product._id} className="product-card">
-                                {/* Using the Instrument component to display the product details */}
-                                <Instrument product={product} onDelete={() => {}} />
-                            </div>
-                        ))
-                    ) : (
-                        <p>No products with more than 15 reviews found.</p>
-                    )}
+                {/* Background Video */}
+                <div className="background-video">
+                    <video
+                        className="background-video"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                    >
+                        <source src="/videos/background.mp4" type="video/mp4" />
+
+                    </video>
+
+                    <div className="shop-button-container">
+                        <Link to="/MainPage" className="shop-button">
+                            Shop Now
+                        </Link>
+                    </div>
                 </div>
-                <Link to="/MainPage" className="shop-link">
-                    See more products
-                </Link>
+
+                {/* Content Below the Video */}
+                <div className="content">
+                    <h1>Welcome to MyShop</h1>
+                    <p>Explore some of our products:</p>
+
+                    <div className="product-list">
+                        {this.state.products.length > 0 ? (
+                            this.state.products.map((product) => (
+                                <div key={product._id} className="product-card">
+                                    {/* Using the Instrument component to display the product details */}
+                                    <Instrument product={product} onDelete={() => {}} />
+                                </div>
+                            ))
+                        ) : (
+                            <p>No products with more than 15 reviews found.</p>
+                        )}
+                    </div>
+
+
+                </div>
             </div>
         );
     }
+
 }
