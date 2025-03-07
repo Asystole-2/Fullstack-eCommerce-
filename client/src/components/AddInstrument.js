@@ -1,7 +1,7 @@
 import React, {Component} from "react"
 import {Redirect, Link} from "react-router-dom"
 import axios from "axios"
-import {SERVER_HOST} from "../config/global_constants"
+import {ACCESS_LEVEL_ADMIN, SERVER_HOST} from "../config/global_constants"
 import LinkInClass from "./LinkInClass";
 
 export default class AddInstrument extends Component {
@@ -14,45 +14,46 @@ export default class AddInstrument extends Component {
             stock: "",
             description: "",
             image: "",
-            redirectToDisplayAllInstruments: false
+            redirectToDisplayAllInstruments: localStorage.accessLevel < ACCESS_LEVEL_ADMIN
         }
 
     }
 
-    // componentDidMount() {
-    //     this.inputToFocus.focus()
-    // }
+    componentDidMount() {
+    }
 
     handleChange = (e) => {
         this.setState({[e.target.name]: e.target.value})
     }
 
-    handleSubmit = (e) => {
-        e.preventDefault()
+    handleSubmit = async (e) => {
+        e.preventDefault();
 
-        const instrumentObject = {
-            name: this.state.name,
-            price: Number(this.state.price),
-            stock: Number(this.state.stock),
-            description: this.state.description,
-            image: this.state.image
-        }
-        axios.post(`${SERVER_HOST}/instruments`, instrumentObject)
-            .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        console.log(res.data.errorMessage)
-                    } else {
-                        console.log("Record added")
-                        this.setState({redirectToDisplayAllInstruments: true})
-                    }
-                } else {
-                    console.log("Record not added")
+        try {
+            const instrumentObject = {
+                name: this.state.name,
+                price: Number(this.state.price),
+                stock: Number(this.state.stock),
+                description: this.state.description,
+                image: this.state.image // Ensure this is a valid URL or handle FormData if it's a file
+            };
+
+            const res = await axios.post(`${SERVER_HOST}/instruments/add`, instrumentObject, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
-            })
-            .catch(error => console.error("Error adding instrument:", error))
+            });
 
-    }
+            if (res.status === 201 || res.status === 200) {
+                console.log("Record added");
+                this.setState({ redirectToDisplayAllInstruments: true });
+            } else {
+                console.log("Unexpected response:", res.data);
+            }
+        } catch (error) {
+            console.error("Error adding instrument:", error.response?.data?.errorMessage || error.message);
+        }
+    };
 
     render() {
         return (

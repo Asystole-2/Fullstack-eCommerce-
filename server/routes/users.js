@@ -1,11 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
-const path = require("path");
-const cors = require("cors");
 const UserModel = require("../models/users");
 
 const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
@@ -59,31 +56,7 @@ router.get("/users/:id", async (req, res) => {
 //
 // const emptyFolder = require('empty-folder')
 
-// router.post(`/users/register/:name/:email/:password`, (req, res) => {
-//     console.log(req.params.name);
-//
-//     // Check if user already exists
-//     UserModel.findOne({email: req.params.email}).then(uniqueData => {
-//         if (uniqueData) {
-//             res.json({errorMessage: `User already exists`})
-//         } else {
-//             bcrypt.hash(req.params.password, parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS)).then(hash => {
-//                 UserModel.create({name: req.params.name, email: req.params.email, password: hash, role: req.params.role, accessLevel: req.params.role === "admin" ? 2 : 1}).then(data => {
-//                     if (data) {
-//                         const token = jwt.sign(
-//                             { email: data.email, accessLevel: data.accessLevel },
-//                             JWT_PRIVATE_KEY,
-//                             {algorithm: "RS256", expiresIn: process.env.JWT_EXPIRES });
-//                         res.json({name: data.name, accessLevel: data.accessLevel, token: token});
-//                     } else {
-//                         res.json({errorMessage: `User was not registered`})
-//                     }
-//                 })
-//             })
-//         }
-//     })
-// })
-
+// Register User
 router.post('/users/register', async (req, res) => {
     const { name, email, password, role } = req.body;
 
@@ -127,57 +100,51 @@ router.post('/users/register', async (req, res) => {
     }
 });
 
-router.post('/users/login', async (req, res) => {
+// Login
+router.post(`/users/login`, async (req, res) => {
     try {
-        const { email, password } = req.body;
-        console.log(`Login attempt: ${email}`);
+        const { email, password } = req.body; // Get login credentials from request body
 
-        // Find user in database
+        if (!email || !password) {
+            return res.status(400).json({ errorMessage: "Email and password are required." });
+        }
+
+        const user1 = await UserModel.findOne({ email: "admin@example.com" });
+        console.log(user1.accessLevel); // Should be 'admin' for admin, 'user' for normal users
+
+        console.log("User role: ", user1.accessLevel); // Add this before sending response
+
+        // Find the user by email
         const user = await UserModel.findOne({ email });
 
         if (!user) {
-            console.error("Login error: User not found");
-            return res.status(400).json({ error: 'User not found' });
+            console.log("User not found in DB");
+            return res.status(401).json({ errorMessage: "Invalid email or password" });
         }
 
-        if (!user.role) {
-            console.error("Login error: User role is missing");
-            return res.status(400).json({ error: 'User role is missing in the database' });
-        }
-
-        // Compare password
+        // Compare passwords
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            console.error("Login error: Wrong password");
-            return res.status(400).json({ error: 'Wrong Password' });
+            return res.status(401).json({ errorMessage: "Invalid email or password" });
         }
 
-        // Generate JWT Token
+        // Create JWT token
         const token = jwt.sign(
-            {
-                id: user._id,
-                accessLevel: user.accessLevel,
-                email: user.email,
-                role: user.role,
-            },
-            JWT_PRIVATE_KEY, // Secret key from `.env`
-            { algorithm: 'RS256', expiresIn: process.env.JWT_EXPIRY } // Expiry from `.env`
+            { email: user.email, accessLevel: user.accessLevel, role: user.role },
+            JWT_PRIVATE_KEY,
+            { algorithm: "RS256", expiresIn: process.env.JWT_EXPIRY }
         );
 
-        console.log(token);
-
-        console.log(`User ${user.email} logged in successfully with role ${user.role}`);
-
-        // Send response with token
         res.json({
-            message: "Login successful",
+            name: user.name,
+            accessLevel: user.accessLevel,
             role: user.role,
-            token: token
+            token: token,
         });
 
     } catch (error) {
-        console.error("Server Error in Login:", error);
-        res.status(500).json({ error: "Internal Server Error", details: error.message });
+        console.error("Login error:", error);
+        res.status(500).json({ errorMessage: "An error occurred during login." });
     }
 });
 

@@ -2,6 +2,7 @@ import React, {Component} from "react"
 import {Link} from "react-router-dom"
 import axios from 'axios'
 import InstrumentAPI from "../services/InstrumentAPI";
+import {ACCESS_LEVEL_ADMIN} from "../config/global_constants";
 
 export default class Instrument extends Component {
 
@@ -82,6 +83,7 @@ export default class Instrument extends Component {
         const {product, onDelete} = this.props
         const {userRole} = this.state
         const value = product.price ? product.price.toFixed(2) : 0
+        const userAccessLevel = localStorage.getItem("accessLevel");
         return (
             <div className="product-card">
                 <div className="image-gallery">
@@ -115,7 +117,7 @@ export default class Instrument extends Component {
                 <p>Price: ${value}</p>
                 <p>Stock: {product.stock}</p>
 
-                {userRole === "admin" ? (
+                {userAccessLevel >= ACCESS_LEVEL_ADMIN ? (
                     <div>
                         <button onClick={() => this.handleStockChange(-1)} disabled={product.stock <= 0}>
                             Decrease Stock
