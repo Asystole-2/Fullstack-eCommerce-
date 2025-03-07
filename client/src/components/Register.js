@@ -1,7 +1,5 @@
-import React from 'react';
-import Navbar from "./Navbar";
+import React from "react";
 import { Link, Redirect } from "react-router-dom";
-import LinkInClass from "./LinkInClass";
 import axios from "axios";
 import { SERVER_HOST } from "../config/global_constants";
 
@@ -13,50 +11,74 @@ class Register extends React.Component {
             email: "",
             password: "",
             confirmPassword: "",
-            selectedFile:null,
+            errors: {},
             isRegistered: false,
-            errors: ""
-        };
+        }
     }
 
+    // Function to handle input changes
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
-    };
-    handleFileChange = (e) =>
-    {
-        this.setState({selectedFile: e.target.files[0]})
     }
 
+    // Function to validate name
+    validateName = (name) => {
+        return /^[a-zA-Z\s]{3,50}$/.test(name);
+    }
+
+    // Function to validate email
+    validateEmail = (email) => {
+        return /\S+@\S+\.\S+/.test(email);
+    }
+
+    // Function to validate password
+    validatePassword = (password) => {
+        return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
+    }
+
+    // Function to handle form submission
     handleSubmit = (e) => {
         e.preventDefault();
 
-        let formData = new FormData()
-        formData.append("profilePhoto", this.state.selectedFile)
+        const { name, email, password, confirmPassword } = this.state;
+        let errors = {};
 
-        // Check password confirmation
-        if (this.state.password !== this.state.confirmPassword) {
-            alert("Passwords do not match");
+        if (!this.validateName(name)) {
+            errors.name = "Name must be between 3 and 50 characters and contain only letters and spaces.";
+        }
+
+        if (!this.validateEmail(email)) {
+            errors.email = "Invalid email format.";
+        }
+
+        if (!this.validatePassword(password)) {
+            errors.password = "Password must be at least 8 characters, include one uppercase letter, one lowercase letter, one number, and one special character.";
+        }
+
+        //Ceck if password and confirm password match
+        if (password !== confirmPassword) {
+            errors.confirmPassword = "Passwords do not match.";
+        }
+
+        //Check if there are any errors
+        if (Object.keys(errors).length > 0) {
+            this.setState({ errors });
             return;
         }
 
-        axios.post(`${SERVER_HOST}/users/register`, {
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password
-        })
-            .then(res => {
+        axios
+            .post(`${SERVER_HOST}/users/register`, { name, email, password })
+            .then((res) => {
                 if (res.data && res.data.errorMessage) {
-                    console.log(res.data.errorMessage);
-                    this.setState({ errors: res.data.errorMessage });
+                    this.setState({ errors: { server: res.data.errorMessage } });
                 } else {
                     console.log("Record added");
-                    sessionStorage.pprofilePhoto= res.data.profilePhoto;
                     this.setState({ isRegistered: true });
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error("Registration error:", error.response?.data || error.message);
-                this.setState({ errors: "Registration failed. Please try again." });
+                this.setState({ errors: { server: "Registration failed. Please try again." } });
             });
     };
 
@@ -82,6 +104,7 @@ class Register extends React.Component {
                                         onChange={this.handleChange}
                                         required
                                     />
+                                    {this.state.errors.name && <p style={{ color: "red" }}>{this.state.errors.name}</p>}
                                 </label>
 
                                 <label>
@@ -94,6 +117,7 @@ class Register extends React.Component {
                                         onChange={this.handleChange}
                                         required
                                     />
+                                    {this.state.errors.email && <p style={{ color: "red" }}>{this.state.errors.email}</p>}
                                 </label>
 
                                 <label>
@@ -106,6 +130,7 @@ class Register extends React.Component {
                                         onChange={this.handleChange}
                                         required
                                     />
+                                    {this.state.errors.password && <p style={{ color: "red" }}>{this.state.errors.password}</p>}
                                 </label>
 
                                 <label>
@@ -118,17 +143,10 @@ class Register extends React.Component {
                                         onChange={this.handleChange}
                                         required
                                     />
-                                </label>
-                                <input
-                                    type="file"
-                                    onChange={this.handleFileChange}
-                                />
-
-                                <label>
-
+                                    {this.state.errors.confirmPassword && <p style={{ color: "red" }}>{this.state.errors.confirmPassword}</p>}
                                 </label>
 
-                                {this.state.errors && <p style={{color: "red"}}>{this.state.errors}</p>}
+                                {this.state.errors.server && <p style={{ color: "red" }}>{this.state.errors.server}</p>}
 
                                 <button type="submit" className="green-button">Register New User</button>
                                 <Link className="red-button" to={"/Login"}>Cancel</Link>
