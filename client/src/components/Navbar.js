@@ -6,19 +6,21 @@ export default class Navbar extends Component {
     static contextType = SearchContext;
 
     handleSearch = (event) => {
-        this.context.setSearchQuery(event.target.value)
+        this.context.setSearchQuery(event.target.value);
     };
 
     handleLogout = () => {
+        localStorage.removeItem('token'); // Clear the token in localStorage
+        localStorage.removeItem('profilePhoto'); // Clear the profile photo from localStorage
         sessionStorage.clear();
-        localStorage.clear();
-        window.location.href = '/login';
+        this.forceUpdate();
     };
 
     render() {
-        const isLoggedIn = sessionStorage.getItem('token') !== null;
-        const profilePhoto = sessionStorage.getItem('profilePhoto');
+        const isLoggedIn = localStorage.getItem('token') !== null;
+        const profilePhoto = localStorage.getItem('profilePhoto');
 
+        // Debugging output
         console.log('Is logged in:', isLoggedIn);
         console.log('Profile photo:', profilePhoto);
 
@@ -45,17 +47,20 @@ export default class Navbar extends Component {
                     {/* Show profile picture and logout button if logged in */}
                     {isLoggedIn && profilePhoto ? (
                         <>
-                            <img
-                                src={`uploads/${profilePhoto}`}
-                                alt="Profile"
-                                className="profile-photo"
-                            />
+                            {localStorage.profilePhoto !== "null" ? (
+                                <img
+                                    id="profilePhoto"
+                                    src={`data:;base64,${localStorage.profilePhoto}`}
+                                    alt="Profile"
+                                />
+                            ) : null}
+
                             <button onClick={this.handleLogout} className="logout-button">
                                 Logout
                             </button>
                         </>
                     ) : (
-
+                        // Show login button if not logged in
                         <Link to="/Login"><i className="fas fa-user"></i></Link>
                     )}
                 </div>
