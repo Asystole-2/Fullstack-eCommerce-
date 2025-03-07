@@ -12,7 +12,8 @@ import Navbar from "./components/Navbar"
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants"
 import LoggedInRoute from "./components/LoggedInRoute"
 import AdminRoute from "./components/AdminRoute"
-
+import AboutPage from "./components/AboutPage"
+import Home from "./components/Home"
 
 if (typeof localStorage.accessLevel === "undefined")
 {
@@ -35,6 +36,8 @@ export default class App extends Component {
                             <AdminRoute exact path="/AddInstrument" component={AddInstrument}/>
                             <AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
                             <CartPage exact path="/cart" component={CartPage}/>
+                            <Route exact path="/Aboutpage" component={AboutPage}/>
+                            <Route exact path="/Home" component={Home}/>
                             <Route component={MainPage}/>
                         </Switch>
                     </div>
