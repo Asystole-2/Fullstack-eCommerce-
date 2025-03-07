@@ -4,26 +4,42 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const UserModel = require("../models/users");
+const authenticateJWT = require("../middleware/authMiddleware");
 
 const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
 
 // Delete user
-router.delete("/api/user/:id", async (req, res) => {
+router.delete("/api/user/:id", authenticateJWT, async (req, res) => {
     try {
         console.log("Attempting to delete user with ID:", req.params.id);
 
-        const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
-
-        if (!deletedUser) {
-            console.log("User not found with ID:", req.params.id);
-            return res.status(400).json({message: "User not found"});
+        // Ensure ID is provided
+        if (!req.params.id) {
+            return res.status(400).json({ message: "User ID is required" });
         }
 
+        // Ensure the request includes a valid token
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized. No valid JWT token." });
+        }
+
+        console.log("Authenticated User:", req.user);
+
+        // Check if the user exists
+        const userToDelete = await UserModel.findById(req.params.id);
+        if (!userToDelete) {
+            console.log("User not found with ID:", req.params.id);
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Delete the user
+        const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
         console.log("User deleted successfully:", deletedUser);
-        res.json({message: "User deleted successfully"});
+
+        res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
         console.error("Server error:", error);
-        res.status(500).json({message: "Server error", error});
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 });
 

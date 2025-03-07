@@ -21,27 +21,32 @@ export default class EditInstrument extends Component {
     }
 
     componentDidMount = async () => {
-        const token = localStorage.getItem("token"); // ✅ Retrieve JWT
+        const token = localStorage.getItem("token");
 
         if (!token) {
             console.error("User is not logged in");
-            alert("Please log in to view this instrument.");
+            alert("Please log in to edit instruments.");
             return;
         }
 
         try {
+            console.log("Fetching instrument with ID:", this.props.match.params.id);
+
             const response = await axios.get(
-                `http://localhost:4000/instruments/${this.props.match.params.id}`,
+                `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`, // ✅ Attach JWT
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 }
             );
+
+            console.log("API Response:", response.data);
+
+            console.log("Name:", response.data.name);
 
             if (response.data) {
                 this.setState({
                     name: response.data.name || "",
+                    brand: response.data.brand || "",
                     price: response.data.price || "",
                     stock: response.data.stock || "",
                     description: response.data.description || "",
