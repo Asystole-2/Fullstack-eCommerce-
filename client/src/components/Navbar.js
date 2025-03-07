@@ -6,20 +6,21 @@ export default class Navbar extends Component {
     static contextType = SearchContext;
 
     handleSearch = (event) => {
-        this.context.setSearchQuery(event.target.value);
+        this.context.setSearchQuery(event.target.value)
     };
 
     handleLogout = () => {
+        sessionStorage.clear();
         localStorage.clear();
-        sessionStorage.clear(); // Clear sessionStorage as well
-        window.location.href = '/login';    // Redirect to login
+        window.location.href = '/login';
     };
 
     render() {
-        const isLoggedIn = sessionStorage.getItem('token') !== null; // Check if the user is logged in
-
-        // Get profile photo from localStorage (if available)
+        const isLoggedIn = sessionStorage.getItem('token') !== null;
         const profilePhoto = sessionStorage.getItem('profilePhoto');
+
+        console.log('Is logged in:', isLoggedIn);
+        console.log('Profile photo:', profilePhoto);
 
         return (
             <nav className="navbar">
@@ -41,22 +42,21 @@ export default class Navbar extends Component {
                     <Link to="/"><i className="fas fa-heart"></i></Link>
                     <Link to="/cart"><i className="fas fa-shopping-cart"></i></Link>
 
-                    {/* Show profile picture if logged in */}
+                    {/* Show profile picture and logout button if logged in */}
                     {isLoggedIn && profilePhoto ? (
-                        <img
-                            src={`uploads/${profilePhoto}`} // Profile image from uploads folder
-                            alt="Profile"
-                            className="profile-photo"
-                        />
+                        <>
+                            <img
+                                src={`uploads/${profilePhoto}`}
+                                alt="Profile"
+                                className="profile-photo"
+                            />
+                            <button onClick={this.handleLogout} className="logout-button">
+                                Logout
+                            </button>
+                        </>
                     ) : (
-                        <Link to="/Login"><i className="fas fa-user"></i></Link> // Show login if not logged in
-                    )}
 
-                    {/* Show logout button if logged in */}
-                    {isLoggedIn && (
-                        <div>
-                            <button onClick={this.handleLogout} className="logout-button">Logout</button>
-                        </div>
+                        <Link to="/Login"><i className="fas fa-user"></i></Link>
                     )}
                 </div>
             </nav>

@@ -14,11 +14,12 @@ import LoggedInRoute from "./components/LoggedInRoute"
 import AdminRoute from "./components/AdminRoute"
 
 
-if (typeof sessionStorage.accessLevel === "undefined") {
-    sessionStorage.name = "GUEST"
-    sessionStorage.accessLevel = ACCESS_LEVEL_GUEST
-    sessionStorage.profilePhoto = null
-
+if (typeof localStorage.accessLevel === "undefined")
+{
+    localStorage.name = "GUEST"
+    localStorage.accessLevel = ACCESS_LEVEL_GUEST
+    localStorage.token = null
+    localStorage.profilePhoto = null
 }
 export default class App extends Component {
     render() {

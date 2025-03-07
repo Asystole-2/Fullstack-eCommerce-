@@ -2,6 +2,12 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const UserModel = require('../models/users');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
+
+// Set up multer to handle image uploads
+const upload = multer({ dest: `${process.env.UPLOADED_FILES_FOLDER}` });
 
 // Middleware to verify token
 const verifyToken = (req, res, next) => {
@@ -28,41 +34,60 @@ const isValidName = (name) => {
     return /^[a-zA-Z\s]{3,50}$/.test(name);
 }
 
-// Register user with validation
-router.post('/users/register', async (req, res) => {
+// Register user with validation and image upload
+router.post('/users/register', upload.single("profilePhoto"), async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
         return res.status(400).json({ error: 'All fields are required' });
     }
+
     if (!isValidName(name)) {
         return res.status(400).json({ error: 'Name must be between 3 and 50 characters and contain only letters and spaces.' });
     }
+
     if (!isValidEmail(email)) {
         return res.status(400).json({ error: 'Invalid email format.' });
     }
+
     if (!isValidPassword(password)) {
         return res.status(400).json({ error: 'Password must be at least 8 characters, include one uppercase letter, one lowercase letter, one number, and one special character.' });
     }
 
-    try {
-        //Check if user already exists
-        const existingUser = await UserModel.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
+    if (!req.file) {
+        return res.status(400).json({ errorMessage: 'No file was selected to be uploaded' });
+    }
+
+    if (!['image/png', 'image/jpg', 'image/jpeg'].includes(req.file.mimetype)) {
+        fs.unlink(path.join(__dirname, req.file.path), (error) => {
+            return res.status(400).json({ errorMessage: 'Only .png, .jpg, and .jpeg formats are accepted' });
+        });
+    } else {
+        // File is valid, continue processing the user registration
+        try {
+            const existingUser = await UserModel.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ error: 'User already exists' });
+            }
+
+            // Hash password
+            const saltRounds = parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS) || 10;
+            const hashPassword = await bcrypt.hash(password, saltRounds);
+
+            // Create new user
+            const newUser = new UserModel({
+                name,
+                email,
+                password: hashPassword,
+                profilePhotoFilename: req.file.filename, // Save the filename in the database
+            });
+
+            await newUser.save();
+
+            res.status(201).json({ message: 'User registered successfully' });
+        } catch (error) {
+            res.status(500).json({ error: 'Internal Server Error' });
         }
-
-        //Hash password
-        const saltRounds = parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS) || 10;
-        const hashPassword = await bcrypt.hash(password, saltRounds);
-
-        //Create new user
-        const newUser = new UserModel({ name, email, password: hashPassword });
-        await newUser.save();
-
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
@@ -73,6 +98,7 @@ router.post('/users/login', async (req, res) => {
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
     }
+
     if (!isValidEmail(email)) {
         return res.status(400).json({ error: 'Invalid email format' });
     }
