@@ -38,6 +38,7 @@ class Login extends Component {
             } else {
                 localStorage.setItem('token', res.data.token);
                 alert('Login successful');
+                sessionStorage.pprofilePhoto= res.data.profilePhoto;
                 this.setState({isLoggedIn: true, redirectURL: res.data.redirectURL});
             }
         } catch (error) {

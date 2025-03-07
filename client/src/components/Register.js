@@ -13,7 +13,7 @@ class Register extends React.Component {
             email: "",
             password: "",
             confirmPassword: "",
-
+            selectedFile:null,
             isRegistered: false,
             errors: ""
         };
@@ -22,10 +22,16 @@ class Register extends React.Component {
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
     };
+    handleFileChange = (e) =>
+    {
+        this.setState({selectedFile: e.target.files[0]})
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
 
+        let formData = new FormData()
+        formData.append("profilePhoto", this.state.selectedFile)
 
         // Check password confirmation
         if (this.state.password !== this.state.confirmPassword) {
@@ -44,6 +50,7 @@ class Register extends React.Component {
                     this.setState({ errors: res.data.errorMessage });
                 } else {
                     console.log("Record added");
+                    sessionStorage.pprofilePhoto= res.data.profilePhoto;
                     this.setState({ isRegistered: true });
                 }
             })
@@ -112,8 +119,16 @@ class Register extends React.Component {
                                         required
                                     />
                                 </label>
+                                <input
+                                    type="file"
+                                    onChange={this.handleFileChange}
+                                />
 
-                                {this.state.errors && <p style={{ color: "red" }}>{this.state.errors}</p>}
+                                <label>
+
+                                </label>
+
+                                {this.state.errors && <p style={{color: "red"}}>{this.state.errors}</p>}
 
                                 <button type="submit" className="green-button">Register New User</button>
                                 <Link className="red-button" to={"/Login"}>Cancel</Link>
