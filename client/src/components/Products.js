@@ -1,14 +1,15 @@
 import React, {Component} from "react"
 import Instrument from "./Instrument"
-import {SERVER_HOST} from "../config/global_constants"
+import {ACCESS_LEVEL_ADMIN, SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
 import {Link} from "react-router-dom"
 
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
-import SearchContext, {SearchProvider} from "./SearchContext"
-import UsersList from "./UsersLists"
+import SearchContext, {SearchProvider} from "./SearchContext";
+import UsersList from "./UsersLists";
+import api from "../services/api";
 
 export default class Products extends Component {
     constructor(props) {
@@ -33,18 +34,46 @@ export default class Products extends Component {
         this.handleSortChange = this.handleSortChange.bind(this)
     }
 
-    handleAddProduct = (newProduct) => {
-        this.setState({products: [...this.state.products, newProduct]})
-    }
+    handleAddProduct = async () => {
+        const token = localStorage.getItem("token"); 
+
+        if (!token) {
+            console.error("User is not logged in"); // Log issue for debugging
+            alert("Please log in to add instruments.");
+            return;
+        }
+
+        try {
+            const response = await axios.post(`${SERVER_HOST}/instruments/add`, {
+                name: "Guitar",
+                brand: "Fender",
+                price: 1200,
+                stock: 5
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // Ensure token is sent
+                }
+            });
+
+            console.log("Instrument added successfully:", response.data);
+        } catch (error) {
+            console.error("Error adding instrument:", error);
+        }
+    };
 
     // Handle DELETE request
     handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this instrument?")) return
 
         try {
-            const response = await fetch(`${SERVER_HOST}/api/instruments/${id}`, {
+            const response = await fetch(`${SERVER_HOST}/api/instruments/delete/${id}`, {
                 method: "DELETE",
-            })
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+
 
             if (response.ok) {
                 alert("Instrument deleted successfully!")
@@ -80,6 +109,7 @@ export default class Products extends Component {
         axios.get(`${SERVER_HOST}/instruments`)
             .then(res => {
                 if ((res.data)) {
+
                     console.table(res.data)
 
                     this.originalProducts = res.data
@@ -145,7 +175,8 @@ export default class Products extends Component {
             filteredProducts.sort((a, b) => (a.reviews || 0) - (b.reviews || 0))
         }
 
-        const userRole = localStorage.getItem("role")
+        const userAccessLevel = localStorage.getItem("accessLevel");
+
         return (
             <div className="product-list">
 
@@ -155,11 +186,13 @@ export default class Products extends Component {
                                selectedBrand={this.state.selectedBrand}/>
 
                 {/*<AddInstrument onAddProduct={this.handleAddProduct} />*/}
-                {userRole === "admin" && (
+                {userAccessLevel >=  ACCESS_LEVEL_ADMIN ?
                     <div className="add-new-product">
                         <Link className="blue-button" to={"/AddInstrument"}>Add New Instrument</Link>
                     </div>
-                )}
+                :
+                    null
+                }
                 <div>
                     <SortProducts sortOrder={this.state.sortOrder} handleSortChange={this.handleSortChange}/>
                     <div className="grid">
@@ -178,9 +211,11 @@ export default class Products extends Component {
                         )}
                     </div>
                 </div>
-                {userRole === "admin" && (
+                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
                     <UsersList/>
-                )}
+                :
+                    null
+                }
             </div>
         )
     }

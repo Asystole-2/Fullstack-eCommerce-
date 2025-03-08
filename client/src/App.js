@@ -16,9 +16,9 @@ import AdminRoute from "./components/AdminRoute"
 
 if (typeof sessionStorage.accessLevel === "undefined") {
     sessionStorage.name = "GUEST"
-    sessionStorage.accessLevel = ACCESS_LEVEL_GUEST
-
+    // sessionStorage.accessLevel = ACCESS_LEVEL_GUEST;
 }
+
 export default class App extends Component {
     render() {
         return (
@@ -30,9 +30,9 @@ export default class App extends Component {
                             <Route exact path="/MainPage" component={MainPage}/>
                             <Route exact path="/Login" component={Login}/>
                             <Route exact path="/Register" component={Register}/>
-                            <AdminRoute exact path="/AddInstrument" component={AddInstrument}/>
-                            <AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
-                            <CartPage exact path="/cart" component={CartPage}/>
+                            <Route exact path="/AddInstrument" component={AddInstrument}/>
+                            <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
+                            <LoggedInRoute exact path="/cart" component={CartPage}/>
                             <Route component={MainPage}/>
                         </Switch>
                     </div>

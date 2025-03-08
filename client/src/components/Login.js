@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import Navbar from "./Navbar";
 import axios from "axios";
 import {Link, Redirect} from "react-router-dom";
 import {SERVER_HOST} from "../config/global_constants";
@@ -19,6 +18,7 @@ class Login extends Component {
     handleLogin = async (e) => {
         e.preventDefault();
         console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+        console.log("User role: ", this.state.accessLevel); // Add this before sending response
 
         try {
             const res = await axios.post(`${SERVER_HOST}/users/login`, {
@@ -26,23 +26,32 @@ class Login extends Component {
                 password: this.state.loginPassword
             });
 
-            if (!res.data || !res.data.role) {
-                this.setState({error: "Login failed. No role found in response."});
+            if (!res.data) {
+                throw new Error("No response data received");
+            }
+
+            if (res.data.errorMessage) {
+                console.log(res.data.errorMessage);
+                this.setState({ errors: { general: res.data.errorMessage } });
                 return;
             }
 
-            localStorage.setItem("role", res.data.role);
+            console.log("User logged in");
 
-            if (res.data.errorMessage) {
-                this.setState({errors: {general: res.data.errorMessage}});
-            } else {
-                localStorage.setItem('token', res.data.token);
-                alert('Login successful');
-                this.setState({isLoggedIn: true, redirectURL: res.data.redirectURL});
-            }
+            localStorage.setItem("name", res.data.name);
+            localStorage.setItem("accessLevel", res.data.accessLevel);
+            localStorage.setItem("token", res.data.token);
+
+            this.setState({ isLoggedIn: true });
+
         } catch (error) {
             console.error('Login error:', error.response?.data || error.message);
-            this.setState({errors: {general: error.response?.data?.error || "Login failed. Please check your credentials."}});
+
+            this.setState({
+                errors: {
+                    general: error.response?.data?.error || "Login failed. Please check your credentials."
+                }
+            });
         }
     };
 

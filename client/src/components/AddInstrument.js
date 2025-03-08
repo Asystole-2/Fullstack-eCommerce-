@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import { Redirect, Link } from "react-router-dom";
-import axios from "axios";
-import { SERVER_HOST } from "../config/global_constants";
+import React, {Component} from "react"
+import {Redirect, Link} from "react-router-dom"
+import axios from "axios"
+import {ACCESS_LEVEL_ADMIN, SERVER_HOST} from "../config/global_constants"
 import LinkInClass from "./LinkInClass";
 
 export default class AddInstrument extends Component {
@@ -14,30 +14,15 @@ export default class AddInstrument extends Component {
             stock: "",
             description: "",
             image: "",
-            errors: {},
-            redirectToDisplayAllInstruments: false
-        };
-    }
-
-    handleChange = (e) => {
-        this.setState({ [e.target.name]: e.target.value });
-    };
-
-    validateForm = () => {
-        let errors = {};
-        const { name, price, stock, description, image } = this.state;
-
-        if (name.trim().length < 3 || name.trim().length > 50) {
-            errors.name = "Name must be between 3 and 50 characters.";
+            redirectToDisplayAllInstruments: localStorage.accessLevel < ACCESS_LEVEL_ADMIN
         }
 
         if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) {
             errors.price = "Price must be a positive number.";
         }
-
-        if (!/^\d+$/.test(stock) || Number(stock) < 0) {
-            errors.stock = "Stock must be a non-negative integer.";
-        }
+      
+    componentDidMount() {
+    }
 
         if (description.trim().length < 10) {
             errors.description = "Description must be at least 10 characters.";
@@ -52,36 +37,33 @@ export default class AddInstrument extends Component {
         return Object.keys(errors).length === 0;
     };
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!this.validateForm()) return;
+        try {
+            const instrumentObject = {
+                name: this.state.name,
+                price: Number(this.state.price),
+                stock: Number(this.state.stock),
+                description: this.state.description,
+                image: this.state.image // Ensure this is a valid URL or handle FormData if it's a file
+            };
 
-        const instrumentObject = {
-            name: this.state.name,
-            price: Number(this.state.price),
-            stock: Number(this.state.stock),
-            description: this.state.description,
-            image: this.state.image
-        };
-
-        axios.post(`${SERVER_HOST}/instruments`, instrumentObject)
-            .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        this.setState({ errors: { server: res.data.errorMessage } });
-                    } else {
-                        console.log("Record added");
-                        this.setState({ redirectToDisplayAllInstruments: true });
-                    }
-                } else {
-                    this.setState({ errors: { server: "Record not added." } });
+            const res = await axios.post(`${SERVER_HOST}/instruments/add`, instrumentObject, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
-            })
-            .catch(error => {
-                console.error("Error adding instrument:", error);
-                this.setState({ errors: { server: "Error adding instrument. Try again." } });
             });
+
+            if (res.status === 201 || res.status === 200) {
+                console.log("Record added");
+                this.setState({ redirectToDisplayAllInstruments: true });
+            } else {
+                console.log("Unexpected response:", res.data);
+            }
+        } catch (error) {
+            console.error("Error adding instrument:", error.response?.data?.errorMessage || error.message);
+        }
     };
 
     render() {

@@ -1,9 +1,13 @@
 const express = require("express")
 const router = express.Router()
 const InstrumentModel = require("../models/instruments"); // Import the Product model
+const authenticateJWT = require("../middleware/authMiddleware");
 console.log("Instrument model: ", InstrumentModel)
 const mongoose = require("mongoose")
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
 
+const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
@@ -19,29 +23,53 @@ router.get("/instruments", async (req, res) => {
 // Read one instrument by ID
 router.get("/instruments/:id", async (req, res) => {
     try {
-        const instrument = await InstrumentModel.findById(req.params.id)
-        if (!instrument) return res.status(404).json({error: "Instrument not found"})
-        res.json(instrument)
+        jwt.verify(req.headers.authorization, JWT_PRIVATE_KEY, {algorithm: "RS256"}, (err, decodedToken) => {
+            if (err) {
+                res.json({errorMessage:`User is not logged in`})
+            }
+            else {
+                InstrumentModel.findById(req.params.id, (error, data) => {
+                    res.json(data)
+                })
+            }
+        })
     } catch (error) {
         console.error("Error fetching instrument:", error)
         res.status(500).json({error: "Internal Server Error"})
     }
 })
 
-// Add new record
-router.post("/instruments", async (req, res) => {
+// // Add new record
+router.post('/instruments/add',authenticateJWT, async (req, res) => {
     try {
-        const newInstrument = await InstrumentModel.create(req.body)
-        res.status(201).json(newInstrument)
+        // Extract the token from the Authorization header
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({ errorMessage: "User is not logged in" });
+        }
+
+        // Create a new car record
+        const newInstrument = await InstrumentModel.create(req.body);
+
+        res.status(201).json(newInstrument);
     } catch (error) {
-        console.error("Error adding instrument:", error)
-        res.status(500).json({error: "Internal Server Error"})
+        console.error("Error adding instruments:", error);
+        if (error.name === "JsonWebTokenError") {
+            return res.status(401).json({ errorMessage: "Invalid token" });
+        }
+        res.status(500).json({ errorMessage: "Internal server error" });
     }
-})
+});
 
 // Update instrument
-router.put("/instruments/:id", async (req, res) => {
+router.put("/instruments/:id", authenticateJWT, async (req, res) => {
     try {
+        // Extract the token from the Authorization header
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({ errorMessage: "User is not logged in" });
+        }
+
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             req.params.id,
             req.body,
@@ -56,7 +84,7 @@ router.put("/instruments/:id", async (req, res) => {
 })
 
 // Delete instrument
-router.delete("/api/instruments/:id", async (req, res) => {
+router.delete("/api/instruments/delete/:id",authenticateJWT, async (req, res) => {
     try {
         console.log("Attempting to delete instrument with ID:", req.params.id);
 
@@ -76,7 +104,7 @@ router.delete("/api/instruments/:id", async (req, res) => {
 });
 
 // Increase Stock Route
-router.put("/instruments/:id/increase", async (req, res) => {
+router.put("/instruments/:id/increase",authenticateJWT, async (req, res) => {
     try {
         const {id} = req.params;
         const {amount} = req.body;
@@ -105,7 +133,7 @@ router.put("/instruments/:id/increase", async (req, res) => {
 });
 
 // Decrease Stock Route
-router.put("/instruments/:id/decrease", async (req, res) => {
+router.put("/instruments/:id/decrease",authenticateJWT, async (req, res) => {
     try {
         const {id} = req.params;
         const {amount} = req.body;
@@ -134,6 +162,5 @@ router.put("/instruments/:id/decrease", async (req, res) => {
         res.status(500).json({error: error.message});
     }
 });
-
 
 module.exports = router
