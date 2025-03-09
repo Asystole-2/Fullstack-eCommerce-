@@ -13,8 +13,7 @@ const ProductSchema = new mongoose.Schema({
     reviews: {type: Number},
     price: {type: Number},
     stock: {type: Number},
-    image: [{type: String}] , // Image may not be required
-    // image:[productPhotosShcema],
+    image: [{type: String}] ,
     sold: {type: Boolean, default:false}
 }, {
     collection: "products",

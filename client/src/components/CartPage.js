@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import BuyProduct from './BuyProduct'
 
-class CartPage extends Component {
+export default class CartPage extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -118,4 +118,3 @@ class CartPage extends Component {
     }
 }
 
-export default CartPage
