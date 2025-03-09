@@ -11,49 +11,90 @@ class Register extends React.Component {
             email: "",
             password: "",
             confirmPassword: "",
-
+            errors: {},
+            selectedFile:null,
             isRegistered: false,
-            errors: ""
-        };
+        }
     }
 
+    // Function to handle input changes
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
-    };
+    }
+    handleFileChange = (e) =>
+    {
+        this.setState({selectedFile: e.target.files[0]})
+    }
 
-    handleSubmit = (e) => {
+    // Function to validate name
+    validateName = (name) => {
+        return /^[a-zA-Z\s]{3,50}$/.test(name);
+    }
+
+    // Function to validate email
+    validateEmail = (email) => {
+        return /\S+@\S+\.\S+/.test(email);
+    }
+
+    // Function to validate password
+    validatePassword = (password) => {
+        return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
+    }
+
+    // Function to handle form submission
+    handleSubmit = async (e) => {
         e.preventDefault();
 
+        const { name, email, password, confirmPassword, selectedFile } = this.state
+        let errors = {};
 
-        // Check password confirmation
-        if (this.state.password !== this.state.confirmPassword) {
-            alert("Passwords do not match");
+        // Validate form inputs
+        if (!this.validateName(name)) {
+            errors.name = "Name must be between 3 and 50 characters and contain only letters and spaces.";
+        }
+        if (!this.validateEmail(email)) {
+            errors.email = "Invalid email format.";
+        }
+        if (!this.validatePassword(password)) {
+            errors.password = "Password must be at least 8 characters, include one uppercase letter, one lowercase letter, one number, and one special character.";
+        }
+        if (password !== confirmPassword) {
+            errors.confirmPassword = "Passwords do not match.";
+        }
+
+        // If there are any errors, set state and return early
+        if (Object.keys(errors).length > 0) {
+            this.setState({ errors });
             return;
         }
 
-        axios.post(`${SERVER_HOST}/users/register`, {
-            name: this.state.name,
-            email: this.state.email,
-            password: this.state.password
-        })
-            .then(res => {
-                if (res.data && res.data.errorMessage) {
-                    console.log(res.data.errorMessage);
-                    this.setState({ errors: res.data.errorMessage });
-                } else {
-                    console.log("Record added");
-                    this.setState({ isRegistered: true });
-                }
-            })
-            .catch(error => {
-                console.error("Registration error:", error.response?.data || error.message);
-                this.setState({ errors: "Registration failed. Please try again." });
-            });
-    };
+        let formData = new FormData()
+        formData.append("profilePhoto", selectedFile)
+        formData.append("name", name)
+        formData.append("email", email)
+        formData.append("password", password)
 
+        // Send formData to backend
+        try {
+            const res = await axios.post(`${SERVER_HOST}/users/register`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            })
+
+            if (res.data.errorMessage) {
+                this.setState({ errors: { server: res.data.errorMessage } })
+            } else {
+                // Registration success
+                this.setState({ isRegistered: true })
+            }
+        } catch (error) {
+            this.setState({ errors: { server: "Registration failed. Please try again." } })
+        }
+    };
     render() {
         if (this.state.isRegistered) {
-            return <Redirect to="/MainPage" />;
+            return <Redirect to="/MainPage" />
         }
 
         return (
@@ -73,6 +114,7 @@ class Register extends React.Component {
                                         onChange={this.handleChange}
                                         required
                                     />
+                                    {this.state.errors.name && <p style={{ color: "red" }}>{this.state.errors.name}</p>}
                                 </label>
 
                                 <label>
@@ -85,6 +127,7 @@ class Register extends React.Component {
                                         onChange={this.handleChange}
                                         required
                                     />
+                                    {this.state.errors.email && <p style={{ color: "red" }}>{this.state.errors.email}</p>}
                                 </label>
 
                                 <label>
@@ -97,6 +140,7 @@ class Register extends React.Component {
                                         onChange={this.handleChange}
                                         required
                                     />
+                                    {this.state.errors.password && <p style={{ color: "red" }}>{this.state.errors.password}</p>}
                                 </label>
 
                                 <label>
@@ -109,9 +153,18 @@ class Register extends React.Component {
                                         onChange={this.handleChange}
                                         required
                                     />
+                                    {this.state.errors.confirmPassword && <p style={{ color: "red" }}>{this.state.errors.confirmPassword}</p>}
                                 </label>
 
-                                {this.state.errors && <p style={{ color: "red" }}>{this.state.errors}</p>}
+                                <label>
+                                    <input
+                                        type="file"
+                                        onChange={this.handleFileChange}
+                                        required
+                                    />
+                                </label>
+
+                                {this.state.errors.server && <p style={{color: "red"}}>{this.state.errors.server}</p>}
 
                                 <button type="submit" className="green-button">Register New User</button>
                                 <Link className="red-button" to={"/Login"}>Cancel</Link>

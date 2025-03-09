@@ -1,8 +1,7 @@
-import React, {Component} from "react";
-import Navbar from "./Navbar";
+import React, { Component } from "react";
+import { Link, Redirect } from "react-router-dom";
 import axios from "axios";
-import {Link, Redirect} from "react-router-dom";
-import {SERVER_HOST} from "../config/global_constants";
+import { SERVER_HOST } from "../config/global_constants";
 
 class Login extends Component {
     constructor(props) {
@@ -16,9 +15,11 @@ class Login extends Component {
         };
     }
 
+    // Handle Login
     handleLogin = async (e) => {
         e.preventDefault();
         console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+        console.log("User role: ", this.state.accessLevel); // Add this before sending response
 
         try {
             const res = await axios.post(`${SERVER_HOST}/users/login`, {
@@ -26,36 +27,49 @@ class Login extends Component {
                 password: this.state.loginPassword
             });
 
-            if (!res.data || !res.data.role) {
-                this.setState({error: "Login failed. No role found in response."});
-                return;
-            }
-
-            localStorage.setItem("role", res.data.role);
-
-            if (res.data.errorMessage) {
-                this.setState({errors: {general: res.data.errorMessage}});
-            } else {
+            // Handle successful login
+            if (res.data.token) {
                 localStorage.setItem('token', res.data.token);
-                alert('Login successful');
-                this.setState({isLoggedIn: true, redirectURL: res.data.redirectURL});
+                sessionStorage.setItem('token', res.data.token);
+                localStorage.setItem('profilePhoto', res.data.profilePhoto);
+                this.setState({ isLoggedIn: true });
+                console.log("User logged in");
             }
-        } catch (error) {
-            console.error('Login error:', error.response?.data || error.message);
-            this.setState({errors: {general: error.response?.data?.error || "Login failed. Please check your credentials."}});
-        }
-    };
 
+            localStorage.setItem("name", res.data.name);
+            localStorage.setItem("accessLevel", res.data.accessLevel);
+            localStorage.setItem("token", res.data.token);
+
+        } catch (error) {
+            console.error('Login error:', error);
+            this.setState({ error: "Login failed. Please check your credentials." });
+        }
+    }
+
+    // Logout Function
+    handleLogout = () => {
+        localStorage.clear(); // Clear storage on logout
+        sessionStorage.clear();
+        this.setState({ isLoggedIn: false }); // Update state
+    }
+
+    componentDidMount() {
+        // Check if user is logged in when component mounts
+        const token = localStorage.getItem('token');
+        if (token) {
+            this.setState({ isLoggedIn: true });
+        }
+    }
 
     render() {
         if (this.state.isLoggedIn) {
-            return <Redirect to={this.state.redirectURL}/>;
+            return <Redirect to={this.state.redirectURL} />;
         }
+
         return (
             <div>
                 <div className="login">
                     <div className="login-container">
-                        {/* Login Form */}
                         <form onSubmit={this.handleLogin}>
                             <h2>Login</h2>
                             <div className="input-group">
@@ -64,7 +78,7 @@ class Login extends Component {
                                     <input
                                         type="email"
                                         value={this.state.loginEmail}
-                                        onChange={e => this.setState({loginEmail: e.target.value})}
+                                        onChange={e => this.setState({ loginEmail: e.target.value })}
                                         required
                                     />
                                 </label>
@@ -73,30 +87,30 @@ class Login extends Component {
                                     <input
                                         type="password"
                                         value={this.state.loginPassword}
-                                        onChange={e => this.setState({loginPassword: e.target.value})}
+                                        onChange={e => this.setState({ loginPassword: e.target.value })}
                                         required
                                     />
                                 </label>
-                                <div>
-                                    <input type="checkbox"/> Remember Me
-                                </div>
                                 <button type="submit">Log in</button>
-                                <a href="#">Lost your password?</a>
                             </div>
                         </form>
-
+                        {this.state.error && <p style={{color: "red"}}>{this.state.error}</p>}
 
                         {/* Additional Links */}
-                        <div style={{marginLeft: 20}}>
+                        <div style={{ marginLeft: 20 }}>
                             <p>Don't have an account?</p>
                             <Link to="/Register">Register</Link>
-                            <br/><br/>
+                            <br /><br />
                             <p>Or, sign in as Admin</p>
                             <Link to="/AdminLogin">Admin Login</Link>
-
                         </div>
                     </div>
                 </div>
+
+                {/* Show Logout Button if Logged In */}
+                {this.state.isLoggedIn && (
+                    <button onClick={this.handleLogout}>Logout</button>
+                )}
             </div>
         );
     }

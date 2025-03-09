@@ -8,7 +8,7 @@
 body {
     justify-content: center;
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background:  #e9f7fc;
 }
 
 .register,
@@ -96,9 +96,9 @@ switch a {
 
 /* Base styling */
 select {
-    width: 100%; /* Make it full width */
+    width: 100%;
     padding: 10px;
-    border: 2px solid #3498db; /* Blue border */
+    border: 2px solid #3498db;
     border-radius: 5px;
     background-color: white;
     font-size: 16px;
@@ -110,7 +110,7 @@ select {
 
 /* Hover effect */
 select:hover {
-    border-color: #2980b9; /* Darker blue */
+    border-color: #2980b9;
 }
 
 /* Focus (when clicked) */
@@ -221,7 +221,126 @@ select:active, select:focus {
     }
 }
 
+/*.home-page .background-image {*/
+/*    !*background-image: url('/photo/background.jpg'); !* Use the root relative path *!*/
+/*    background-size: cover;*/
+/*    background-position: center;*/
+/*    background-repeat: no-repeat;*/
+/*    padding: 40px 20px;*/
+/*    color: white;*/
+/*    text-align: center;*/
+/*}*/
 
+.background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60vh;
+    object-fit: cover;
+    z-index: -1;
+}
+.shop-button-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+.shop-button {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 30px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+}
+
+.shop-button:hover {
+    background-color: #0056b3;
+}
+
+
+.home-page {
+    position: relative;
+    width: 100%;
+    padding-top: 50vh;
+    z-index: 1;
+}
+.home-page .product-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 50px;
+}
+.home-page .product-card{
+    padding: 10px;
+    max-width: 250px;
+    margin: 0 auto;
+}
+.home-page .product-card img.main-image{
+    width: 100%;
+    height: 100%;
+    max-height: 100px;
+    object-fit: cover;
+}
+.product-card button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+.product-card button:hover{
+    background-color: #0056b3;
+}
+.home-page .product-card button{
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+.home-page .product-card button:hover{
+    background-color: #0056b3;
+}
+@media (max-width: 1024px) {
+    .home-page .product-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .home-page .product-card {
+        max-width: 90%;
+    }
+}
+@media (max-width: 768px) {
+    .home-page .product-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        margin: 20px;
+    }
+    .home-page .product-card {
+        max-width: 70%;
+    }
+
+    .home-page .shop-button {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
+}
+@media (max-width: 480px) {
+
+    .home-page .product-card {
+        padding: 8px;
+        margin-bottom: 20px;
+    }
+}
 .product-list .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -438,6 +557,74 @@ select:active, select:focus {
 
 .continue-shopping:hover {
     background-color: #0056b3;
+}
+.about-page header {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+.about-page header h1{
+    font-size: 4rem;
+    margin: 0;
+}
+.about-page{
+    padding: 40px 20px;
+    text-align: center;
+}
+.about-page h2{
+    font-size: 2.5rem;
+    color:#333333;
+}
+.about-page p{
+    font-size: 1.2em;
+    color:#555;
+    line-height: 2;
+    max-width: 800px;
+    margin: 20px auto;
+}
+.about-page .contact-info {
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    border-radius: 10px;
+}
+.about-page .contact-info h3 {
+    font-size: 2em;
+    color: #333333;
+    margin-bottom: 20px;
+
+}
+.about-page .contact-info p {
+    font-size: 1.1em;
+    color:#555555;
+}
+.about-page .mission{
+    background-color: #ffffff;
+    padding: 40px 20px;
+    text-align: center;
+}
+.about-page .mission h3{
+    font-size: 2.5em;
+    color: #333333;
+}
+.about-page .mission p{
+    font-size: 1.2em;
+    color:#555555;
+    line-height: 1.6;
+    margin-top: 20px;
+}
+ footer{
+    background-color: #333;
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+}
+footer p{
+    font-size: 1.2em;
+    margin:0;
+    text-align: center;
 }
 
 /* Responsive Design */

@@ -12,6 +12,9 @@ import CartPage from './components/CartPage'
 import Navbar from "./components/Navbar"
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants"
 import AdminRoute from "./components/AdminRoute"
+import AboutPage from "./components/AboutPage"
+import Home from "./components/Home"
+
 import BuyProduct from "./components/BuyProduct";
 import PayPalMessage from "./components/PayPalMessage";
 import Products from "./components/Products";
@@ -22,6 +25,7 @@ if (typeof localStorage.accessLevel === "undefined")
     localStorage.accessLevel = ACCESS_LEVEL_GUEST
     localStorage.token = null
     localStorage.profilePhoto = null
+
 }
 
 export default class App extends Component {
@@ -40,6 +44,11 @@ export default class App extends Component {
                             <Route exact path="/Register" component={Register}/>
                             <AdminRoute exact path="/AddInstrument" component={AddInstrument}/>
                             <AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
+                            <CartPage exact path="/cart" component={CartPage}/>
+                            <Route exact path="/Aboutpage" component={AboutPage}/>
+                            <Route exact path="/Home" component={Home}/>
+                            <Route component={Home}/>
+
                             <Route exact path="/cart" component={CartPage}/>
                             <Route path="*" component={Products}/>
                         </Switch>

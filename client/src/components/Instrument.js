@@ -1,6 +1,9 @@
 import React, {Component} from "react"
 import InstrumentAPI from "../services/InstrumentAPI"
 import Modal from "./Modal"
+import {Link} from "react-router-dom"
+import axios from 'axios'
+import {ACCESS_LEVEL_ADMIN} from "../config/global_constants";
 
 export default class Instrument extends Component {
     constructor(props) {
@@ -93,6 +96,9 @@ export default class Instrument extends Component {
         const {product, onDelete} = this.props
         const {userRole, showModal} = this.state
 
+        const {userRole} = this.state
+        const value = product.price ? product.price.toFixed(2) : 0
+        const userAccessLevel = localStorage.getItem("accessLevel");
         return (
             <div className="product-card" onClick={this.toggleModal}>
                 <div className="product-card2">
