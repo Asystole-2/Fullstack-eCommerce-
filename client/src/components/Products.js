@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import Instrument from "./Instrument"
 import {ACCESS_LEVEL_ADMIN, SERVER_HOST} from "../config/global_constants"
-import { SERVER_HOST } from "../config/global_constants"
 import axios from "axios"
 import { Link } from "react-router-dom"
 import CategoryDropDown from "./CategoryDropDown"
@@ -9,7 +8,6 @@ import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
 import UsersList from "./UsersLists"
 import SearchContext, {SearchProvider} from "./SearchContext";
-import UsersList from "./UsersLists";
 import api from "../services/api";
 
 export default class Products extends Component {
@@ -236,7 +234,6 @@ export default class Products extends Component {
                 :
                     null
                 }
-                {userRole === "admin" && <UsersList />}
             </div>
         )
     }

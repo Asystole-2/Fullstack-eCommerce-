@@ -102,7 +102,7 @@ export default class BuyProduct extends Component {
             ) {
                 console.error("Missing required fields in saleData:", saleData)
                 alert("Missing required fields. Please check your data.")
-                retur
+                return
             }
 
             // Log the request payload for debugging

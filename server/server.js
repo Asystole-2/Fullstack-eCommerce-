@@ -18,8 +18,8 @@ app.use(require("body-parser").json());
 
 // Routers
 
-const adminRoutes = require("./routes/admin");
-app.use("/api/admin", adminRoutes);
+// const adminRoutes = require("./routes/admin");
+// app.use("/api/admin", adminRoutes);
 
 const userRoutes = require("./routes/users");
 app.use(userRoutes);

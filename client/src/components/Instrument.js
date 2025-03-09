@@ -96,7 +96,6 @@ export default class Instrument extends Component {
         const {product, onDelete} = this.props
         const {userRole, showModal} = this.state
 
-        const {userRole} = this.state
         const value = product.price ? product.price.toFixed(2) : 0
         const userAccessLevel = localStorage.getItem("accessLevel");
         return (
