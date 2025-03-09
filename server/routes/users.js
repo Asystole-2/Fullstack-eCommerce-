@@ -174,10 +174,13 @@ router.post('/users/login', async (req, res) => {
             return res.status(400).json({ error: 'User role is missing in the database' });
         }
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            JWT_PRIVATE_KEY,
+            { expiresIn: '1h' }
+        )
         let redirectURL = user.role === 'admin' ? '/MainPage' : '/MainPage';
-        res.json({ token, role: user.role, redirectURL });
+        res.json({ token, role: user.role,  profilePhoto: user.profilePhotoFilename ? `/uploads/${user.profilePhotoFilename}` : null, redirectURL });
     } catch (error) {
         res.status(500).send('Internal Server Error');
     }

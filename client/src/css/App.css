@@ -310,6 +310,37 @@ select:active, select:focus {
 .home-page .product-card button:hover{
     background-color: #0056b3;
 }
+@media (max-width: 1024px) {
+    .home-page .product-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .home-page .product-card {
+        max-width: 90%;
+    }
+}
+@media (max-width: 768px) {
+    .home-page .product-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        margin: 20px;
+    }
+    .home-page .product-card {
+        max-width: 70%;
+    }
+
+    .home-page .shop-button {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
+}
+@media (max-width: 480px) {
+
+    .home-page .product-card {
+        padding: 8px;
+        margin-bottom: 20px;
+    }
+}
 .product-list .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
