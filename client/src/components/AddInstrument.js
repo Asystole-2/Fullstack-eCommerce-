@@ -16,26 +16,31 @@ export default class AddInstrument extends Component {
             image: "",
             redirectToDisplayAllInstruments: localStorage.accessLevel < ACCESS_LEVEL_ADMIN
         }
-
-        if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) {
-            errors.price = "Price must be a positive number.";
-        }
-      
-    componentDidMount() {
     }
 
-        if (description.trim().length < 10) {
-            errors.description = "Description must be at least 10 characters.";
-        }
+    //     if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) {
+    //         errors.price = "Price must be a positive number.";
+    //     }
+    //
+    // componentDidMount() {
+    // }
+    //
+    //     if (description.trim().length < 10) {
+    //         errors.description = "Description must be at least 10 characters.";
+    //     }
+    //
+    //     if (!/^(ftp|http|https):\/\/[^ "]+$/.test(image)) {
+    //         errors.image = "Invalid image URL.";
+    //     }
+    //
+    //     this.setState({ errors });
+    //
+    //     return Object.keys(errors).length === 0;
+    // };
 
-        if (!/^(ftp|http|https):\/\/[^ "]+$/.test(image)) {
-            errors.image = "Invalid image URL.";
-        }
-
-        this.setState({ errors });
-
-        return Object.keys(errors).length === 0;
-    };
+    handleChange = (e) => {
+        this.setState({[e.target.name]: e.target.value})
+    }
 
     handleSubmit = async (e) => {
         e.preventDefault();
