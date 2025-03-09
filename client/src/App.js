@@ -17,6 +17,7 @@ import AdminRoute from "./components/AdminRoute"
 if (typeof sessionStorage.accessLevel === "undefined") {
     sessionStorage.name = "GUEST"
     // sessionStorage.accessLevel = ACCESS_LEVEL_GUEST;
+
 }
 
 export default class App extends Component {
