@@ -1,17 +1,19 @@
-import React, { Component } from "react"
-import { Link } from "react-router-dom"
+import React, {Component} from "react"
 import InstrumentAPI from "../services/InstrumentAPI"
+import Modal from "./Modal"
 
 export default class Instrument extends Component {
     constructor(props) {
         super(props)
         this.state = {
             userRole: localStorage.getItem("role") || "guest", // Default to guest
+            showModal: false,
         }
 
-        // Bind functions to `this`
+
         this.handleStockChange = this.handleStockChange.bind(this)
         this.handleAddToCart = this.handleAddToCart.bind(this)
+        this.toggleModal = this.toggleModal.bind(this)
     }
 
     componentDidMount() {
@@ -20,11 +22,20 @@ export default class Instrument extends Component {
     }
 
     updateUserRole = () => {
-        this.setState({ userRole: localStorage.getItem("role") || "guest" })
+        this.setState({userRole: localStorage.getItem("role") || "guest"})
+    }
+
+    toggleModal = (e) => {
+        if (e) {
+            e.stopPropagation()
+        }
+        this.setState((prevState) => ({
+            showModal: !prevState.showModal,
+        }))
     }
 
     handleAddToCart = () => {
-        const { product } = this.props
+        const {product} = this.props
 
         // Retrieve existing cart from localStorage or initialize an empty array
         const cart = JSON.parse(localStorage.getItem("cart")) || []
@@ -37,7 +48,7 @@ export default class Instrument extends Component {
             existingItem.quantity += 1
         } else {
             // If the product is not in the cart, add it with quantity 1
-            cart.push({ productId: product._id, quantity: 1, product })
+            cart.push({productId: product._id, quantity: 1, product})
         }
 
         // Save the updated cart to localStorage
@@ -47,7 +58,7 @@ export default class Instrument extends Component {
     }
 
     handleStockChange = async (change) => {
-        const { product, onUpdate } = this.props
+        const {product, onUpdate} = this.props
 
         if (!product._id || product._id.length !== 24) {
             alert("Invalid instrument ID")
@@ -72,72 +83,55 @@ export default class Instrument extends Component {
                 throw new Error("Failed to update stock.")
             }
 
-            onUpdate({ ...product, stock: updatedProduct.stock })
+            onUpdate({...product, stock: updatedProduct.stock})
         } catch (error) {
             alert("Failed to update stock: " + (error.message || "Unknown error"))
         }
     }
 
     render() {
-        const { product, onDelete } = this.props
-        const { userRole } = this.state
+        const {product, onDelete} = this.props
+        const {userRole, showModal} = this.state
+
         return (
-            <div className="product-card">
-                <div className="image-gallery">
-                    {product.images?.length > 0 ? (
-                        <>
+            <div className="product-card" onClick={this.toggleModal}>
+                <div className="product-card2">
+                    <div className="image-gallery">
+                        {product.images?.length > 0 ? (
                             <img
                                 src={product.images[0]}
                                 alt={product.name}
                                 className="main-image"
                             />
-                            <div className="thumbnail-container">
-                                {product.images.map((img, index) => (
-                                    <img
-                                        key={index}
-                                        src={img}
-                                        alt={`${product.name} thumbnail ${index}`}
-                                        className="thumbnail"
-                                    />
-                                ))}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="no-image">No Image Available</div>
-                    )}
-                </div>
-                <h2>{product.name}</h2>
-                <p>Brand: {product.brand}</p>
-                <p>{product.description}</p>
-                <p>Rating: {product.rating}</p>
-                <p>Reviews: {product.reviews}</p>
-                <p>
-                    Price:{" "}
-                    {product.price !== undefined
-                        ? `$${product.price.toFixed(2)}`
-                        : "Price not available"}
-                </p>
-                <p>Stock: {product.stock}</p>
-
-                {userRole === "admin" ? (
-                    <div>
-                        <button
-                            onClick={() => this.handleStockChange(-1)}
-                            disabled={product.stock <= 0}
-                        >
-                            Decrease Stock
-                        </button>
-                        <button onClick={() => this.handleStockChange(1)}>Increase Stock</button>
-                        <button onClick={() => onDelete(product._id)}>Delete</button>
-                        <button>
-                            <Link to={`/EditInstrument/${product._id}`}>Edit</Link>
-                        </button>
+                        ) : (
+                            <div className="no-image">No Image Available</div>
+                        )}
                     </div>
-                ) : (
-                    // User View
-                    <button onClick={this.handleAddToCart}>Add to Cart</button>
-                )}
-            </div>)
+                    <h2>{product.name}</h2>
+                    <p>Brand: {product.brand}</p>
+                    <p>Rating: {product.rating}</p>
+                    <p>
+                        Price:{" "}
+                        {product.price !== undefined
+                            ? `$${product.price.toFixed(2)}`
+                            : "Price not available"}
+                    </p>
+                    <button className="add-to-cart-button" onClick={this.handleAddToCart}>
+                        Add to Cart
+                    </button>
+                </div>
 
+                <Modal
+                    showModal={showModal}
+                    toggleModal={this.toggleModal}
+                    product={{ ...product, images: product.images || [] }}
+                    userRole={userRole}
+                    onDelete={onDelete}
+                    handleAddToCart={this.handleAddToCart}
+                    handleStockChange={this.handleStockChange}
+                    onUpdate={this.props.onUpdate}
+                />
+            </div>
+        )
     }
 }
