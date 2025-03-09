@@ -10,8 +10,7 @@ const authenticateJWT = require("../middleware/authMiddleware");
 const express = require("express");
 
 // Set up multer to handle image uploads
-const upload = multer({ dest: `${process.env.UPLOADED_FILES_FOLDER}` });
-=======
+const upload = multer({ dest: process.env.UPLOADED_FILES_FOLDER || './uploads' });
 
 
 const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
@@ -96,27 +95,22 @@ router.get("/users/:id", async (req, res) => {
 router.post('/users/register', upload.single("profilePhoto"), async (req, res) => {
     const { name, email, password } = req.body;
 
-
+    // Validation
     if (!name || !email || !password) {
-        return res.status(400).json({error: 'All fields are required'});
+        return res.status(400).json({ error: 'All fields are required' });
     }
 
     if (!isValidName(name)) {
-        return res.status(400).json({error: 'Name must be between 3 and 50 characters and contain only letters and spaces.'});
+        return res.status(400).json({ error: 'Name must be between 3 and 50 characters and contain only letters and spaces.' });
     }
 
     if (!isValidEmail(email)) {
-        return res.status(400).json({error: 'Invalid email format.'});
+        return res.status(400).json({ error: 'Invalid email format.' });
     }
 
     if (!isValidPassword(password)) {
-        return res.status(400).json({error: 'Password must be at least 8 characters, include one uppercase letter, one lowercase letter, one number, and one special character.'});
+        return res.status(400).json({ error: 'Password must be at least 8 characters, include one uppercase letter, one lowercase letter, one number, and one special character.' });
     }
-
-    if (!name || !email || !password) {
-        return res.status(400).json({error: 'All fields are required'});
-    }
-
 
     if (!req.file) {
         return res.status(400).json({ errorMessage: 'No file was selected to be uploaded' });
@@ -137,92 +131,55 @@ router.post('/users/register', upload.single("profilePhoto"), async (req, res) =
             // Hash password
             const saltRounds = parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS) || 10;
             const hashPassword = await bcrypt.hash(password, saltRounds);
-          
-            // Set access level based on role (default: normal user)
-            const accessLevel = role === "admin" ? 2 : 1;
+
 
             // Create new user
             const newUser = new UserModel({
                 name,
                 email,
                 password: hashPassword,
-                role, accessLevel,
                 profilePhotoFilename: req.file.filename, // Save the filename in the database
             });
 
             await newUser.save();
-          
-            // Generate JWT Token
-        const token = jwt.sign(
-            {id: newUser._id, email: newUser.email, accessLevel: newUser.accessLevel, role: newUser.role},
-            JWT_PRIVATE_KEY,
-            {algorithm: "RS256", expiresIn: process.env.JWT_EXPIRES || "1h"}
-        );
 
-        res.status(201).json({
-            message: "User registered successfully",
-            token,
-            user: {name: newUser.name, email: newUser.email, role: newUser.role}
-        });
-
+            res.status(201).json({ message: 'User registered successfully' });
         } catch (error) {
             res.status(500).json({ error: 'Internal Server Error' });
         }
-
     }
 });
 
 // Login
-router.post(`/users/login`, async (req, res) => {
+// User login with validation
+router.post('/users/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    if (!isValidEmail(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+    }
+
     try {
-        const {email, password} = req.body; // Get login credentials from request body
+        const user = await UserModel.findOne({ email });
+        if (!user) return res.status(400).json({ error: 'User not found' });
 
-
-        if (!email || !password) {
-            return res.status(400).json({errorMessage: "Email and password are required."});
-        }
-
-
-        if (!isValidEmail(email)) {
-            return res.status(400).json({error: 'Invalid email format'});
-        }
-
-        const user1 = await UserModel.findOne({email: "admin@example.com"});
-        console.log(user1.accessLevel); // Should be 'admin' for admin, 'user' for normal users
-
-        console.log("User role: ", user1.accessLevel); // Add this before sending response
-
-        // Find the user by email
-        const user = await UserModel.findOne({email});
-
-        if (!user) {
-            console.log("User not found in DB");
-            return res.status(401).json({errorMessage: "Invalid email or password"});
-        }
-
-        // Compare passwords
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({errorMessage: "Invalid email or password"});
+        if (!isMatch) return res.status(400).json({ error: 'Wrong Password' });
+
+        if (!user.role) {
+            return res.status(400).json({ error: 'User role is missing in the database' });
         }
 
-        // Create JWT token
-        const token = jwt.sign(
-            {email: user.email, accessLevel: user.accessLevel, role: user.role},
-            JWT_PRIVATE_KEY,
-            {algorithm: "RS256", expiresIn: process.env.JWT_EXPIRY}
-        );
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.json({
-            name: user.name,
-            accessLevel: user.accessLevel,
-            role: user.role,
-            token: token,
-        });
-
+        let redirectURL = user.role === 'admin' ? '/MainPage' : '/MainPage';
+        res.json({ token, role: user.role, redirectURL });
     } catch (error) {
-        console.error("Login error:", error);
-        res.status(500).json({errorMessage: "An error occurred during login."});
+        res.status(500).send('Internal Server Error');
     }
 });
 

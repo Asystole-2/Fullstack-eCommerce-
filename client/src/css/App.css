@@ -8,7 +8,7 @@
 body {
     justify-content: center;
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background:  #e9f7fc;
 }
 
 .register,
@@ -286,6 +286,18 @@ select:active, select:focus {
     max-height: 100px;
     object-fit: cover;
 }
+.product-card button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+.product-card button:hover{
+    background-color: #0056b3;
+}
 .home-page .product-card button{
     background-color: #007bff;
     color: white;
@@ -306,7 +318,8 @@ select:active, select:focus {
 }
 
 .product-card {
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
+    background-color: #e4e4e4;
     border-radius: 8px;
     padding: 1rem;
     text-align: center;
@@ -514,6 +527,74 @@ select:active, select:focus {
 
 .continue-shopping:hover {
     background-color: #0056b3;
+}
+.about-page header {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+.about-page header h1{
+    font-size: 4rem;
+    margin: 0;
+}
+.about-page{
+    padding: 40px 20px;
+    text-align: center;
+}
+.about-page h2{
+    font-size: 2.5rem;
+    color:#333333;
+}
+.about-page p{
+    font-size: 1.2em;
+    color:#555;
+    line-height: 2;
+    max-width: 800px;
+    margin: 20px auto;
+}
+.about-page .contact-info {
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    border-radius: 10px;
+}
+.about-page .contact-info h3 {
+    font-size: 2em;
+    color: #333333;
+    margin-bottom: 20px;
+
+}
+.about-page .contact-info p {
+    font-size: 1.1em;
+    color:#555555;
+}
+.about-page .mission{
+    background-color: #ffffff;
+    padding: 40px 20px;
+    text-align: center;
+}
+.about-page .mission h3{
+    font-size: 2.5em;
+    color: #333333;
+}
+.about-page .mission p{
+    font-size: 1.2em;
+    color:#555555;
+    line-height: 1.6;
+    margin-top: 20px;
+}
+ footer{
+    background-color: #333;
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+}
+footer p{
+    font-size: 1.2em;
+    margin:0;
+    text-align: center;
 }
 
 /* Responsive Design */
