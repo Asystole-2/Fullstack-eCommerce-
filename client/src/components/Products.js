@@ -1,14 +1,13 @@
-import React, { Component } from "react"
+import React, {Component} from "react"
 import Instrument from "./Instrument"
 import {ACCESS_LEVEL_ADMIN, SERVER_HOST} from "../config/global_constants"
 import axios from "axios"
-import { Link } from "react-router-dom"
+import {Link} from "react-router-dom"
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
 import UsersList from "./UsersLists"
-import SearchContext, {SearchProvider} from "./SearchContext";
-import api from "../services/api";
+import SearchContext, {SearchProvider} from "./SearchContext"
 
 export default class Products extends Component {
     constructor(props) {
@@ -34,7 +33,7 @@ export default class Products extends Component {
     }
 
     handleAddProduct = (newProduct) => {
-        this.setState({ products: [...this.state.products, newProduct] })
+        this.setState({products: [...this.state.products, newProduct]})
     }
     handleAddProduct = async () => {
         const token = localStorage.getItem("token");
@@ -104,7 +103,7 @@ export default class Products extends Component {
         const updatedProducts = this.state.products.map((product) =>
             product._id === updatedProduct._id ? updatedProduct : product
         )
-        this.setState({ products: updatedProducts })
+        this.setState({products: updatedProducts})
     }
 
     componentDidMount() {
@@ -137,22 +136,22 @@ export default class Products extends Component {
     }
 
     handleCategoryChange(e) {
-        this.setState({ selectedCategory: e.target.value })
+        this.setState({selectedCategory: e.target.value})
     }
 
     handleBrandChange(e) {
-        this.setState({ selectedBrand: e.target.value })
+        this.setState({selectedBrand: e.target.value})
     }
 
     handleSortChange(order) {
-        this.setState({ sortOrder: order })
+        this.setState({sortOrder: order})
     }
 
     static contextType = SearchContext
 
     render() {
-        const { products, selectedBrand, selectedCategory, sortOrder } = this.state
-        const { searchQuery = "" } = this.context || {}
+        const {products, selectedBrand, selectedCategory, sortOrder} = this.state
+        const {searchQuery = ""} = this.context || {}
 
         let filteredProducts = products.filter((product) => {
             return (
@@ -188,32 +187,37 @@ export default class Products extends Component {
 
         return (
             <div className="product-list">
-                <CategoryDropDown
-                    categories={this.state.categories}
-                    handleCategoryChange={this.handleCategoryChange}
-                    selectedCategory={this.state.selectedCategory}
-                />
-                <BrandDropDown
-                    brands={this.state.brands}
-                    handleBrandChange={this.handleBrandChange}
-                    selectedBrand={this.state.selectedBrand}
-                />
+                <div className="filter-bar">
+
+                    <CategoryDropDown
+                        categories={this.state.categories}
+                        handleCategoryChange={this.handleCategoryChange}
+                        selectedCategory={this.state.selectedCategory}
+                    />
+                    <BrandDropDown
+                        brands={this.state.brands}
+                        handleBrandChange={this.handleBrandChange}
+                        selectedBrand={this.state.selectedBrand}
+                    />
+                </div>
 
                 {/*<AddInstrument onAddProduct={this.handleAddProduct} />*/}
-                {userAccessLevel >=  ACCESS_LEVEL_ADMIN ?
+                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
                     <div className="add-new-product">
                         <Link className="blue-button" to={"/AddInstrument"}>
                             Add New Instrument
                         </Link>
                     </div>
-                :
+                    :
                     null
                 }
                 <div>
+                    <div className="sort-bar">
                     <SortProducts
                         sortOrder={this.state.sortOrder}
                         handleSortChange={this.handleSortChange}
                     />
+                    </div>
                     <div className="grid">
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map((product) => (
@@ -231,7 +235,7 @@ export default class Products extends Component {
                 </div>
                 {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
                     <UsersList/>
-                :
+                    :
                     null
                 }
             </div>

@@ -8,7 +8,7 @@
 body {
     justify-content: center;
     font-family: Arial, sans-serif;
-    background:  #e9f7fc;
+    background:  ghostwhite;
 }
 
 .register,
@@ -308,7 +308,7 @@ select:active, select:focus {
     font-size: 0.8em;
 }
 .home-page .product-card button:hover{
-    background-color: #0056b3;
+    background-color: whitesmoke;
 }
 @media (max-width: 1024px) {
     .home-page .product-list {
@@ -718,7 +718,6 @@ footer p{
 
 /* Status Icons */
 .payPalMessage::before {
-    font-family: "Font Awesome 5 Free";
     font-weight: 900;
     font-size: 3rem;
     display: block;
@@ -969,4 +968,90 @@ button:hover {
 
 .close-expanded-image:hover {
     color: #ccc;
+}
+/* Sort and Filter Bar */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Dropdown Container */
+.filter-bar select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    appearance: none; /* Remove default arrow */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23007bff"><path d="M7 10l5 5 5-5z"/></svg>'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 8px center; /* Position the arrow */
+    background-size: 12px; /* Size of the arrow */
+
+}
+
+/* Hover State */
+.filter-bar select:hover {
+    border-color: #007bff; /* Highlight border on hover */
+}
+
+/* Focus State */
+.filter-bar select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Subtle shadow on focus */
+}
+
+/* Dropdown Options */
+.filter-bar select option {
+    font-size: 13px; /* Smaller font size for options */
+    padding: 6px 10px; /* Compact padding for options */
+}
+/* Filter Bar Container */
+.filter-bar {
+    display: flex; /* Use Flexbox for horizontal alignment */
+    gap: 10px; /* Space between dropdowns */
+    align-items: center; /* Vertically center the dropdowns */
+    margin-bottom: 20px; /* Space below the filter bar */
+}
+
+/* Dropdown Styling */
+.filter-bar select {
+    padding: 6px 10px; /* Compact padding */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 13px; /* Smaller font size */
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none; /* For Safari */
+    -moz-appearance: none; /* For Firefox */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23007bff"><path d="M7 10l5 5 5-5z"/></svg>'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 8px center; /* Position the arrow */
+    background-size: 12px; /* Size of the arrow */
+    padding-right: 30px; /* Add space for the arrow */
+}
+
+/* Hover State */
+.filter-bar select:hover {
+    border-color: #007bff; /* Highlight border on hover */
+}
+
+/* Focus State */
+.filter-bar select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Subtle shadow on focus */
+}
+
+/* Dropdown Options */
+.filter-bar select option {
+    font-size: 13px; /* Smaller font size for options */
+    padding: 6px 10px; /* Compact padding for options */
 }
