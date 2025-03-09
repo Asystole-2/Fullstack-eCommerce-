@@ -11,7 +11,7 @@ export default class Navbar extends Component {
 
     handleLogout = () => {
         localStorage.removeItem('token'); // Clear the token in localStorage
-        localStorage.removeItem('profilePhoto'); // Clear the profile photo from localStorage
+        localStorage.removeItem('profilePhoto');
         sessionStorage.clear();
         this.forceUpdate();
     };
