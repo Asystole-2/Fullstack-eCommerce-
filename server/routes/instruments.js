@@ -64,11 +64,12 @@ router.post('/instruments/add',authenticateJWT, async (req, res) => {
 // Update instrument
 router.put("/instruments/:id", authenticateJWT, async (req, res) => {
     try {
-        // Extract the token from the Authorization header
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ errorMessage: "User is not logged in" });
+        // Ensure the user is authorized (e.g., must be an admin)
+        if (!req.user || req.user.accessLevel < 2) {
+            return res.status(403).json({ errorMessage: "Access denied. Admins only." });
         }
+
+        console.log("User making request:", req.user);
 
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             req.params.id,

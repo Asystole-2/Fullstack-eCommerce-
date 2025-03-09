@@ -110,9 +110,6 @@ export default class Products extends Component {
             .then(res => {
                 if ((res.data)) {
 
-                    console.table(res.data)
-
-                    this.originalProducts = res.data
                     const categories = ["All Categories", ...new Set(res.data.map(item => item.category).filter(Boolean))]
                     const brands = ["All Brands", ...new Set(res.data.map(item => item.brand).filter(Boolean))]
 
@@ -190,7 +187,11 @@ export default class Products extends Component {
                 {userAccessLevel >=  ACCESS_LEVEL_ADMIN ?
                     <div className="add-new-product">
                         <Link className="blue-button" to={"/AddInstrument"}>Add New Instrument</Link>
+                        <div className="view-users">
+                            <Link className="blue-button" to={"/UsersLists"}>View Users</Link>
+                        </div>
                     </div>
+
                 :
                     null
                 }
@@ -212,11 +213,6 @@ export default class Products extends Component {
                         )}
                     </div>
                 </div>
-                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
-                    <UsersList/>
-                :
-                    null
-                }
             </div>
         )
     }

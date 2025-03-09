@@ -22,6 +22,7 @@ export default class EditInstrument extends Component {
 
     componentDidMount = async () => {
         const token = localStorage.getItem("token");
+        console.log("Token in localStorage:", token); // Debug: Check if token is null or undefined
 
         if (!token) {
             console.error("User is not logged in");
@@ -29,19 +30,20 @@ export default class EditInstrument extends Component {
             return;
         }
 
+        const authHeader = `Bearer ${token}`;
+        console.log("Authorization Header Sent:", authHeader);
+
         try {
             console.log("Fetching instrument with ID:", this.props.match.params.id);
 
             const response = await axios.get(
                 `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
                 {
-                    headers: { Authorization: `Bearer ${token}` },
+                    headers: { Authorization: authHeader },
                 }
             );
 
             console.log("API Response:", response.data);
-
-            console.log("Name:", response.data.name);
 
             if (response.data) {
                 this.setState({
@@ -51,6 +53,7 @@ export default class EditInstrument extends Component {
                     stock: response.data.stock || "",
                     description: response.data.description || "",
                     image: response.data.image || "",
+                    errors: {},
                 });
             } else {
                 console.log("Record not found");
@@ -67,7 +70,7 @@ export default class EditInstrument extends Component {
     handleSubmit = async (e) => {
         e.preventDefault();
 
-        const token = localStorage.getItem("token"); // ✅ Retrieve JWT token
+        const token = localStorage.getItem("token"); // Retrieve JWT token
         console.log(token)
 
         if (!token) {
@@ -87,7 +90,7 @@ export default class EditInstrument extends Component {
             };
 
             const response = await axios.put(
-                `http://localhost:4000/instruments/${this.props.match.params.id}`,
+                `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
                 instrumentObject,
                 {
                     headers: {

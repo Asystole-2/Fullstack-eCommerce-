@@ -11,7 +11,7 @@ export default class UsersList extends Component {
     }
 
     componentDidMount() {
-        const token = localStorage.getItem("token"); // ✅ Retrieve JWT token
+        const token = localStorage.getItem("token"); // Retrieve JWT token
 
         if (!token) {
             console.error("User is not logged in");
@@ -20,7 +20,7 @@ export default class UsersList extends Component {
         }
 
         axios.get(`${SERVER_HOST}/users`, {
-            headers: { Authorization: `Bearer ${token}` } // ✅ Attach JWT
+            headers: { Authorization: `Bearer ${token}` } // Attach JWT
         })
             .then(res => {
                 if (res.data) {
@@ -33,13 +33,13 @@ export default class UsersList extends Component {
             .catch(error => console.error("Error fetching users:", error));
     }
 
-// ✅ Handle DELETE with JWT authentication
+// Handle DELETE with JWT authentication
     handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
 
         console.log("Deleting user with ID:", id);
 
-        const token = localStorage.getItem("token"); // ✅ Retrieve JWT token
+        const token = localStorage.getItem("token"); // Retrieve JWT token
 
         if (!token) {
             alert("You must be logged in to delete a user.");
