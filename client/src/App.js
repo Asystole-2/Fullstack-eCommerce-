@@ -42,7 +42,7 @@ export default class App extends Component {
                             <Route exact path="/BuyProduct" component={BuyProduct}/>
                             <Route exact path="/PayPalMessage/:messageType/:payPalPaymentID" component={PayPalMessage}/>
                             <Route exact path="/Register" component={Register}/>
-                            <AdminRoute exact path="/AddInstrument" component={AddInstrument}/>
+                            <Route exact path="/AddInstrument" component={AddInstrument}/>
                             <AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
                             <CartPage exact path="/cart" component={CartPage}/>
                             <Route exact path="/Aboutpage" component={AboutPage}/>
