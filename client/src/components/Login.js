@@ -62,9 +62,9 @@ class Login extends Component {
     }
 
     render() {
-        if (this.state.isLoggedIn) {
-            return <Redirect to={this.state.redirectURL} />;
-        }
+        // if (this.state.isLoggedIn) {
+        //     return <Redirect to={this.state.redirectURL} />;
+        // }
 
         return (
             <div>

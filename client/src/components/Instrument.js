@@ -3,7 +3,7 @@ import InstrumentAPI from "../services/InstrumentAPI"
 import Modal from "./Modal"
 import {Link} from "react-router-dom"
 import axios from 'axios'
-import {ACCESS_LEVEL_ADMIN} from "../config/global_constants";
+import {ACCESS_LEVEL_ADMIN, ACCESS_LEVEL_USER} from "../config/global_constants";
 
 export default class Instrument extends Component {
     constructor(props) {
@@ -115,15 +115,14 @@ export default class Instrument extends Component {
                     <h2>{product.name}</h2>
                     <p>Brand: {product.brand}</p>
                     <p>Rating: {product.rating}</p>
-                    <p>
-                        Price:{" "}
-                        {product.price !== undefined
-                            ? `$${product.price.toFixed(2)}`
-                            : "Price not available"}
-                    </p>
-                    <button className="add-to-cart-button" onClick={this.handleAddToCart}>
-                        Add to Cart
-                    </button>
+                    <p>Price: ${value}</p>
+                    {userAccessLevel >=  ACCESS_LEVEL_USER ?
+                        <button className="add-to-cart-button" onClick={this.handleAddToCart}>
+                            Add to Cart
+                        </button>
+                        :
+                        null
+                    }
                 </div>
 
                 <Modal

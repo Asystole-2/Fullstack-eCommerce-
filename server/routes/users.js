@@ -150,39 +150,56 @@ router.post('/users/register', upload.single("profilePhoto"), async (req, res) =
     }
 });
 
-// Login
 // User login with validation
-router.post('/users/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
-    }
-
-    if (!isValidEmail(email)) {
-        return res.status(400).json({ error: 'Invalid email format' });
-    }
-
+// Login
+router.post(`/users/login`, async (req, res) => {
     try {
-        const user = await UserModel.findOne({ email });
-        if (!user) return res.status(400).json({ error: 'User not found' });
+        const { email, password } = req.body; // Get login credentials from request body
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ error: 'Wrong Password' });
-
-        if (!user.role) {
-            return res.status(400).json({ error: 'User role is missing in the database' });
+        if (!isValidEmail(email)) {
+            return res.status(400).json({ error: 'Invalid email format.' });
         }
 
+        if (!email || !password) {
+            return res.status(400).json({ errorMessage: "Email and password are required." });
+        }
+
+        const user1 = await UserModel.findOne({ email: "admin@example.com" });
+        console.log(user1.accessLevel); // Should be 'admin' for admin, 'user' for normal users
+
+        console.log("User role: ", user1.accessLevel); // Add this before sending response
+
+        // Find the user by email
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            console.log("User not found in DB");
+            return res.status(401).json({ errorMessage: "Invalid email or password" });
+        }
+
+        // Compare passwords
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ errorMessage: "Invalid email or password" });
+        }
+
+        // Create JWT token
         const token = jwt.sign(
-            { id: user._id, role: user.role },
+            { email: user.email, accessLevel: user.accessLevel, role: user.role },
             JWT_PRIVATE_KEY,
-            { expiresIn: '1h' }
-        )
-        let redirectURL = user.role === 'admin' ? '/MainPage' : '/MainPage';
-        res.json({ token, role: user.role,  profilePhoto: user.profilePhotoFilename ? `/uploads/${user.profilePhotoFilename}` : null, redirectURL });
+            { algorithm: "RS256", expiresIn: process.env.JWT_EXPIRY }
+        );
+
+        res.json({
+            name: user.name,
+            accessLevel: user.accessLevel,
+            role: user.role,
+            token: token,
+        });
+
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        console.error("Login error:", error);
+        res.status(500).json({ errorMessage: "An error occurred during login." });
     }
 });
 
