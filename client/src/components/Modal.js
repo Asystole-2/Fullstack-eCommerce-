@@ -53,6 +53,7 @@ export default class Modal extends Component {
         const { showModal, toggleModal, product, userRole, onDelete, handleAddToCart, handleStockChange, onUpdate } = this.props
         const { expandedImage } = this.state
         const images = product.images || [] // Fallback to an empty array if images is undefined
+        const value = product.price ? product.price.toFixed(2) : 0
 
         return (
             <>
@@ -92,12 +93,7 @@ export default class Modal extends Component {
                             <p>{product.description}</p>
                             <p>Rating: {product.rating}</p>
                             <p>Reviews: {product.reviews}</p>
-                            <p>
-                                Price:{" "}
-                                {product.price !== undefined
-                                    ? `$${product.price.toFixed(2)}`
-                                    : "Price not available"}
-                            </p>
+                            <p>Price: ${value}</p>
                             <p>Stock: {product.stock}</p>
                             {userRole === "admin" ? (
                                 <div className="admin-buttons">
