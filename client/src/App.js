@@ -15,13 +15,16 @@ import AdminRoute from "./components/AdminRoute"
 import AboutPage from "./components/AboutPage"
 import Home from "./components/Home"
 
+
 if (typeof localStorage.accessLevel === "undefined")
 {
     localStorage.name = "GUEST"
     localStorage.accessLevel = ACCESS_LEVEL_GUEST
     localStorage.token = null
     localStorage.profilePhoto = null
+
 }
+
 export default class App extends Component {
     render() {
         return (
@@ -39,6 +42,7 @@ export default class App extends Component {
                             <Route exact path="/Aboutpage" component={AboutPage}/>
                             <Route exact path="/Home" component={Home}/>
                             <Route component={Home}/>
+
                         </Switch>
                     </div>
                 </BrowserRouter>

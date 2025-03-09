@@ -19,26 +19,45 @@ export default class EditInstrument extends Component {
         };
     }
 
-    componentDidMount() {
-        axios.get(`${SERVER_HOST}/instruments/${this.props.match.params.id}`)
-            .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        console.log(res.data.errorMessage);
-                    } else {
-                        this.setState({
-                            name: res.data.name || "",
-                            price: res.data.price || "",
-                            stock: res.data.stock || "",
-                            description: res.data.description || "",
-                            image: res.data.image || "",
-                        });
-                    }
-                } else {
-                    console.log("Record not found");
+    componentDidMount = async () => {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            console.error("User is not logged in");
+            alert("Please log in to edit instruments.");
+            return;
+        }
+
+        try {
+            console.log("Fetching instrument with ID:", this.props.match.params.id);
+
+            const response = await axios.get(
+                `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
+                {
+                    headers: { Authorization: `Bearer ${token}` },
                 }
-            });
-    }
+            );
+
+            console.log("API Response:", response.data);
+
+            console.log("Name:", response.data.name);
+
+            if (response.data) {
+                this.setState({
+                    name: response.data.name || "",
+                    brand: response.data.brand || "",
+                    price: response.data.price || "",
+                    stock: response.data.stock || "",
+                    description: response.data.description || "",
+                    image: response.data.image || "",
+                });
+            } else {
+                console.log("Record not found");
+            }
+        } catch (error) {
+            console.error("Error fetching instrument:", error.response?.data?.errorMessage || error.message);
+        }
+    };
 
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
@@ -73,36 +92,48 @@ export default class EditInstrument extends Component {
         return Object.keys(errors).length === 0;
     };
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!this.validateForm()) return;
+        const token = localStorage.getItem("token"); 
+        console.log(token)
 
-        const instrumentObject = {
-            name: this.state.name,
-            price: Number(this.state.price),
-            stock: Number(this.state.stock),
-            description: this.state.description,
-            image: this.state.image,
-        };
+        if (!token) {
+            console.error("User is not logged in");
+            alert("Please log in to update instruments.");
+            return;
+        }
 
-        axios.put(`${SERVER_HOST}/instruments/${this.props.match.params.id}`, instrumentObject)
-            .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        this.setState({ errors: { server: res.data.errorMessage } });
-                    } else {
-                        console.log("Record updated");
-                        this.setState({ redirectToDisplayAllInstruments: true });
+        try {
+            const instrumentObject = {
+                name: this.state.name,
+                brand: this.state.brand,
+                price: this.state.price,
+                stock: this.state.stock,
+                description: this.state.description,
+                image: this.state.image
+            };
+
+            const response = await axios.put(
+                `http://localhost:4000/instruments/${this.props.match.params.id}`,
+                instrumentObject,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     }
-                } else {
-                    this.setState({ errors: { server: "Record not updated." } });
                 }
-            })
-            .catch(error => {
-                console.error("Error updating instrument:", error);
-                this.setState({ errors: { server: "Error updating instrument. Try again." } });
-            });
+            );
+
+            if (response.status === 200) {
+                console.log(`Record updated successfully`);
+                this.setState({ redirectToDisplayAllInstruments: true });
+            } else {
+                console.error(`Unexpected response:`, response.data);
+            }
+        } catch (error) {
+            console.error("Error updating instrument:", error.response?.data?.errorMessage || error.message);
+        }
     };
 
     render() {

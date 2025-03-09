@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
-import { SERVER_HOST } from "../config/global_constants";
-import LinkInClass from "./LinkInClass";
+import { ACCESS_LEVEL_ADMIN, SERVER_HOST } from "../config/global_constants";
 
 export default class AddInstrument extends Component {
     constructor(props) {
@@ -15,7 +14,7 @@ export default class AddInstrument extends Component {
             description: "",
             image: "",
             errors: {},
-            redirectToDisplayAllInstruments: false
+            redirectToDisplayAllInstruments: Number(localStorage.getItem("accessLevel")) < ACCESS_LEVEL_ADMIN
         };
     }
 
@@ -24,26 +23,21 @@ export default class AddInstrument extends Component {
     };
 
     validateForm = () => {
-        let errors = {};
-        const { name, price, stock, description, image } = this.state;
+        const errors = {};
 
-        if (name.trim().length < 3 || name.trim().length > 50) {
-            errors.name = "Name must be between 3 and 50 characters.";
+        if (!this.state.name.trim()) {
+            errors.name = "Name is required.";
         }
-
-        if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) {
+        if (!/^\d+(\.\d{1,2})?$/.test(this.state.price) || Number(this.state.price) <= 0) {
             errors.price = "Price must be a positive number.";
         }
-
-        if (!/^\d+$/.test(stock) || Number(stock) < 0) {
+        if (!/^\d+$/.test(this.state.stock) || Number(this.state.stock) < 0) {
             errors.stock = "Stock must be a non-negative integer.";
         }
-
-        if (description.trim().length < 10) {
+        if (this.state.description.trim().length < 10) {
             errors.description = "Description must be at least 10 characters.";
         }
-
-        if (!/^(ftp|http|https):\/\/[^ "]+$/.test(image)) {
+        if (!/^(ftp|http|https):\/\/[^ "]+$/.test(this.state.image)) {
             errors.image = "Invalid image URL.";
         }
 
@@ -52,36 +46,36 @@ export default class AddInstrument extends Component {
         return Object.keys(errors).length === 0;
     };
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!this.validateForm()) return;
+        if (!this.validateForm()) {
+            return;
+        }
 
-        const instrumentObject = {
-            name: this.state.name,
-            price: Number(this.state.price),
-            stock: Number(this.state.stock),
-            description: this.state.description,
-            image: this.state.image
-        };
+        try {
+            const instrumentObject = {
+                name: this.state.name,
+                price: Number(this.state.price),
+                stock: Number(this.state.stock),
+                description: this.state.description,
+                image: this.state.image
+            };
 
-        axios.post(`${SERVER_HOST}/instruments`, instrumentObject)
-            .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        this.setState({ errors: { server: res.data.errorMessage } });
-                    } else {
-                        console.log("Record added");
-                        this.setState({ redirectToDisplayAllInstruments: true });
-                    }
-                } else {
-                    this.setState({ errors: { server: "Record not added." } });
-                }
-            })
-            .catch(error => {
-                console.error("Error adding instrument:", error);
-                this.setState({ errors: { server: "Error adding instrument. Try again." } });
+            const res = await axios.post(`${SERVER_HOST}/instruments/add`, instrumentObject, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
             });
+
+            if (res.status === 201 || res.status === 200) {
+                console.log("Record added");
+                this.setState({ redirectToDisplayAllInstruments: true });
+            } else {
+                console.log("Unexpected response:", res.data);
+            }
+        } catch (error) {
+            console.error("Error adding instrument:", error.response?.data?.errorMessage || error.message);
+            this.setState({ errors: { server: "Error adding instrument. Please try again." } });
+        }
     };
 
     render() {
@@ -110,21 +104,21 @@ export default class AddInstrument extends Component {
 
                     <input
                         type="text"
-                        name="description"
-                        placeholder="Description"
-                        value={this.state.description}
-                        onChange={this.handleChange}
-                    />
-                    {this.state.errors.description && <p style={{ color: "red" }}>{this.state.errors.description}</p>}
-
-                    <input
-                        type="text"
                         name="stock"
                         placeholder="Stock"
                         value={this.state.stock}
                         onChange={this.handleChange}
                     />
                     {this.state.errors.stock && <p style={{ color: "red" }}>{this.state.errors.stock}</p>}
+
+                    <input
+                        type="text"
+                        name="description"
+                        placeholder="Description"
+                        value={this.state.description}
+                        onChange={this.handleChange}
+                    />
+                    {this.state.errors.description && <p style={{ color: "red" }}>{this.state.errors.description}</p>}
 
                     <input
                         type="text"

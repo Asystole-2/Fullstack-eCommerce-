@@ -1,4 +1,6 @@
+
 import React, { Component } from "react";
+
 import axios from "axios";
 import { Link, Redirect } from "react-router-dom";
 import { SERVER_HOST } from "../config/global_constants";
@@ -18,12 +20,14 @@ class Login extends Component {
     handleLogin = async (e) => {
         e.preventDefault();
         console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+        console.log("User role: ", this.state.accessLevel); // Add this before sending response
 
         try {
             const res = await axios.post(`${SERVER_HOST}/users/login`, {
                 email: this.state.loginEmail,
                 password: this.state.loginPassword
             });
+
 
             if (res.data.errorMessage) {
                 this.setState({error: res.data.errorMessage})
@@ -33,10 +37,22 @@ class Login extends Component {
                 localStorage.setItem('profilePhoto', res.data.profilePhoto);
 
                 this.setState({isLoggedIn: true})
+
             }
+
+            console.log("User logged in");
+
+            localStorage.setItem("name", res.data.name);
+            localStorage.setItem("accessLevel", res.data.accessLevel);
+            localStorage.setItem("token", res.data.token);
+
+            this.setState({ isLoggedIn: true });
+
         } catch (error) {
+
             console.error('Login error:', error)
             this.setState({error: "Login failed. Please check your credentials."})
+
         }
     }
 
@@ -82,9 +98,11 @@ class Login extends Component {
                         <div style={{ marginLeft: 20 }}>
                             <p>Don't have an account?</p>
                             <Link to="/Register">Register</Link>
+
                             <br /><br />
                             <p>Or, sign in as Admin</p>
                             <Link to="/AdminLogin">Admin Login</Link>
+
                         </div>
                     </div>
                 </div>
