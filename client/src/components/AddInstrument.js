@@ -1,8 +1,7 @@
-import React, {Component} from "react"
-import {Redirect, Link} from "react-router-dom"
-import axios from "axios"
-import {ACCESS_LEVEL_ADMIN, SERVER_HOST} from "../config/global_constants"
-import LinkInClass from "./LinkInClass";
+import React, { Component } from "react";
+import { Redirect, Link } from "react-router-dom";
+import axios from "axios";
+import { ACCESS_LEVEL_ADMIN, SERVER_HOST } from "../config/global_constants";
 
 export default class AddInstrument extends Component {
     constructor(props) {
@@ -14,36 +13,45 @@ export default class AddInstrument extends Component {
             stock: "",
             description: "",
             image: "",
-            redirectToDisplayAllInstruments: localStorage.accessLevel < ACCESS_LEVEL_ADMIN
-        }
+            errors: {},
+            redirectToDisplayAllInstruments: Number(localStorage.getItem("accessLevel")) < ACCESS_LEVEL_ADMIN
+        };
     }
-
-    //     if (!/^\d+(\.\d{1,2})?$/.test(price) || Number(price) <= 0) {
-    //         errors.price = "Price must be a positive number.";
-    //     }
-    //
-    // componentDidMount() {
-    // }
-    //
-    //     if (description.trim().length < 10) {
-    //         errors.description = "Description must be at least 10 characters.";
-    //     }
-    //
-    //     if (!/^(ftp|http|https):\/\/[^ "]+$/.test(image)) {
-    //         errors.image = "Invalid image URL.";
-    //     }
-    //
-    //     this.setState({ errors });
-    //
-    //     return Object.keys(errors).length === 0;
-    // };
 
     handleChange = (e) => {
-        this.setState({[e.target.name]: e.target.value})
-    }
+        this.setState({ [e.target.name]: e.target.value });
+    };
+
+    validateForm = () => {
+        const errors = {};
+
+        if (!this.state.name.trim()) {
+            errors.name = "Name is required.";
+        }
+        if (!/^\d+(\.\d{1,2})?$/.test(this.state.price) || Number(this.state.price) <= 0) {
+            errors.price = "Price must be a positive number.";
+        }
+        if (!/^\d+$/.test(this.state.stock) || Number(this.state.stock) < 0) {
+            errors.stock = "Stock must be a non-negative integer.";
+        }
+        if (this.state.description.trim().length < 10) {
+            errors.description = "Description must be at least 10 characters.";
+        }
+        if (!/^(ftp|http|https):\/\/[^ "]+$/.test(this.state.image)) {
+            errors.image = "Invalid image URL.";
+        }
+
+        this.setState({ errors });
+
+        return Object.keys(errors).length === 0;
+    };
 
     handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!this.validateForm()) {
+            return;
+        }
 
         try {
             const instrumentObject = {
@@ -51,13 +59,11 @@ export default class AddInstrument extends Component {
                 price: Number(this.state.price),
                 stock: Number(this.state.stock),
                 description: this.state.description,
-                image: this.state.image // Ensure this is a valid URL or handle FormData if it's a file
+                image: this.state.image
             };
 
             const res = await axios.post(`${SERVER_HOST}/instruments/add`, instrumentObject, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
             });
 
             if (res.status === 201 || res.status === 200) {
@@ -68,6 +74,7 @@ export default class AddInstrument extends Component {
             }
         } catch (error) {
             console.error("Error adding instrument:", error.response?.data?.errorMessage || error.message);
+            this.setState({ errors: { server: "Error adding instrument. Please try again." } });
         }
     };
 
@@ -97,21 +104,21 @@ export default class AddInstrument extends Component {
 
                     <input
                         type="text"
-                        name="description"
-                        placeholder="Description"
-                        value={this.state.description}
-                        onChange={this.handleChange}
-                    />
-                    {this.state.errors.description && <p style={{ color: "red" }}>{this.state.errors.description}</p>}
-
-                    <input
-                        type="text"
                         name="stock"
                         placeholder="Stock"
                         value={this.state.stock}
                         onChange={this.handleChange}
                     />
                     {this.state.errors.stock && <p style={{ color: "red" }}>{this.state.errors.stock}</p>}
+
+                    <input
+                        type="text"
+                        name="description"
+                        placeholder="Description"
+                        value={this.state.description}
+                        onChange={this.handleChange}
+                    />
+                    {this.state.errors.description && <p style={{ color: "red" }}>{this.state.errors.description}</p>}
 
                     <input
                         type="text"
