@@ -1,51 +1,53 @@
-// Cors
-const cors = require('cors')
+const cors = require("cors");
 
 // Express
-const express = require(`express`)
-const app = express()
+const express = require("express");
+const app = express();
 
-
-const cartRoutes = require('./routes/cart')
-app.use('/api', cartRoutes)
 // Server-side global variables
-require(`dotenv`).config({path: `./config/.env`})
+require("dotenv").config({ path: "./config/.env" });
 
 //mongoose stuff
-require(`./config/db`)
+require("./config/db");
 
 // Middleware
-app.use(express.json())
-app.use(cors())
+app.use(express.json());
+app.use(cors());
 
-app.use(require(`body-parser`).json())
-
+app.use(require("body-parser").json());
 
 // Routers
-const userRoutes = require(`./routes/users`)
-const instrumentsRoutes = require(`./routes/instruments`)
 
-app.use(instrumentsRoutes)
+const adminRoutes = require("./routes/admin");
+app.use("/api/admin", adminRoutes);
+
+const userRoutes = require("./routes/users");
 app.use(userRoutes);
-// app.use('/api/admin', adminRoutes)
 
+const instrumentsRoutes = require("./routes/instruments");
+app.use(instrumentsRoutes);
+
+const salesRoutes = require("./routes/sales");
+app.use(salesRoutes);
+
+const cartRoutes = require("./routes/cart");
+app.use("/api", cartRoutes);
 
 // Port
 app.listen(process.env.SERVER_PORT, () => {
-    console.log(`Connected to port ` + process.env.SERVER_PORT)
-})
-
+    console.log(`Connected to port ${process.env.SERVER_PORT}`);
+});
 
 // Error 404
 app.use((req, res, next) => {
-    next(createError(404))
-})
+    next(createError(404));
+});
 
 // Other errors
 app.use(function (err, req, res, next) {
-    console.error(err.message)
+    console.error(err.message);
     if (!err.statusCode) {
-        err.statusCode = 500
+        err.statusCode = 500;
     }
-    res.status(err.statusCode).send(err.message)
-})
+    res.status(err.statusCode).send(err.message);
+});
