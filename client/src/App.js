@@ -10,8 +10,8 @@ import {SearchProvider} from "./components/SearchContext"
 import CartPage from './components/CartPage' // Adjust path if needed
 import Navbar from "./components/Navbar"
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants"
-import LoggedInRoute from "./components/LoggedInRoute"
 import AdminRoute from "./components/AdminRoute"
+import UserProfile from "./components/UserProfile";
 
 
 if (typeof sessionStorage.accessLevel === "undefined") {
@@ -30,6 +30,7 @@ export default class App extends Component {
                             <Route exact path="/MainPage" component={MainPage}/>
                             <Route exact path="/Login" component={Login}/>
                             <Route exact path="/Register" component={Register}/>
+                            <Route exact path ="/UserProfile" component={UserProfile}/>
                             <AdminRoute exact path="/AddInstrument" component={AddInstrument}/>
                             <AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
                             <CartPage exact path="/cart" component={CartPage}/>

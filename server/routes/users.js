@@ -97,6 +97,56 @@ router.post('/users/login', async (req, res) => {
     }
 });
 
+// Update user details (name, email, or password)
+router.put('/users/update', verifyToken, async (req, res) => {
+    const { name, email, password } = req.body;
+    let updates = {};
+
+    try {
+        // Fetch the user from the database
+        const user = await UserModel.findById(req.user.id);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        // Validate and update name
+        if (name) {
+            if (!isValidName(name)) {
+                return res.status(400).json({ error: "Name must be between 3 and 50 characters and contain only letters and spaces." });
+            }
+            updates.name = name;
+        }
+
+        // Validate and update email
+        if (email) {
+            if (!isValidEmail(email)) {
+                return res.status(400).json({ error: "Invalid email format." });
+            }
+            const emailExists = await UserModel.findOne({ email });
+            if (emailExists && emailExists._id.toString() !== user._id.toString()) {
+                return res.status(400).json({ error: "Email already in use by another account." });
+            }
+            updates.email = email;
+        }
+
+        // Validate and update password
+        if (password) {
+            if (!isValidPassword(password)) {
+                return res.status(400).json({ error: "Password must be at least 8 characters, include one uppercase, one lowercase, one number, and one special character." });
+            }
+            const saltRounds = parseInt(process.env.PASSWORD_HASH_SALT_ROUNDS) || 10;
+            updates.password = await bcrypt.hash(password, saltRounds);
+        }
+
+        // Apply updates
+        const updatedUser = await UserModel.findByIdAndUpdate(req.user.id, updates, { new: true });
+
+        res.json({ message: "User updated successfully", user: updatedUser });
+    } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
 // Get all users
 router.get('/users', verifyToken, async (req, res) => {
     try {

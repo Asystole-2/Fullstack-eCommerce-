@@ -1,6 +1,7 @@
 import React, {Component} from "react"
 import {Link} from "react-router-dom"
 import SearchContext from "./SearchContext"
+import {ACCESS_LEVEL_GUEST} from "../config/global_constants";
 
 export default class Navbar extends Component {
     static contextType = SearchContext;
@@ -10,7 +11,10 @@ export default class Navbar extends Component {
     }
 
     render() {
-
+        const accessLevel = Number(sessionStorage.getItem("accessLevel")) || ACCESS_LEVEL_GUEST;
+        console.log(sessionStorage.getItem("accessLevel"));
+        const userLink = accessLevel === ACCESS_LEVEL_GUEST ? "/Login" : "/UserProfile";
+        console.log(userLink);
         return (
             <nav className="navbar">
                 <Link to="/MainPage">
@@ -30,7 +34,7 @@ export default class Navbar extends Component {
                 <div className="nav-icons">
                     <Link to="/"><i className="fas fa-heart"></i></Link>
                     <Link to="/cart"><i className="fas fa-shopping-cart"></i></Link>
-                    <Link to="/Login"><i className="fas fa-user"></i></Link>
+                    <Link to= {userLink}><i className="fas fa-user"></i></Link>
                 </div>
             </nav>
         )
