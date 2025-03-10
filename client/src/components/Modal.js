@@ -118,7 +118,7 @@ export default class Modal extends Component {
                                     </button>
                                     <button onClick={() => onDelete(product._id)}>Delete</button>
                                     <button>
-                                        <Link to={`/EditInstrument/${product._id}`}>Edit</Link>
+                                        <Link className="edit-button" to={`/EditInstrument/${product._id}`}>Edit</Link>
                                     </button>
                                 </div>
                              :

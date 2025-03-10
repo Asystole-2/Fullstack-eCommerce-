@@ -5,7 +5,7 @@ import MainPage from "./components/MainPage"
 import Login from "./components/Login"
 import Register from "./components/Register"
 import AddInstrument from "./components/AddInstrument"
-import "./css/App.css"
+import "./scss/App.css"
 import EditInstrument from "./components/EditInstrument"
 import {SearchProvider} from "./components/SearchContext"
 import CartPage from './components/CartPage'
