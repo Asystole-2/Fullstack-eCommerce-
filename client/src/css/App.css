@@ -377,6 +377,12 @@ select:active, select:focus {
     cursor: pointer;
 }
 
+.view-users,
+.add-new-product {
+    margin: 1rem;
+    position: relative;
+}
+
 .add-new-car {
     margin-top: 1em;
 }

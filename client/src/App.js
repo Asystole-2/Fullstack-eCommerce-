@@ -14,6 +14,7 @@ import {ACCESS_LEVEL_GUEST} from "./config/global_constants"
 import AdminRoute from "./components/AdminRoute"
 import AboutPage from "./components/AboutPage"
 import Home from "./components/Home"
+import UsersLists from "./components/UsersLists"
 
 import BuyProduct from "./components/BuyProduct";
 import PayPalMessage from "./components/PayPalMessage";
@@ -47,6 +48,7 @@ export default class App extends Component {
                             <CartPage exact path="/cart" component={CartPage}/>
                             <Route exact path="/Aboutpage" component={AboutPage}/>
                             <Route exact path="/Home" component={Home}/>
+                            <Route exact path="/UsersLists" component={UsersLists}/>
                             <Route component={Home}/>
 
                             <Route exact path="/cart" component={CartPage}/>

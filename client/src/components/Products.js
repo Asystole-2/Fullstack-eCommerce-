@@ -211,6 +211,15 @@ export default class Products extends Component {
                     :
                     null
                 }
+                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
+                    <div className="view-users">
+                        <Link className="blue-button" to={"/UsersLists"}>
+                            View Users
+                        </Link>
+                    </div>
+                    :
+                    null
+                }
                 <div>
                     <div className="sort-bar">
                     <SortProducts
@@ -233,11 +242,6 @@ export default class Products extends Component {
                         )}
                     </div>
                 </div>
-                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
-                    <UsersList/>
-                    :
-                    null
-                }
             </div>
         )
     }
