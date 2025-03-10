@@ -34,50 +34,63 @@ router.get("/instruments/:id", authenticateJWT, async (req, res) => {
     }
 });
 
-// // Add new record
-router.post('/instruments/add',authenticateJWT, async (req, res) => {
+// Add
+router.post("/instruments/add", authenticateJWT, async (req, res) => {
     try {
-        // Extract the token from the Authorization header
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ errorMessage: "User is not logged in" });
+        const { name, brand, price, stock, description, images } = req.body;
+
+        // Allow query parameters (CDN images, image processing links)
+        const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i;
+
+        if (images && !imageUrlPattern.test(images)) {
+            return res.status(400).json({ error: "Invalid image URL format. Use a direct image link." });
         }
 
-        // Create a new car record
-        const newInstrument = await InstrumentModel.create(req.body);
+        const newInstrument = new InstrumentModel({
+            name,
+            brand,
+            price,
+            stock,
+            description,
+            images
+        });
 
+        await newInstrument.save();
         res.status(201).json(newInstrument);
     } catch (error) {
-        console.error("Error adding instruments:", error);
-        if (error.name === "JsonWebTokenError") {
-            return res.status(401).json({ errorMessage: "Invalid token" });
-        }
-        res.status(500).json({ errorMessage: "Internal server error" });
+        console.error("Error adding instrument:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
-// Update instrument
+// Update instrument (including image URL)
 router.put("/instruments/:id", authenticateJWT, async (req, res) => {
     try {
-        if (req.user.accessLevel < 2) {
-            return res.status(403).json({ error: "Unauthorized: Only admins can update instruments" });
-        }
+        const { name, brand, price, stock, description, images } = req.body;
 
-        const instrument = await InstrumentModel.findById(req.params.id);
-        if (!instrument) return res.status(404).json({ error: "Instrument not found" });
+        // Validate URL
+        const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i;
+
+        if (images && !imageUrlPattern.test(images)) {
+            return res.status(400).json({ error: "Invalid image URL format. Use a direct image link." });
+        }
 
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             req.params.id,
-            req.body,
-            {new: true}
-        )
-        if (!updatedInstrument) return res.status(404).json({error: "Instrument not found"})
-        res.json(updatedInstrument)
+            { name, brand, price, stock, description, images },
+            { new: true }
+        );
+
+        if (!updatedInstrument) {
+            return res.status(404).json({ error: "Instrument not found" });
+        }
+
+        res.json(updatedInstrument);
     } catch (error) {
-        console.error("Error updating instrument:", error)
-        res.status(500).json({error: "Internal Server Error"})
+        console.error("Error updating instrument:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-})
+});
 
 // Delete instrument
 router.delete("/api/instruments/delete/:id",authenticateJWT, async (req, res) => {

@@ -13,7 +13,7 @@ const ProductSchema = new mongoose.Schema({
     reviews: {type: Number},
     price: {type: Number},
     stock: {type: Number},
-    image: [{type: String}] ,
+    images: {type: [String], required: false},
     sold: {type: Boolean, default:false}
 }, {
     collection: "products",

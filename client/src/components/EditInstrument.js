@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
-import LinkInClass from "../components/LinkInClass";
 import { SERVER_HOST } from "../config/global_constants";
 
 export default class EditInstrument extends Component {
@@ -15,7 +14,8 @@ export default class EditInstrument extends Component {
             stock: "",
             description: "",
             category: "",
-            image: "",
+            images: [],  // Store multiple images as an array
+            newImageURL: "", // Store new image input
             errors: {},
             redirectToDisplayAllInstruments: false
         };
@@ -30,17 +30,12 @@ export default class EditInstrument extends Component {
         }
 
         try {
-            console.log("Fetching instrument with ID:", this.props.match.params.id);
-            console.log("Token being sent:", `Bearer ${token}`);
-
             const response = await axios.get(
                 `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
-
-            console.log("API Response:", response.data);
 
             if (response.data && Object.keys(response.data).length > 0) {
                 this.setState({
@@ -50,7 +45,7 @@ export default class EditInstrument extends Component {
                     stock: response.data.stock || "",
                     description: response.data.description || "",
                     category: response.data.category || "",
-                    image: response.data.image || "",
+                    images: response.data.images || [], // Ensure images is an array
                 });
             } else {
                 console.log("Record not found");
@@ -64,9 +59,30 @@ export default class EditInstrument extends Component {
         this.setState({ [e.target.name]: e.target.value });
     };
 
+    handleAddImage = () => {
+        const { newImageURL, images } = this.state;
+
+        if (!/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(newImageURL)) {
+            this.setState({ errors: { images: "Invalid image URL format." } });
+            return;
+        }
+
+        this.setState({
+            images: [...images, newImageURL],  // Add new image to array
+            newImageURL: "", // Reset input
+            errors: {}
+        });
+    };
+
+    handleRemoveImage = (index) => {
+        const updatedImages = [...this.state.images];
+        updatedImages.splice(index, 1);
+        this.setState({ images: updatedImages });
+    };
+
     validateForm = () => {
         let errors = {};
-        const { name, price, stock, description, image } = this.state;
+        const { name, price, stock, description, images } = this.state;
 
         if (name.trim().length < 3 || name.trim().length > 50) {
             errors.name = "Name must be between 3 and 50 characters.";
@@ -84,8 +100,8 @@ export default class EditInstrument extends Component {
             errors.description = "Description must be at least 10 characters.";
         }
 
-        if (!/^(ftp|http|https):\/\/[^ "]+$/.test(image)) {
-            errors.image = "Invalid image URL.";
+        if (images.length === 0) {
+            errors.images = "At least one image is required.";
         }
 
         this.setState({ errors });
@@ -97,11 +113,12 @@ export default class EditInstrument extends Component {
         e.preventDefault();
 
         const token = localStorage.getItem("token");
-        console.log(token)
-
         if (!token) {
-            console.error("User is not logged in");
             alert("Please log in to update instruments.");
+            return;
+        }
+
+        if (!this.validateForm()) {
             return;
         }
 
@@ -113,7 +130,7 @@ export default class EditInstrument extends Component {
                 stock: this.state.stock,
                 description: this.state.description,
                 category: this.state.category,
-                image: this.state.image
+                images: this.state.images, // Send images array
             };
 
             const response = await axios.put(
@@ -128,10 +145,10 @@ export default class EditInstrument extends Component {
             );
 
             if (response.status === 200) {
-                console.log(`Record updated successfully`);
+                console.log("Record updated successfully");
                 this.setState({ redirectToDisplayAllInstruments: true });
             } else {
-                console.error(`Unexpected response:`, response.data);
+                console.error("Unexpected response:", response.data);
             }
         } catch (error) {
             console.error("Error updating instrument:", error.response?.data?.errorMessage || error.message);
@@ -141,7 +158,7 @@ export default class EditInstrument extends Component {
     render() {
         return (
             <div className="form-container">
-                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/MainPage" /> : null}
+                {this.state.redirectToDisplayAllInstruments && <Redirect to="/MainPage" />}
 
                 <form onSubmit={this.handleSubmit}>
                     <label>Name</label>
@@ -150,7 +167,6 @@ export default class EditInstrument extends Component {
 
                     <label>Category</label>
                     <input type="text" name="category" value={this.state.category} onChange={this.handleChange} />
-                    {this.state.errors.category && <p style={{ color: "red" }}>{this.state.errors.category}</p>}
 
                     <label>Price</label>
                     <input type="text" name="price" value={this.state.price} onChange={this.handleChange} />
@@ -161,16 +177,26 @@ export default class EditInstrument extends Component {
                     {this.state.errors.stock && <p style={{ color: "red" }}>{this.state.errors.stock}</p>}
 
                     <label>Description</label>
-                    <input type="text" name="description" value={this.state.description} onChange={this.handleChange} />
-                    {this.state.errors.description && <p style={{ color: "red" }}>{this.state.errors.description}</p>}
-
-                    <label>Image</label>
-                    <input type="text" name="image" value={this.state.image} onChange={this.handleChange} />
-                    {this.state.errors.image && <p style={{ color: "red" }}>{this.state.errors.image}</p>}
+                    <textarea name="description" value={this.state.description} onChange={this.handleChange} />
 
                     <label>Brand</label>
                     <input type="text" name="brand" value={this.state.brand} onChange={this.handleChange} />
-                    {this.state.errors.brand && <p style={{ color: "red" }}>{this.state.errors.brand}</p>}
+
+                    {/* Image Input */}
+                    <label>Images</label>
+                    <input type="text" name="newImageURL" placeholder="New Image URL" value={this.state.newImageURL} onChange={this.handleChange} />
+                    <button type="button" onClick={this.handleAddImage}>Add Image</button>
+                    {this.state.errors.images && <p style={{ color: "red" }}>{this.state.errors.images}</p>}
+
+                    {/* Image Previews */}
+                    <div className="image-preview-container">
+                        {this.state.images.map((img, index) => (
+                            <div key={index} className="image-preview-wrapper">
+                                <img src={img} alt={`Preview ${index + 1}`} className="image-preview" />
+                                <button type="button" onClick={() => this.handleRemoveImage(index)}>Remove</button>
+                            </div>
+                        ))}
+                    </div>
 
                     {this.state.errors.server && <p style={{ color: "red" }}>{this.state.errors.server}</p>}
 
