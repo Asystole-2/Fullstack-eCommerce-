@@ -10,9 +10,11 @@ export default class EditInstrument extends Component {
 
         this.state = {
             name: "",
+            brand: "",
             price: "",
             stock: "",
             description: "",
+            category: "",
             image: "",
             errors: {},
             redirectToDisplayAllInstruments: false
@@ -23,13 +25,13 @@ export default class EditInstrument extends Component {
         const token = localStorage.getItem("token");
 
         if (!token) {
-            console.error("User is not logged in");
-            alert("Please log in to edit instruments.");
+            alert("Please log in.");
             return;
         }
 
         try {
             console.log("Fetching instrument with ID:", this.props.match.params.id);
+            console.log("Token being sent:", `Bearer ${token}`);
 
             const response = await axios.get(
                 `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
@@ -40,22 +42,21 @@ export default class EditInstrument extends Component {
 
             console.log("API Response:", response.data);
 
-            console.log("Name:", response.data.name);
-
-            if (response.data) {
+            if (response.data && Object.keys(response.data).length > 0) {
                 this.setState({
                     name: response.data.name || "",
                     brand: response.data.brand || "",
                     price: response.data.price || "",
                     stock: response.data.stock || "",
                     description: response.data.description || "",
+                    category: response.data.category || "",
                     image: response.data.image || "",
                 });
             } else {
                 console.log("Record not found");
             }
         } catch (error) {
-            console.error("Error fetching instrument:", error.response?.data?.errorMessage || error.message);
+            console.error("Error fetching instrument:", error.response || error.message);
         }
     };
 
@@ -95,7 +96,7 @@ export default class EditInstrument extends Component {
     handleSubmit = async (e) => {
         e.preventDefault();
 
-        const token = localStorage.getItem("token"); 
+        const token = localStorage.getItem("token");
         console.log(token)
 
         if (!token) {
@@ -111,11 +112,12 @@ export default class EditInstrument extends Component {
                 price: this.state.price,
                 stock: this.state.stock,
                 description: this.state.description,
+                category: this.state.category,
                 image: this.state.image
             };
 
             const response = await axios.put(
-                `http://localhost:4000/instruments/${this.props.match.params.id}`,
+                `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
                 instrumentObject,
                 {
                     headers: {
@@ -139,12 +141,16 @@ export default class EditInstrument extends Component {
     render() {
         return (
             <div className="form-container">
-                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments" /> : null}
+                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/MainPage" /> : null}
 
                 <form onSubmit={this.handleSubmit}>
                     <label>Name</label>
                     <input type="text" name="name" value={this.state.name} onChange={this.handleChange} />
                     {this.state.errors.name && <p style={{ color: "red" }}>{this.state.errors.name}</p>}
+
+                    <label>Category</label>
+                    <input type="text" name="category" value={this.state.category} onChange={this.handleChange} />
+                    {this.state.errors.category && <p style={{ color: "red" }}>{this.state.errors.category}</p>}
 
                     <label>Price</label>
                     <input type="text" name="price" value={this.state.price} onChange={this.handleChange} />
@@ -161,6 +167,10 @@ export default class EditInstrument extends Component {
                     <label>Image</label>
                     <input type="text" name="image" value={this.state.image} onChange={this.handleChange} />
                     {this.state.errors.image && <p style={{ color: "red" }}>{this.state.errors.image}</p>}
+
+                    <label>Brand</label>
+                    <input type="text" name="brand" value={this.state.brand} onChange={this.handleChange} />
+                    {this.state.errors.brand && <p style={{ color: "red" }}>{this.state.errors.brand}</p>}
 
                     {this.state.errors.server && <p style={{ color: "red" }}>{this.state.errors.server}</p>}
 

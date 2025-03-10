@@ -18,7 +18,7 @@ export default class InstrumentAPI {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}` // ✅ Attach JWT token
+                    Authorization: `Bearer ${token}` // Attach JWT token
                 },
                 body: JSON.stringify({ amount })
             });

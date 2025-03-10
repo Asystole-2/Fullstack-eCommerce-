@@ -1,11 +1,20 @@
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
+const express = require("express");
+const router = express.Router()
 
 // Load public key for verifying JWTs
 const publicKey = fs.readFileSync(process.env.JWT_PUBLIC_KEY_FILENAME, "utf8");
 
 const authenticateJWT = (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1]; // Expecting format: "Bearer <token>"
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ errorMessage: "User is not logged in" });
+    }
+
+    const token = authHeader.split(" ")[1]; // Expecting format: "Bearer <token>"
 
     if (!token) {
         return res.status(403).json({ errorMessage: "Access denied. No token provided." });
@@ -21,12 +30,9 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-const authorizeAdmin = (req, res, next) => {
-    if (req.user.role !== "admin") {
-        return res.status(403).json({ errorMessage: "Admin access required." });
-    }
+router.use((req, res, next) => {
+    console.log("Received Token:", req.headers.authorization);
     next();
-};
-
+});
 
 module.exports = authenticateJWT;

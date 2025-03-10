@@ -21,23 +21,18 @@ router.get("/instruments", async (req, res) => {
 })
 
 // Read one instrument by ID
-router.get("/instruments/:id", async (req, res) => {
+router.get("/instruments/:id", authenticateJWT, async (req, res) => {
     try {
-        jwt.verify(req.headers.authorization, JWT_PRIVATE_KEY, {algorithm: "RS256"}, (err, decodedToken) => {
-            if (err) {
-                res.json({errorMessage:`User is not logged in`})
-            }
-            else {
-                InstrumentModel.findById(req.params.id, (error, data) => {
-                    res.json(data)
-                })
-            }
-        })
+        const instrument = await InstrumentModel.findById(req.params.id);
+        if (!instrument) {
+            return res.status(404).json({ errorMessage: "Instrument not found" });
+        }
+        res.json(instrument);
     } catch (error) {
-        console.error("Error fetching instrument:", error)
-        res.status(500).json({error: "Internal Server Error"})
+        console.error("Error fetching instrument:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-})
+});
 
 // // Add new record
 router.post('/instruments/add',authenticateJWT, async (req, res) => {
@@ -64,11 +59,12 @@ router.post('/instruments/add',authenticateJWT, async (req, res) => {
 // Update instrument
 router.put("/instruments/:id", authenticateJWT, async (req, res) => {
     try {
-        // Extract the token from the Authorization header
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ errorMessage: "User is not logged in" });
+        if (req.user.accessLevel < 2) {
+            return res.status(403).json({ error: "Unauthorized: Only admins can update instruments" });
         }
+
+        const instrument = await InstrumentModel.findById(req.params.id);
+        if (!instrument) return res.status(404).json({ error: "Instrument not found" });
 
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             req.params.id,
