@@ -11,39 +11,55 @@ export default class UsersList extends Component {
     }
 
     componentDidMount() {
-        axios.get(`${SERVER_HOST}/users`)
-            .then(res => {
-                if ((res.data)) {
-                    console.table(res.data)
+        const token = localStorage.getItem("token"); // Retrieve JWT token
 
-                    this.setState({
-                        users: res.data,
-                    })
+        if (!token) {
+            console.error("User is not logged in");
+            alert("Please log in to view users.");
+            return;
+        }
+
+        axios.get(`${SERVER_HOST}/users`, {
+            headers: { Authorization: `Bearer ${token}` } // Attach JWT
+        })
+            .then(res => {
+                if (res.data) {
+                    console.table(res.data);
+                    this.setState({ users: res.data });
                 } else {
-                    console.log("Record not found")
+                    console.log("Record not found");
                 }
             })
-            .catch(error => console.error("Error fetching instruments:", error))
+            .catch(error => console.error("Error fetching users:", error));
     }
 
-    // Handle DELETE request
+// Handle DELETE with JWT authentication
     handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
 
         console.log("Deleting user with ID:", id);
 
+        const token = localStorage.getItem("token"); // Retrieve JWT token
+
+        if (!token) {
+            alert("You must be logged in to delete a user.");
+            return;
+        }
+
         try {
-            const response = await fetch(`http://localhost:4000/api/user/${id}`, {
+            const response = await fetch(`${SERVER_HOST}/api/users/${id}`, {
                 method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
             });
 
             if (response.ok) {
                 alert("User deleted successfully!");
-                if (this.state.users) {
-                    this.setState({
-                        users: this.state.users.filter(user => user._id !== id)
-                    });
-                }
+                this.setState({
+                    users: this.state.users.filter(user => user._id !== id),
+                });
             } else {
                 alert("Error deleting user");
             }

@@ -19,6 +19,7 @@ export default class EditInstrument extends Component {
         };
     }
 
+<<<<<<< HEAD
     componentDidMount() {
         axios.get(`${SERVER_HOST}/instruments/${this.props.match.params.id}`)
             .then(res => {
@@ -39,6 +40,50 @@ export default class EditInstrument extends Component {
                 }
             });
     }
+=======
+    componentDidMount = async () => {
+        const token = localStorage.getItem("token");
+        console.log("Token in localStorage:", token); // Debug: Check if token is null or undefined
+
+        if (!token) {
+            console.error("User is not logged in");
+            alert("Please log in to edit instruments.");
+            return;
+        }
+
+        const authHeader = `Bearer ${token}`;
+        console.log("Authorization Header Sent:", authHeader);
+
+        try {
+            console.log("Fetching instrument with ID:", this.props.match.params.id);
+
+            const response = await axios.get(
+                `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
+                {
+                    headers: { Authorization: authHeader },
+                }
+            );
+
+            console.log("API Response:", response.data);
+
+            if (response.data) {
+                this.setState({
+                    name: response.data.name || "",
+                    brand: response.data.brand || "",
+                    price: response.data.price || "",
+                    stock: response.data.stock || "",
+                    description: response.data.description || "",
+                    image: response.data.image || "",
+                    errors: {},
+                });
+            } else {
+                console.log("Record not found");
+            }
+        } catch (error) {
+            console.error("Error fetching instrument:", error.response?.data?.errorMessage || error.message);
+        }
+    };
+>>>>>>> admin-login3
 
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
@@ -73,9 +118,10 @@ export default class EditInstrument extends Component {
         return Object.keys(errors).length === 0;
     };
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
 
+<<<<<<< HEAD
         if (!this.validateForm()) return;
 
         const instrumentObject = {
@@ -103,6 +149,47 @@ export default class EditInstrument extends Component {
                 console.error("Error updating instrument:", error);
                 this.setState({ errors: { server: "Error updating instrument. Try again." } });
             });
+=======
+        const token = localStorage.getItem("token"); // Retrieve JWT token
+        console.log(token)
+
+        if (!token) {
+            console.error("User is not logged in");
+            alert("Please log in to update instruments.");
+            return;
+        }
+
+        try {
+            const instrumentObject = {
+                name: this.state.name,
+                brand: this.state.brand,
+                price: this.state.price,
+                stock: this.state.stock,
+                description: this.state.description,
+                image: this.state.image
+            };
+
+            const response = await axios.put(
+                `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
+                instrumentObject,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+
+            if (response.status === 200) {
+                console.log(`Record updated successfully`);
+                this.setState({ redirectToDisplayAllInstruments: true });
+            } else {
+                console.error(`Unexpected response:`, response.data);
+            }
+        } catch (error) {
+            console.error("Error updating instrument:", error.response?.data?.errorMessage || error.message);
+        }
+>>>>>>> admin-login3
     };
 
     render() {

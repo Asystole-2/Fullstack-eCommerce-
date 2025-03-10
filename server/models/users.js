@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 let usersSchema = new mongoose.Schema(
     {
+<<<<<<< HEAD
         name: {
             type: String,
             required: true,
@@ -47,6 +48,14 @@ let usersSchema = new mongoose.Schema(
             type: String,
             default: ""
         }
+=======
+        name: {type: String, required: true},
+        email: {type: String, required: true},
+        password: {type: String, required: true},
+        // profilePhotoFilename: {type:String, default:""}
+        accessLevel: {type: Number, default: parseInt(process.env.ACCESS_LEVEL_NORMAL_USER)},
+        role: {type: String, enum: ['user', 'admin'], default: 'user'}
+>>>>>>> admin-login3
     },
     {
         collection: "users",

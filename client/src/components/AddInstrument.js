@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
 import { SERVER_HOST } from "../config/global_constants";
+=======
+import React, {Component} from "react"
+import {Redirect, Link} from "react-router-dom"
+import axios from "axios"
+import {ACCESS_LEVEL_ADMIN, SERVER_HOST} from "../config/global_constants"
+>>>>>>> admin-login3
 import LinkInClass from "./LinkInClass";
 
 export default class AddInstrument extends Component {
@@ -14,11 +21,22 @@ export default class AddInstrument extends Component {
             stock: "",
             description: "",
             image: "",
+<<<<<<< HEAD
             errors: {},
             redirectToDisplayAllInstruments: false
         };
     }
 
+=======
+            redirectToDisplayAllInstruments: localStorage.accessLevel < ACCESS_LEVEL_ADMIN
+        }
+
+    }
+
+    componentDidMount() {
+    }
+
+>>>>>>> admin-login3
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
     };
@@ -52,6 +70,7 @@ export default class AddInstrument extends Component {
         return Object.keys(errors).length === 0;
     };
 
+<<<<<<< HEAD
     handleSubmit = (e) => {
         e.preventDefault();
 
@@ -82,6 +101,35 @@ export default class AddInstrument extends Component {
                 console.error("Error adding instrument:", error);
                 this.setState({ errors: { server: "Error adding instrument. Try again." } });
             });
+=======
+    handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const instrumentObject = {
+                name: this.state.name,
+                price: Number(this.state.price),
+                stock: Number(this.state.stock),
+                description: this.state.description,
+                image: this.state.image // Ensure this is a valid URL or handle FormData if it's a file
+            };
+
+            const res = await axios.post(`${SERVER_HOST}/instruments/add`, instrumentObject, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+
+            if (res.status === 201 || res.status === 200) {
+                console.log("Record added");
+                this.setState({ redirectToDisplayAllInstruments: true });
+            } else {
+                console.log("Unexpected response:", res.data);
+            }
+        } catch (error) {
+            console.error("Error adding instrument:", error.response?.data?.errorMessage || error.message);
+        }
+>>>>>>> admin-login3
     };
 
     render() {

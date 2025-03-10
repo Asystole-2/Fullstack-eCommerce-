@@ -18,7 +18,12 @@ class Login extends Component {
 
     handleLogin = async (e) => {
         e.preventDefault();
+<<<<<<< HEAD
         console.log('Logging in with:', this.state.loginEmail, this.state.loginPassword);
+=======
+        console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+        console.log("User role: ", this.state.accessLevel); // Add this before sending response
+>>>>>>> admin-login3
 
         try {
             const res = await axios.post(`${SERVER_HOST}/users/login`, {
@@ -26,6 +31,7 @@ class Login extends Component {
                 password: this.state.loginPassword
             });
 
+<<<<<<< HEAD
             if (!res.data || !res.data.role) {
                 this.setState({ error: "Login failed. No role found in response." });
                 return;
@@ -50,6 +56,34 @@ class Login extends Component {
         } catch (error) {
             console.error('Login error:', error.response?.data || error.message);
             this.setState({ error: error.response?.data?.error || "Login failed. Please check your credentials." });
+=======
+            if (!res.data) {
+                throw new Error("No response data received");
+            }
+
+            if (res.data.errorMessage) {
+                console.log(res.data.errorMessage);
+                this.setState({ errors: { general: res.data.errorMessage } });
+                return;
+            }
+
+            console.log("User logged in");
+
+            localStorage.setItem("name", res.data.name);
+            localStorage.setItem("accessLevel", res.data.accessLevel);
+            localStorage.setItem("token", res.data.token);
+
+            this.setState({ isLoggedIn: true });
+
+        } catch (error) {
+            console.error('Login error:', error.response?.data || error.message);
+
+            this.setState({
+                errors: {
+                    general: error.response?.data?.error || "Login failed. Please check your credentials."
+                }
+            });
+>>>>>>> admin-login3
         }
     };
 

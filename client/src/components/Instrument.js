@@ -1,6 +1,12 @@
 import React, {Component} from "react"
 import {Link} from "react-router-dom"
+<<<<<<< HEAD
 import InstrumentAPI from "../services/InstrumentAPI"
+=======
+import axios from 'axios'
+import InstrumentAPI from "../services/InstrumentAPI";
+import {ACCESS_LEVEL_ADMIN} from "../config/global_constants";
+>>>>>>> admin-login3
 
 export default class Instrument extends Component {
 
@@ -80,6 +86,8 @@ export default class Instrument extends Component {
     render() {
         const {product, onDelete} = this.props
         const {userRole} = this.state
+        const value = product.price ? product.price.toFixed(2) : 0
+        const userAccessLevel = localStorage.getItem("accessLevel");
         return (
             <div className="product-card">
                 <div className="image-gallery">
@@ -110,10 +118,14 @@ export default class Instrument extends Component {
                 <p>{product.description}</p>
                 <p>Rating: {product.rating}</p>
                 <p>Reviews: {product.reviews}</p>
+<<<<<<< HEAD
                 <p>Price: {product.price !== undefined ? `$${product.price.toFixed(2)}` : 'Price not available'}</p>
+=======
+                <p>Price: ${value}</p>
+>>>>>>> admin-login3
                 <p>Stock: {product.stock}</p>
 
-                {userRole === "admin" ? (
+                {userAccessLevel >= ACCESS_LEVEL_ADMIN ? (
                     <div>
                         <button onClick={() => this.handleStockChange(-1)} disabled={product.stock <= 0}>
                             Decrease Stock

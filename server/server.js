@@ -22,14 +22,16 @@ app.use(require(`body-parser`).json())
 
 
 // Routers
-
-const adminRoutes = require(`./routes/admin`)
 const userRoutes = require(`./routes/users`)
 const instrumentsRoutes = require(`./routes/instruments`)
 
 app.use(instrumentsRoutes)
+<<<<<<< HEAD
 app.use(userRoutes)
 app.use('/api/admin', adminRoutes)
+=======
+app.use(userRoutes);
+>>>>>>> admin-login3
 
 
 // Port
