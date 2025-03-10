@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const publicKey = fs.readFileSync(process.env.JWT_PUBLIC_KEY_FILENAME, "utf8");
 
 const authenticateJWT = (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1]; // Expecting format: "Bearer <token>"
+    const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
         return res.status(403).json({ errorMessage: "Access denied. No token provided." });
@@ -13,7 +13,7 @@ const authenticateJWT = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, publicKey, { algorithms: ["RS256"] });
-        req.user = decoded; // Attach user data to request
+        req.user = decoded;
         next();
     } catch (error) {
         console.error("JWT Verification Failed:", error);
@@ -28,5 +28,4 @@ const authorizeAdmin = (req, res, next) => {
     next();
 };
 
-
-module.exports = authenticateJWT;
+module.exports = { authenticateJWT, authorizeAdmin };

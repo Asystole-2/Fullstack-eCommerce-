@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const InstrumentModel = require("../models/instruments"); // Import the Product model
-const authenticateJWT = require("../middleware/authMiddleware");
+const { authenticateJWT } = require("../middleware/authMiddleware");
 console.log("Instrument model: ", InstrumentModel)
 const mongoose = require("mongoose")
 const jwt = require("jsonwebtoken");
