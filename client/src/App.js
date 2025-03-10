@@ -11,13 +11,13 @@ import {SearchProvider} from "./components/SearchContext"
 import CartPage from './components/CartPage'
 import Navbar from "./components/Navbar"
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants"
-import AdminRoute from "./components/AdminRoute"
 import AboutPage from "./components/AboutPage"
 import Home from "./components/Home"
 
 import BuyProduct from "./components/BuyProduct";
 import PayPalMessage from "./components/PayPalMessage";
 import Products from "./components/Products";
+import UserProfile from "./components/UserProfile";
 
 if (typeof localStorage.accessLevel === "undefined")
 {
@@ -47,8 +47,8 @@ export default class App extends Component {
                             <CartPage exact path="/cart" component={CartPage}/>
                             <Route exact path="/Aboutpage" component={AboutPage}/>
                             <Route exact path="/Home" component={Home}/>
+                            <Route exact path="/UserProfile" component={UserProfile}/>
                             <Route component={Home}/>
-
                             <Route exact path="/cart" component={CartPage}/>
                             <Route path="*" component={Products}/>
                         </Switch>
