@@ -1,12 +1,12 @@
-import React, { Component } from "react";
-import { Redirect, Link } from "react-router-dom";
-import axios from "axios";
-import { SERVER_HOST } from "../config/global_constants";
+import React, {Component} from "react"
+import {Redirect, Link} from "react-router-dom"
+import axios from "axios"
+import {ACCESS_LEVEL_ADMIN, SERVER_HOST} from "../config/global_constants"
 import LinkInClass from "./LinkInClass";
 
 export default class AddInstrument extends Component {
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             name: "",
@@ -14,9 +14,12 @@ export default class AddInstrument extends Component {
             stock: "",
             description: "",
             image: "",
-            errors: {},
-            redirectToDisplayAllInstruments: false
-        };
+            redirectToDisplayAllInstruments: localStorage.accessLevel < ACCESS_LEVEL_ADMIN
+        }
+
+    }
+
+    componentDidMount() {
     }
 
     handleChange = (e) => {
@@ -52,44 +55,43 @@ export default class AddInstrument extends Component {
         return Object.keys(errors).length === 0;
     };
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!this.validateForm()) return;
 
-        const instrumentObject = {
-            name: this.state.name,
-            price: Number(this.state.price),
-            stock: Number(this.state.stock),
-            description: this.state.description,
-            image: this.state.image
-        };
+        try {
+            const instrumentObject = {
+                name: this.state.name,
+                price: Number(this.state.price),
+                stock: Number(this.state.stock),
+                description: this.state.description,
+                image: this.state.image // Ensure this is a valid URL or handle FormData if it's a file
+            };
 
-        axios.post(`${SERVER_HOST}/instruments`, instrumentObject)
-            .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        this.setState({ errors: { server: res.data.errorMessage } });
-                    } else {
-                        console.log("Record added");
-                        this.setState({ redirectToDisplayAllInstruments: true });
-                    }
-                } else {
-                    this.setState({ errors: { server: "Record not added." } });
+            const res = await axios.post(`${SERVER_HOST}/instruments/add`, instrumentObject, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
-            })
-            .catch(error => {
-                console.error("Error adding instrument:", error);
-                this.setState({ errors: { server: "Error adding instrument. Try again." } });
             });
+
+            if (res.status === 201 || res.status === 200) {
+                console.log("Record added");
+                this.setState({ redirectToDisplayAllInstruments: true });
+            } else {
+                console.log("Unexpected response:", res.data);
+            }
+        } catch (error) {
+            console.error("Error adding instrument:", error.response?.data?.errorMessage || error.message);
+        }
     };
 
     render() {
         return (
             <div className="form-container">
-                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments" /> : null}
+                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments"/> : null}
 
-                <form onSubmit={this.handleSubmit}>
+                <form>
                     <input
                         type="text"
                         name="name"
@@ -137,13 +139,14 @@ export default class AddInstrument extends Component {
 
                     {this.state.errors.server && <p style={{ color: "red" }}>{this.state.errors.server}</p>}
 
-                    <button type="submit" className="green-button">
-                        Add
+                    <button>
+                        <LinkInClass value="Add" className="green-button" onClick={this.handleSubmit}/>
                     </button>
 
                     <Link className="red-button" to={"/MainPage"}>Cancel</Link>
                 </form>
             </div>
-        );
+        )
     }
 }
+

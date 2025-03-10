@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require(`mongoose`)
 
 let usersSchema = new mongoose.Schema(
     {
@@ -38,6 +38,8 @@ let usersSchema = new mongoose.Schema(
                 message: props => "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character."
             }
         },
+
+        accessLevel: {type: Number, default: parseInt(process.env.ACCESS_LEVEL_NORMAL_USER)},
         role: {
             type: String,
             enum: ["user", "admin"],
@@ -54,4 +56,4 @@ let usersSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model("users", usersSchema);
+module.exports = mongoose.model(`users`, usersSchema)

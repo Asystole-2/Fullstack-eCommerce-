@@ -12,11 +12,12 @@ import Navbar from "./components/Navbar"
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants"
 import AdminRoute from "./components/AdminRoute"
 import UserProfile from "./components/UserProfile";
+import UsersListRoute from "./components/UsersLists"
 
 
 if (typeof sessionStorage.accessLevel === "undefined") {
     sessionStorage.name = "GUEST"
-    sessionStorage.accessLevel = ACCESS_LEVEL_GUEST
+    sessionStorage.accessLevel = ACCESS_LEVEL_GUEST;
 
 }
 export default class App extends Component {
@@ -30,10 +31,10 @@ export default class App extends Component {
                             <Route exact path="/MainPage" component={MainPage}/>
                             <Route exact path="/Login" component={Login}/>
                             <Route exact path="/Register" component={Register}/>
-                            <Route exact path ="/UserProfile" component={UserProfile}/>
-                            <AdminRoute exact path="/AddInstrument" component={AddInstrument}/>
-                            <AdminRoute exact path="/EditInstrument/:id" component={EditInstrument}/>
-                            <CartPage exact path="/cart" component={CartPage}/>
+                            <Route exact path="/AddInstrument" component={AddInstrument}/>
+                            <Route exact path="/EditInstrument/:id" component={EditInstrument}/>
+                            <Route exact path="/UsersLists" component={UsersListRoute}/>
+                            <Route exact path="/cart" component={CartPage}/>
                             <Route component={MainPage}/>
                         </Switch>
                     </div>

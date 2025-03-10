@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import axios from "axios";
 import {Link, Redirect} from "react-router-dom";
 import {SERVER_HOST} from "../config/global_constants";
-import {ACCESS_LEVEL_ADMIN, ACCESS_LEVEL_USER, ACCESS_LEVEL_GUEST} from "../config/global_constants";
 
 class Login extends Component {
     constructor(props) {
@@ -13,12 +12,13 @@ class Login extends Component {
             error: '',
             isLoggedIn: false,
             redirectURL: "/MainPage",
-        }
+        };
     }
 
     handleLogin = async (e) => {
         e.preventDefault();
-        console.log('Logging in with:', this.state.loginEmail, this.state.loginPassword);
+        console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+        console.log("User role: ", this.state.accessLevel); // Add this before sending response
 
         try {
             const res = await axios.post(`${SERVER_HOST}/users/login`, {
@@ -26,30 +26,32 @@ class Login extends Component {
                 password: this.state.loginPassword
             });
 
-            if (!res.data || !res.data.role) {
-                this.setState({ error: "Login failed. No role found in response." });
+            if (!res.data) {
+                throw new Error("No response data received");
+            }
+
+            if (res.data.errorMessage) {
+                console.log(res.data.errorMessage);
+                this.setState({ errors: { general: res.data.errorMessage } });
                 return;
             }
 
-            // Convert role string ("user"/"admin") to numerical access level
-            let accessLevel = ACCESS_LEVEL_GUEST;
-            if (res.data.role === "user") {
-                accessLevel = ACCESS_LEVEL_USER;
-            } else if (res.data.role === "admin") {
-                accessLevel = ACCESS_LEVEL_ADMIN;
-            }
+            console.log("User logged in");
 
-            // Store access level in sessionStorage
-            sessionStorage.setItem("accessLevel", accessLevel);
-            sessionStorage.setItem("token", res.data.token); // Store token for authentication
+            localStorage.setItem("name", res.data.name);
+            localStorage.setItem("accessLevel", res.data.accessLevel);
+            localStorage.setItem("token", res.data.token);
 
-            alert('Login successful');
-            window.location.href = "/MainPage";
-            this.setState({ isLoggedIn: true, redirectURL: res.data.redirectURL || "/MainPage" });
+            this.setState({ isLoggedIn: true });
 
         } catch (error) {
             console.error('Login error:', error.response?.data || error.message);
-            this.setState({ error: error.response?.data?.error || "Login failed. Please check your credentials." });
+
+            this.setState({
+                errors: {
+                    general: error.response?.data?.error || "Login failed. Please check your credentials."
+                }
+            });
         }
     };
 
@@ -59,7 +61,7 @@ class Login extends Component {
             return <Redirect to={this.state.redirectURL}/>;
         }
         return (
-            <div style = {{zIndex : 1000}}>
+            <div>
                 <div className="login">
                     <div className="login-container">
                         {/* Login Form */}
@@ -97,12 +99,15 @@ class Login extends Component {
                         <div style={{marginLeft: 20}}>
                             <p>Don't have an account?</p>
                             <Link to="/Register">Register</Link>
-                            <br/>
+                            <br/><br/>
+                            <p>Or, sign in as Admin</p>
+                            <Link to="/AdminLogin">Admin Login</Link>
+
                         </div>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 

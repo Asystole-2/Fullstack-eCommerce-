@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
-import LinkInClass from "../components/LinkInClass";
+
 import { SERVER_HOST } from "../config/global_constants";
 
 export default class EditInstrument extends Component {
@@ -10,6 +10,7 @@ export default class EditInstrument extends Component {
 
         this.state = {
             name: "",
+            brand: "",
             price: "",
             stock: "",
             description: "",
@@ -19,25 +20,41 @@ export default class EditInstrument extends Component {
         };
     }
 
-    componentDidMount() {
-        axios.get(`${SERVER_HOST}/instruments/${this.props.match.params.id}`)
-            .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        console.log(res.data.errorMessage);
-                    } else {
-                        this.setState({
-                            name: res.data.name || "",
-                            price: res.data.price || "",
-                            stock: res.data.stock || "",
-                            description: res.data.description || "",
-                            image: res.data.image || "",
-                        });
-                    }
-                } else {
-                    console.log("Record not found");
-                }
+    async componentDidMount() {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            console.error("User is not logged in");
+            alert("Please log in to edit instruments.");
+            return;
+        }
+
+        console.log("Token in localStorage:", token);
+
+        try {
+            console.log("Fetching instrument with ID:", this.props.match.params.id);
+
+            const response = await axios.get(`${SERVER_HOST}/instruments/${this.props.match.params.id}`, {
+                headers: { Authorization: `Bearer ${token}` },
             });
+
+            console.log("API Response:", response.data);
+
+            if (response.data) {
+                this.setState({
+                    name: response.data.name || "",
+                    brand: response.data.brand || "",
+                    price: response.data.price || "",
+                    stock: response.data.stock || "",
+                    description: response.data.description || "",
+                    image: response.data.image || "",
+                });
+            } else {
+                console.log("Instrument not found");
+            }
+        } catch (error) {
+            console.error("Error fetching instrument:", error.response?.data?.errorMessage || error.message);
+        }
     }
 
     handleChange = (e) => {
@@ -73,47 +90,63 @@ export default class EditInstrument extends Component {
         return Object.keys(errors).length === 0;
     };
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!this.validateForm()) return;
 
-        const instrumentObject = {
-            name: this.state.name,
-            price: Number(this.state.price),
-            stock: Number(this.state.stock),
-            description: this.state.description,
-            image: this.state.image,
-        };
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("User is not logged in");
+            alert("Please log in to update instruments.");
+            return;
+        }
 
-        axios.put(`${SERVER_HOST}/instruments/${this.props.match.params.id}`, instrumentObject)
-            .then(res => {
-                if (res.data) {
-                    if (res.data.errorMessage) {
-                        this.setState({ errors: { server: res.data.errorMessage } });
-                    } else {
-                        console.log("Record updated");
-                        this.setState({ redirectToDisplayAllInstruments: true });
+        try {
+            const instrumentObject = {
+                name: this.state.name,
+                brand: this.state.brand,
+                price: this.state.price,
+                stock: this.state.stock,
+                description: this.state.description,
+                image: this.state.image
+            };
+
+            const response = await axios.put(
+                `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
+                instrumentObject,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     }
-                } else {
-                    this.setState({ errors: { server: "Record not updated." } });
                 }
-            })
-            .catch(error => {
-                console.error("Error updating instrument:", error);
-                this.setState({ errors: { server: "Error updating instrument. Try again." } });
-            });
+            );
+
+            if (response.data && !response.data.errorMessage) {
+                console.log("Instrument updated successfully");
+                this.setState({ redirectToDisplayAllInstruments: true });
+            } else {
+                console.error("Error updating instrument:", response.data.errorMessage);
+            }
+        } catch (error) {
+            console.error("Error updating instrument:", error.response?.data?.errorMessage || error.message);
+        }
     };
 
     render() {
         return (
             <div className="form-container">
-                {this.state.redirectToDisplayAllInstruments ? <Redirect to="/instruments" /> : null}
+                {this.state.redirectToDisplayAllInstruments && <Redirect to="/instruments" />}
 
                 <form onSubmit={this.handleSubmit}>
                     <label>Name</label>
                     <input type="text" name="name" value={this.state.name} onChange={this.handleChange} />
                     {this.state.errors.name && <p style={{ color: "red" }}>{this.state.errors.name}</p>}
+
+                    <label>Brand</label>
+                    <input type="text" name="brand" value={this.state.brand} onChange={this.handleChange} />
+                    {this.state.errors.brand && <p style={{ color: "red" }}>{this.state.errors.brand}</p>}
 
                     <label>Price</label>
                     <input type="text" name="price" value={this.state.price} onChange={this.handleChange} />
@@ -130,8 +163,6 @@ export default class EditInstrument extends Component {
                     <label>Image</label>
                     <input type="text" name="image" value={this.state.image} onChange={this.handleChange} />
                     {this.state.errors.image && <p style={{ color: "red" }}>{this.state.errors.image}</p>}
-
-                    {this.state.errors.server && <p style={{ color: "red" }}>{this.state.errors.server}</p>}
 
                     <button type="submit" className="green-button">Update</button>
                     <Link className="red-button" to={"/MainPage"}>Cancel</Link>
