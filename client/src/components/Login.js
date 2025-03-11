@@ -106,11 +106,6 @@ class Login extends Component {
                         </div>
                     </div>
                 </div>
-
-                {/* Show Logout Button if Logged In */}
-                {this.state.isLoggedIn && (
-                    <button onClick={this.handleLogout}>Logout</button>
-                )}
             </div>
         );
     }
