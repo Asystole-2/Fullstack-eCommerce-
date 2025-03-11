@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { SERVER_HOST } from "../config/global_constants";
 import Instrument from "./Instrument";
-import "../css/home.css";
+import "../scss/home.css";
 export default class MainPage extends Component {
     constructor(props) {
         super(props);

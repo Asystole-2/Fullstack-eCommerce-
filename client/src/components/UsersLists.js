@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import axios from "axios";
 import {SERVER_HOST} from "../config/global_constants";
 
+
 export default class UsersList extends Component {
     constructor(props) {
         super(props);
@@ -11,7 +12,8 @@ export default class UsersList extends Component {
     }
 
     componentDidMount() {
-        const token = localStorage.getItem("token"); // ✅ Retrieve JWT token
+        // Retrieve JWT token
+        const token = localStorage.getItem("token");
 
         if (!token) {
             console.error("User is not logged in");
@@ -20,7 +22,8 @@ export default class UsersList extends Component {
         }
 
         axios.get(`${SERVER_HOST}/users`, {
-            headers: { Authorization: `Bearer ${token}` } // ✅ Attach JWT
+            // Attach JWT
+            headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => {
                 if (res.data) {
@@ -33,13 +36,13 @@ export default class UsersList extends Component {
             .catch(error => console.error("Error fetching users:", error));
     }
 
-// ✅ Handle DELETE with JWT authentication
+// Handle DELETE with JWT authentication
     handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
 
         console.log("Deleting user with ID:", id);
 
-        const token = localStorage.getItem("token"); // ✅ Retrieve JWT token
+        const token = localStorage.getItem("token"); // Retrieve JWT token
 
         if (!token) {
             alert("You must be logged in to delete a user.");
@@ -47,7 +50,7 @@ export default class UsersList extends Component {
         }
 
         try {
-            const response = await fetch(`${SERVER_HOST}/api/users/${id}`, {
+            const response = await fetch(`${SERVER_HOST}/users/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -77,6 +80,7 @@ export default class UsersList extends Component {
                     <tr>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>

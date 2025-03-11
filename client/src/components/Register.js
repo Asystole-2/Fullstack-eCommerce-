@@ -1,183 +1,185 @@
-import React, { Component } from "react";
+import React from 'react';
+import { Link, Redirect } from "react-router-dom";
 import axios from "axios";
-import { Redirect } from "react-router-dom";
 import { SERVER_HOST } from "../config/global_constants";
 
-class UserProfile extends Component {
-    state = {
-        name: localStorage.getItem('name') || "",
-        email: localStorage.getItem('email') || "",
-        profilePhoto: localStorage.getItem('profilePhoto'),
-        editingField: null,
-        newValue: "",
-        newPassword: "",
-        confirmPassword: "",
-        errors: {},
-        errorMessage: "",
-        loggedOut: false
-    }
-
-    componentDidMount()
-    {
-        axios.get(`${SERVER_HOST}/users/me`, {
-            headers: { Authorization: `Bearer ${localStorage.token}` }
-        })
-            .then(res => {
-                const { name, email, profilePhoto } = res.data;
-                this.setState({
-                    name: name || "",
-                    email: email || "",
-                    profilePhoto: profilePhoto || ""
-                })
-
-            })
-            .catch(err => {
-                console.error(err);
-                this.setState({ errorMessage: "Failed to fetch user data." });
-            });
-    }
-
-    // Validation functions
-    validateName = (name) => /^[a-zA-Z\s]{3,50}$/.test(name);
-    validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-    validatePassword = (password) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
-
-    handleEdit = (field) => {
-        this.setState({
-            editingField: field,
-            newValue: this.state[field],
-            newPassword: "",
+class Register extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            name: "",
+            email: "",
+            password: "",
             confirmPassword: "",
             errors: {},
-            errorMessage: "" });
+            selectedFile: null,
+            isRegistered: false,
+        };
+    }
+
+    // Function to handle input changes
+    handleChange = (e) => {
+        this.setState({ [e.target.name]: e.target.value });
     };
 
-    handleSave = () => {
-        const { editingField, newValue, newPassword, confirmPassword } = this.state;
+    handleFileChange = (e) => {
+        this.setState({ selectedFile: e.target.files[0] });
+    };
+
+    // Function to validate name
+    validateName = (name) => /^[a-zA-Z\s]{3,50}$/.test(name);
+
+    // Function to validate email
+    validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+
+    // Function to validate password
+    validatePassword = (password) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
+
+    // Function to handle form submission
+    handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const { name, email, password, confirmPassword, selectedFile } = this.state;
         let errors = {};
 
-        if (editingField === "password") {
-            if (!newPassword || !confirmPassword) {
-                errors.password = "Both password fields are required.";
-            } else if (newPassword !== confirmPassword) {
-                errors.confirmPassword = "Passwords do not match.";
-            } else if (!this.validatePassword(newPassword)) {
-                errors.password = "Password must be at least 8 characters, include one uppercase letter, one lowercase letter, one number, and one special character.";
-            }
-        } else if (editingField === "name") {
-            if (!this.validateName(newValue)) {
-                errors.name = "Name must be between 3 and 50 characters and contain only letters and spaces.";
-            }
-        } else if (editingField === "email") {
-            if (!this.validateEmail(newValue)) {
-                errors.email = "Invalid email format.";
-            }
+        // Validate form inputs
+        if (!this.validateName(name)) {
+            errors.name = "Name must be between 3 and 50 characters and contain only letters and spaces.";
+        }
+        if (!this.validateEmail(email)) {
+            errors.email = "Invalid email format.";
+        }
+        if (!this.validatePassword(password)) {
+            errors.password = "Password must be at least 8 characters, include one uppercase letter, one lowercase letter, one number, and one special character.";
+        }
+        if (password !== confirmPassword) {
+            errors.confirmPassword = "Passwords do not match.";
+        }
+        if (!selectedFile) {
+            errors.profilePhoto = "Please select a profile photo.";
         }
 
-        // If there are errors, display them and stop the request
+        // If there are any errors, set state and return early
         if (Object.keys(errors).length > 0) {
             this.setState({ errors });
             return;
         }
 
-        const updateData = editingField === "password" ? { password: newPassword } : { [editingField]: newValue };
+        let formData = new FormData();
+        formData.append("profilePhoto", selectedFile);
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("password", password);
 
-        axios.put(`${SERVER_HOST}/users/update`, updateData,
-            { headers: { Authorization: `Bearer ${localStorage.token}` } }
-        ).then(res => {
-            if (editingField !== "password") {
-                localStorage.setItem(editingField, newValue);
-                this.setState({ [editingField]: newValue });
+        // Send formData to backend
+        try {
+            const res = await axios.post(`${SERVER_HOST}/users/register`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
+            if (res.data.errorMessage) {
+                this.setState({ errors: { server: res.data.errorMessage } });
+            } else {
+                this.setState({ isRegistered: true, errors: {} });  // Clears errors on success
             }
-            this.setState({ editingField: null, errors: {}, errorMessage: "" });
-            alert("Profile updated successfully.");
-        }).catch(err => {
-            this.setState({ errorMessage: err.response?.data?.error || "Error updating profile." });
-        });
-    };
-
-    handleLogout = () => {
-        localStorage.clear();
-        sessionStorage.clear();
-        this.setState({ loggedOut: true });
-        window.location.href = "/MainPage";
+        } catch (error) {
+            console.error("Registration error:", error.response?.data || error);
+            this.setState({ errors: { server: "Registration failed. Please try again." } });
+        }
     };
 
     render() {
-        if (this.state.loggedOut) {
-            return <Redirect to="/Login" />;
+        if (this.state.isRegistered) {
+            return <Redirect to="/MainPage" />;
         }
 
         return (
-            <div className="user-profile-container">
-                <h2>User Profile</h2>
-                <div className="profile-section">
-                    {this.state.profilePhoto && (
-                        <div className="profile-photo-container">
-                            <img src={`data:;base64,${this.state.profilePhoto}`} alt="Profile" className="profile-photo" />
-                            <button className="edit-button" onClick={() => this.handleEdit("profilePhoto")}>Change Photo</button>
-                        </div>
-                    )}
-                </div>
-
-                <div className="user-info">
-                    {['name', 'email'].map(field => (
-                        <div className="info-item">
-                            <strong>{field.charAt(0).toUpperCase() + field.slice(1)}:</strong>
-                            {this.state.editingField === field ? (
-                                <>
+            <div>
+                <div className="register">
+                    <div className="register-container">
+                        <div className="input-group">
+                            <h2>Register</h2>
+                            <form className="form-container" onSubmit={this.handleSubmit}>
+                                <label>
+                                    Name*
                                     <input
+                                        name="name"
                                         type="text"
-                                        value={this.state.newValue}
-                                        onChange={e => this.setState({ newValue: e.target.value })}
-                                        className={this.state.errors[field] ? "input-error" : ""}
+                                        autoComplete="name"
+                                        value={this.state.name}
+                                        onChange={this.handleChange}
+                                        required
+                                        className={this.state.errors.name ? "input-error" : ""}
                                     />
-                                    <button className="save-button" onClick={this.handleSave}>Save</button>
-                                    <button className="cancel-button" onClick={() => this.setState({ editingField: null })}>Cancel</button>
-                                    {this.state.errors[field] && <p className="error-message">{this.state.errors[field]}</p>}
-                                </>
-                            ) : (
-                                <>
-                                    <span>{this.state[field]}</span>
-                                    <button className="edit-button" onClick={() => this.handleEdit(field)}>Edit</button>
-                                </>
-                            )}
+                                    {this.state.errors.name && <p className="error-message">{this.state.errors.name}</p>}
+                                </label>
+
+                                <label>
+                                    Email*
+                                    <input
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        value={this.state.email}
+                                        onChange={this.handleChange}
+                                        required
+                                        className={this.state.errors.email ? "input-error" : ""}
+                                    />
+                                    {this.state.errors.email && <p className="error-message">{this.state.errors.email}</p>}
+                                </label>
+
+                                <label>
+                                    Password*
+                                    <input
+                                        name="password"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        value={this.state.password}
+                                        onChange={this.handleChange}
+                                        required
+                                        className={this.state.errors.password ? "input-error" : ""}
+                                    />
+                                    {this.state.errors.password && <p className="error-message">{this.state.errors.password}</p>}
+                                </label>
+
+                                <label>
+                                    Confirm Password*
+                                    <input
+                                        name="confirmPassword"
+                                        type="password"
+                                        autoComplete="new-password"
+                                        value={this.state.confirmPassword}
+                                        onChange={this.handleChange}
+                                        required
+                                        className={this.state.errors.confirmPassword ? "input-error" : ""}
+                                    />
+                                    {this.state.errors.confirmPassword && <p className="error-message">{this.state.errors.confirmPassword}</p>}
+                                </label>
+
+                                <label>
+                                    Profile Photo*
+                                    <input
+                                        type="file"
+                                        onChange={this.handleFileChange}
+                                        required
+                                        className={this.state.errors.profilePhoto ? "input-error" : ""}
+                                    />
+                                    {this.state.errors.profilePhoto && <p className="error-message">{this.state.errors.profilePhoto}</p>}
+                                </label>
+
+                                {this.state.errors.server && <p className="error-message">{this.state.errors.server}</p>}
+
+                                <button type="submit" className="green-button">Register New User</button>
+                                <Link className="red-button" to={"/Login"}>Cancel</Link>
+                            </form>
                         </div>
-                    ))}
+                    </div>
                 </div>
-
-                <div className="password-section">
-                    <button className="edit-button" onClick={() => this.handleEdit("password")}>Change Password</button>
-                    {this.state.editingField === "password" && (
-                        <div className="password-inputs">
-                            <input
-                                type="password"
-                                placeholder="New Password"
-                                value={this.state.newPassword}
-                                onChange={e => this.setState({ newPassword: e.target.value })}
-                            />
-                            {this.state.errors.password && <p style={{ color: "red" }}>{this.state.errors.password}</p>}
-                            <input
-                                type="password"
-                                placeholder="Confirm Password"
-                                value={this.state.confirmPassword}
-                                onChange={e => this.setState({ confirmPassword: e.target.value })}
-                            />
-                            {this.state.errors.confirmPassword && <p style={{ color: "red" }}>{this.state.errors.confirmPassword}</p>}
-                            <button className="save-button" onClick={this.handleSave}>Save</button>
-                            <button className="cancel-button" onClick={() => this.setState({ editingField: null })}>Cancel</button>
-                        </div>
-                    )}
-                </div>
-
-                {this.state.errorMessage && (
-                    <p className="error-message" style={{ color: "red" }}>{this.state.errorMessage}</p>
-                )}
-
-                <button className="logout-button" onClick={this.handleLogout}>Logout</button>
             </div>
         );
     }
 }
 
-export default UserProfile;
+export default Register;

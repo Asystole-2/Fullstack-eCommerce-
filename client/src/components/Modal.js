@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
+import {ACCESS_LEVEL_ADMIN, ACCESS_LEVEL_USER} from "../config/global_constants";
 
 export default class Modal extends Component {
     constructor(props) {
@@ -55,6 +56,8 @@ export default class Modal extends Component {
         const images = product.images || [] // Fallback to an empty array if images is undefined
         const value = product.price ? product.price.toFixed(2) : 0
 
+        const userAccessLevel = localStorage.getItem("accessLevel");
+
         return (
             <>
                 {showModal && (
@@ -95,7 +98,14 @@ export default class Modal extends Component {
                             <p>Reviews: {product.reviews}</p>
                             <p>Price: ${value}</p>
                             <p>Stock: {product.stock}</p>
-                            {userRole === "admin" ? (
+                            {userAccessLevel >=  ACCESS_LEVEL_USER ?
+                                <button className="add-to-cart-button" onClick={this.handleAddToCart}>
+                                    Add to Cart
+                                </button>
+                                :
+                                null
+                            }
+                            {userAccessLevel >=  ACCESS_LEVEL_ADMIN ?
                                 <div className="admin-buttons">
                                     <button
                                         onClick={() => handleStockChange(-1)}
@@ -108,15 +118,12 @@ export default class Modal extends Component {
                                     </button>
                                     <button onClick={() => onDelete(product._id)}>Delete</button>
                                     <button>
-                                        <Link to={`/EditInstrument/${product._id}`}>Edit</Link>
+                                        <Link className="edit-button" to={`/EditInstrument/${product._id}`}>Edit</Link>
                                     </button>
                                 </div>
-                            ) : (
-                                // User View
-                                <button className="add-to-cart-button" onClick={handleAddToCart}>
-                                    Add to Cart
-                                </button>
-                            )}
+                             :
+                                null
+                            }
                         </div>
                     </div>
                 )}
