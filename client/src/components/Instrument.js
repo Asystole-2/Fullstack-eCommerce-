@@ -102,12 +102,8 @@ export default class Instrument extends Component {
             <div className="product-card" onClick={this.toggleModal}>
                 <div className="product-card2">
                     <div className="image-gallery">
-                        {product.images?.length > 0 ? (
-                            <img
-                                src={product.images[0]}
-                                alt={product.name}
-                                className="main-image"
-                            />
+                        {product.images ? (
+                            <img src={product.images[0]} alt={product.name} className="main-image" />
                         ) : (
                             <div className="no-image">No Image Available</div>
                         )}

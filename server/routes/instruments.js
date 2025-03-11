@@ -1,10 +1,9 @@
 const express = require("express")
 const router = express.Router()
-const InstrumentModel = require("../models/instruments"); // Import the Product model
+const InstrumentModel = require("../models/instruments");
 const { authenticateJWT } = require("../middleware/authMiddleware");
 console.log("Instrument model: ", InstrumentModel)
 const mongoose = require("mongoose")
-const jwt = require("jsonwebtoken");
 const fs = require("fs");
 
 const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
@@ -21,65 +20,74 @@ router.get("/instruments", async (req, res) => {
 })
 
 // Read one instrument by ID
-router.get("/instruments/:id", async (req, res) => {
+router.get("/instruments/:id", authenticateJWT, async (req, res) => {
     try {
-        jwt.verify(req.headers.authorization, JWT_PRIVATE_KEY, {algorithm: "RS256"}, (err, decodedToken) => {
-            if (err) {
-                res.json({errorMessage:`User is not logged in`})
-            }
-            else {
-                InstrumentModel.findById(req.params.id, (error, data) => {
-                    res.json(data)
-                })
-            }
-        })
+        const instrument = await InstrumentModel.findById(req.params.id);
+        if (!instrument) {
+            return res.status(404).json({ errorMessage: "Instrument not found" });
+        }
+        res.json(instrument);
     } catch (error) {
-        console.error("Error fetching instrument:", error)
-        res.status(500).json({error: "Internal Server Error"})
+        console.error("Error fetching instrument:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 })
 
-// // Add new record
-router.post('/instruments/add',authenticateJWT, async (req, res) => {
+// Add
+router.post("/instruments/add", authenticateJWT, async (req, res) => {
     try {
-        // Extract the token from the Authorization header
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ errorMessage: "User is not logged in" });
+        const { name, brand, price, stock, description, images } = req.body;
+
+        // Allow query parameters (CDN images, image processing links)
+        const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i;
+
+        if (images && !imageUrlPattern.test(images)) {
+            return res.status(400).json({ error: "Invalid image URL format. Use a direct image link." });
         }
 
-        // Create a new car record
-        const newInstrument = await InstrumentModel.create(req.body);
+        const newInstrument = new InstrumentModel({
+            name,
+            brand,
+            price,
+            stock,
+            description,
+            images
+        });
 
+        await newInstrument.save();
         res.status(201).json(newInstrument);
     } catch (error) {
-        console.error("Error adding instruments:", error);
-        if (error.name === "JsonWebTokenError") {
-            return res.status(401).json({ errorMessage: "Invalid token" });
-        }
-        res.status(500).json({ errorMessage: "Internal server error" });
+        console.error("Error adding instrument:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
 // Update instrument
 router.put("/instruments/:id", authenticateJWT, async (req, res) => {
     try {
-        // Extract the token from the Authorization header
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ errorMessage: "User is not logged in" });
+        const { name, brand, price, stock, description, images } = req.body;
+
+        // Validate URL
+        const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i;
+
+        if (images && !imageUrlPattern.test(images)) {
+            return res.status(400).json({ error: "Invalid image URL format. Use a direct image link." });
         }
 
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             req.params.id,
-            req.body,
-            {new: true}
-        )
-        if (!updatedInstrument) return res.status(404).json({error: "Instrument not found"})
-        res.json(updatedInstrument)
+            { name, brand, price, stock, description, images },
+            { new: true }
+        );
+
+        if (!updatedInstrument) {
+            return res.status(404).json({ error: "Instrument not found" });
+        }
+
+        res.json(updatedInstrument);
     } catch (error) {
-        console.error("Error updating instrument:", error)
-        res.status(500).json({error: "Internal Server Error"})
+        console.error("Error updating instrument:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 })
 
@@ -119,7 +127,7 @@ router.put("/instruments/:id/increase",authenticateJWT, async (req, res) => {
 
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             id,
-            {$inc: {stock: amount}}, // Atomic increment
+            {$inc: {stock: amount}},
             {new: true}
         );
 

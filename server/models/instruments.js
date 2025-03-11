@@ -1,14 +1,5 @@
 const mongoose = require("mongoose");
 
-// Schema for product images
-let productPhotosSchema = new mongoose.Schema({
-    filename: {
-        type: String,
-        required: [true, "Image filename is required"],
-        trim: true
-    }
-});
-
 // Main product schema
 const ProductSchema = new mongoose.Schema({
     brand: {

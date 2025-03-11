@@ -9,10 +9,20 @@ export default class Navbar extends Component {
         this.context.setSearchQuery(event.target.value);
     };
 
+    handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('profilePhoto');
+        sessionStorage.clear();
+        this.forceUpdate();
+    };
+
     render() {
-        const accessLevel = parseInt(localStorage.getItem('accessLevel')) || 0;
+        const isLoggedIn = localStorage.getItem('token') !== null;
         const profilePhoto = localStorage.getItem('profilePhoto');
-        console.log('Current accessLevel:', accessLevel);
+
+        // Debugging output
+        console.log('Is logged in:', isLoggedIn);
+        console.log('Profile photo:', profilePhoto);
 
         return (
             <nav className="navbar">
@@ -37,17 +47,21 @@ export default class Navbar extends Component {
                     <Link to="/"><i className="fas fa-heart"></i></Link>
                     <Link to="/cart"><i className="fas fa-shopping-cart"></i></Link>
 
-                    {accessLevel > 0 && profilePhoto && profilePhoto !== "null" ? (
-                        <img
-                            id="profilePhoto"
-                            src={`data:;base64,${profilePhoto}`}
-                            alt="Profile"
-                        />
-                    ) : null}
-
-                    <Link to={accessLevel > 0 ? "/UserProfile" : "/Login"}>
-                        <i className="fas fa-user"></i>
-                    </Link>
+                    {/* Show profile picture and logout button if logged in */}
+                    {isLoggedIn && profilePhoto && (
+                        <>
+                            {localStorage.profilePhoto !== "null" && (
+                                <img
+                                    id="profilePhoto"
+                                    src={`data:image/png;base64,${localStorage.profilePhoto}`}
+                                    alt="Profile"
+                                />
+                            )}
+                            <Link to={isLoggedIn ? "/UserProfile" : "/Login"}>
+                                <i className="fas fa-user"></i>
+                            </Link>
+                        </>
+                    )}
                 </div>
             </nav>
         );

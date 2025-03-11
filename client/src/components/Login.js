@@ -15,34 +15,45 @@ class Login extends Component {
         };
     }
 
+    // Handle Login
     handleLogin = async (e) => {
         e.preventDefault();
+        console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
+        console.log("User role: ", this.state.accessLevel); // Add this before sending response
+
         try {
             const res = await axios.post(`${SERVER_HOST}/users/login`, {
                 email: this.state.loginEmail,
                 password: this.state.loginPassword
             });
 
+            // Handle successful login
             if (res.data.token) {
                 localStorage.setItem('token', res.data.token);
                 sessionStorage.setItem('token', res.data.token);
-                localStorage.setItem("name", res.data.name);
-                localStorage.setItem("email", res.data.email);
-                localStorage.setItem("role", res.data.role);
-                localStorage.setItem("accessLevel", res.data.accessLevel);
-                sessionStorage.setItem("accessLevel", res.data.accessLevel);
+                localStorage.setItem('profilePhoto', res.data.profilePhoto);
+
+                this.setState({ isLoggedIn: true });
+                console.log("User logged in");
 
                 this.setState({ isLoggedIn: true, error: '' });
                 window.location.href = "/MainPage";
-            } else {
+            }else {
                 this.setState({ error: "Invalid response from server." });
             }
+
+            localStorage.setItem("name", res.data.name);
+            localStorage.setItem("accessLevel", res.data.accessLevel);
+            localStorage.setItem("token", res.data.token);
+
+
         } catch (error) {
             console.error('Login error:', error);
             this.setState({ error: "Login failed. Please check your credentials." });
         }
     }
 
+    // Logout Function
     handleLogout = () => {
         localStorage.clear();
         sessionStorage.clear();
@@ -50,6 +61,7 @@ class Login extends Component {
     }
 
     componentDidMount() {
+        // Check if user is logged in when component mounts
         const token = localStorage.getItem('token');
         const accessLevel = parseInt(localStorage.getItem('accessLevel')) || 0;
 
@@ -97,10 +109,13 @@ class Login extends Component {
                         </form>
                         {this.state.error && <p style={{ color: "red" }}>{this.state.error}</p>}
 
+                        {/* Additional Links */}
                         <div style={{ marginLeft: 20 }}>
                             <p>Don't have an account?</p>
                             <Link to="/Register">Register</Link>
-                            <br/>
+                            <br /><br />
+                            <p>Or, sign in as Admin</p>
+                            <Link to="/AdminLogin">Admin Login</Link>
                         </div>
                     </div>
                 </div>
