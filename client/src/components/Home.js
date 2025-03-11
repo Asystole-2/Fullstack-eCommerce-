@@ -67,7 +67,7 @@ export default class MainPage extends Component {
                                 </div>
                             ))
                         ) : (
-                            <p>No products with more than 15 reviews found.</p>
+                            <p>No products found.</p>
                         )}
                     </div>
 

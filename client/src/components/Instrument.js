@@ -116,13 +116,9 @@ export default class Instrument extends Component {
                     <p>Brand: {product.brand}</p>
                     <p>Rating: {product.rating}</p>
                     <p>Price: ${value}</p>
-                    {userAccessLevel >=  ACCESS_LEVEL_USER ?
                         <button className="add-to-cart-button" onClick={this.handleAddToCart}>
                             Add to Cart
                         </button>
-                        :
-                        null
-                    }
                 </div>
 
                 <Modal
