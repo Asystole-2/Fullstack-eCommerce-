@@ -16,6 +16,7 @@ export default class AddInstrument extends Component {
             images: [],
             newImageURL: "",
             errors: {},
+            category: "",
             redirectToDisplayAllInstruments: false
         };
     }
@@ -69,7 +70,8 @@ export default class AddInstrument extends Component {
                 price: Number(this.state.price),
                 stock: Number(this.state.stock),
                 description: this.state.description,
-                images: this.state.images  // Send images as array
+                images: this.state.images,
+                category: this.state.category,
             };
 
             const res = await axios.post(`${SERVER_HOST}/instruments/add`, instrumentObject, {
@@ -97,6 +99,10 @@ export default class AddInstrument extends Component {
                     {this.state.errors.name && <p style={{ color: "red" }}>{this.state.errors.name}</p>}
 
                     <input type="text" name="brand" placeholder="Brand" value={this.state.brand} onChange={this.handleChange} />
+                    {this.state.errors.brand && <p style={{ color: "red" }}>{this.state.errors.brand}</p>}
+
+                    <input type="text" name="category" placeholder="Category" value={this.state.category} onChange={this.handleChange} />
+                    {this.state.errors.category && <p style={{ color: "red" }}>{this.state.errors.category}</p>}
 
                     <input type="text" name="price" placeholder="Price" value={this.state.price} onChange={this.handleChange} />
                     {this.state.errors.price && <p style={{ color: "red" }}>{this.state.errors.price}</p>}

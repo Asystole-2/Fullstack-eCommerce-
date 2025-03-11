@@ -54,7 +54,7 @@ const ProductSchema = new mongoose.Schema({
         min: [0, "Stock cannot be negative"]
     },
 
-    images: [{ type: String, required: [true, "At least one image is required"] }],
+    images: { type: [String], required: [true, "At least one image is required"] },
 
     sold: {
         type: Boolean,
