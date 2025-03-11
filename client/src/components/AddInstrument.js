@@ -34,8 +34,9 @@ export default class AddInstrument extends Component {
         }
 
         this.setState({
-            images: [...images, newImageURL],  // Add new image
-            newImageURL: "", // Reset input
+            // Adds newImageURL to existing image
+            images: [...images, newImageURL],
+            newImageURL: "",
             errors: {}
         });
     };
