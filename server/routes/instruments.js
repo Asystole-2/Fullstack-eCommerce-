@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const InstrumentModel = require("../models/instruments"); // Import the Product model
+const InstrumentModel = require("../models/instruments");
 const authenticateJWT = require("../middleware/authMiddleware");
 console.log("Instrument model: ", InstrumentModel)
 const mongoose = require("mongoose")
@@ -128,7 +128,7 @@ router.put("/instruments/:id/increase",authenticateJWT, async (req, res) => {
 
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             id,
-            {$inc: {stock: amount}}, // Atomic increment
+            {$inc: {stock: amount}},
             {new: true}
         );
 

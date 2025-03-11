@@ -101,8 +101,6 @@ class Login extends Component {
                             <p>Don't have an account?</p>
                             <Link to="/Register">Register</Link>
                             <br /><br />
-                            <p>Or, sign in as Admin</p>
-                            <Link to="/AdminLogin">Admin Login</Link>
                         </div>
                     </div>
                 </div>

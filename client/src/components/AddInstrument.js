@@ -13,8 +13,8 @@ export default class AddInstrument extends Component {
             price: "",
             stock: "",
             description: "",
-            images: [],  // Store multiple images
-            newImageURL: "", // Store current image input
+            images: [],
+            newImageURL: "",
             errors: {},
             redirectToDisplayAllInstruments: false
         };

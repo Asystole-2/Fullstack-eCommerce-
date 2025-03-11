@@ -12,7 +12,8 @@ export default class UsersList extends Component {
     }
 
     componentDidMount() {
-        const token = localStorage.getItem("token"); // Retrieve JWT token
+        // Retrieve JWT token
+        const token = localStorage.getItem("token");
 
         if (!token) {
             console.error("User is not logged in");
@@ -21,7 +22,8 @@ export default class UsersList extends Component {
         }
 
         axios.get(`${SERVER_HOST}/users`, {
-            headers: { Authorization: `Bearer ${token}` } // Attach JWT
+            // Attach JWT
+            headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => {
                 if (res.data) {
