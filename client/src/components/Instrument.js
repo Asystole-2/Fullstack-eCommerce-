@@ -13,7 +13,6 @@ export default class Instrument extends Component {
             showModal: false,
         }
 
-
         this.handleStockChange = this.handleStockChange.bind(this)
         this.handleAddToCart = this.handleAddToCart.bind(this)
         this.toggleModal = this.toggleModal.bind(this)
