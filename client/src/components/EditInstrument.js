@@ -129,7 +129,7 @@ export default class EditInstrument extends Component {
             stock: Number(this.state.stock),
             description: this.state.description,
             category: this.state.category,
-            images: this.state.images.length > 0 ? this.state.images[0] : "",
+            images: Array.isArray(this.state.images) ? this.state.images : [this.state.images],  // Ensure array format
         };
 
         console.log("Updating instrument with data:", JSON.stringify(instrumentObject, null, 2));
