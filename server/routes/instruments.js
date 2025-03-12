@@ -36,7 +36,7 @@ router.get("/instruments/:id", authenticateJWT, async (req, res) => {
 // Add
 router.post("/instruments/add", authenticateJWT, async (req, res) => {
     try {
-        const { name, brand, price, stock, description, images } = req.body;
+        const { name, brand, price, stock, description, images, category } = req.body;
 
         // Allow query parameters (CDN images, image processing links)
         const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i;
@@ -48,10 +48,11 @@ router.post("/instruments/add", authenticateJWT, async (req, res) => {
         const newInstrument = new InstrumentModel({
             name,
             brand,
-            price,
-            stock,
+            price: Number(price),
+            stock: Number(stock),
             description,
-            images
+            images,
+            category
         });
 
         await newInstrument.save();
