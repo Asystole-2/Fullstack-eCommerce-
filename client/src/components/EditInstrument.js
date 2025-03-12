@@ -122,27 +122,30 @@ export default class EditInstrument extends Component {
             return;
         }
 
-        try {
-            const instrumentObject = {
-                name: this.state.name,
-                brand: this.state.brand,
-                price: this.state.price,
-                stock: this.state.stock,
-                description: this.state.description,
-                category: this.state.category,
-                images: this.state.images, // Send images array
-            };
+        const instrumentObject = {
+            name: this.state.name,
+            brand: this.state.brand,
+            price: Number(this.state.price),
+            stock: Number(this.state.stock),
+            description: this.state.description,
+            category: this.state.category,
+            images: this.state.images.length > 0 ? this.state.images[0] : "",
+        };
 
+        console.log("Updating instrument with data:", JSON.stringify(instrumentObject, null, 2));
+        try {
             const response = await axios.put(
                 `${SERVER_HOST}/instruments/${this.props.match.params.id}`,
                 instrumentObject,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
                     }
                 }
             );
+
+            console.log("Response:", response.data);
 
             if (response.status === 200) {
                 console.log("Record updated successfully");
@@ -151,7 +154,7 @@ export default class EditInstrument extends Component {
                 console.error("Unexpected response:", response.data);
             }
         } catch (error) {
-            console.error("Error updating instrument:", error.response?.data?.errorMessage || error.message);
+            console.error("Error updating instrument:", error.response?.data || error.message);
         }
     };
 

@@ -66,18 +66,26 @@ router.post("/instruments/add", authenticateJWT, async (req, res) => {
 // Update instrument
 router.put("/instruments/:id", authenticateJWT, async (req, res) => {
     try {
-        const { name, brand, price, stock, description, images } = req.body;
+        const { name, brand, price, stock, description, images, category } = req.body;
 
         // Validate URL
         const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i;
 
-        if (images && !imageUrlPattern.test(images)) {
-            return res.status(400).json({ error: "Invalid image URL format. Use a direct image link." });
+        const base64Pattern = /^data:image\/(jpeg|png|gif|webp);base64,/;
+
+        if (Array.isArray(images)) {
+            for (let img of images) {
+                if (!imageUrlPattern.test(img) && !base64Pattern.test(img)) {
+                    return res.status(400).json({ error: "Invalid image format. Use a direct link or Base64-encoded image." });
+                }
+            }
+        } else if (images && !imageUrlPattern.test(images) && !base64Pattern.test(images)) {
+            return res.status(400).json({ error: "Invalid image format. Use a direct link or Base64-encoded image." });
         }
 
         const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
             req.params.id,
-            { name, brand, price, stock, description, images },
+            { name, brand, price, stock, description, images, category },
             { new: true }
         );
 
