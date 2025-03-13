@@ -1264,4 +1264,11 @@ button:hover {
   transform: scale(1.05);
 }
 
+.image-preview {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
 /*# sourceMappingURL=App.css.map */
