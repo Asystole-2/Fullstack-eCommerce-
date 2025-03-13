@@ -39,7 +39,7 @@ class Login extends Component {
             }
         } catch (error) {
             console.error('Login error:', error);
-            this.setState({ error: "Login failed. Please check your credentials." });
+            this.setState({ error: "Your password or email is incorrect" });
         }
     }
 

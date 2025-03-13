@@ -38,9 +38,18 @@ class UserProfile extends Component {
     }
 
     // Validation functions
-    validateName = (name) => /^[a-zA-Z\s]{3,50}$/.test(name);
-    validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-    validatePassword = (password) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
+    validateName = (name) =>
+    {
+        return /^[a-zA-Z\s]{3,50}$/.test(name);
+    }
+    validateEmail = (email) =>
+    {
+        return /\S+@\S+\.\S+/.test(email);
+    }
+    validatePassword = (password) =>
+    {
+        return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
+    }
 
     handleEdit = (field) => {
         this.setState({
