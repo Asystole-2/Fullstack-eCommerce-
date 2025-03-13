@@ -12,71 +12,73 @@ class Login extends Component {
             error: '',
             isLoggedIn: false,
             redirectURL: "/MainPage",
-        };
+        }
     }
 
     // Handle Login
     handleLogin = async (e) => {
-        e.preventDefault();
-        console.log('Login with:', this.state.loginEmail, this.state.loginPassword);
-        console.log("User role: ", this.state.accessLevel); // Add this before sending response
+        e.preventDefault()
+
+        console.log('Login with:', this.state.loginEmail, this.state.loginPassword)
+        console.log("User role: ", this.state.accessLevel)
 
         try {
             const res = await axios.post(`${SERVER_HOST}/users/login`, {
                 email: this.state.loginEmail,
                 password: this.state.loginPassword
-            });
+            })
 
             // Handle successful login
             if (res.data.token) {
-                localStorage.setItem('token', res.data.token);
-                sessionStorage.setItem('token', res.data.token);
-                localStorage.setItem('profilePhoto', res.data.profilePhoto);
+                localStorage.setItem('token', res.data.token)
+                sessionStorage.setItem('token', res.data.token)
+                localStorage.setItem('profilePhoto', res.data.profilePhoto)
 
-                this.setState({ isLoggedIn: true });
+                this.setState({ isLoggedIn: true })
                 console.log("User logged in");
 
-                this.setState({ isLoggedIn: true, error: '' });
+                this.setState({ isLoggedIn: true, error: '' })
                 window.location.href = "/MainPage";
             }else {
-                this.setState({ error: "Invalid response from server." });
+                this.setState({ error: "Invalid response from server." })
             }
 
-            localStorage.setItem("name", res.data.name);
-            localStorage.setItem("accessLevel", res.data.accessLevel);
-            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("name", res.data.name)
+            localStorage.setItem("accessLevel", res.data.accessLevel)
+            localStorage.setItem("token", res.data.token)
 
 
         } catch (error) {
-            console.error('Login error:', error);
-            this.setState({ error: "Login failed. Please check your credentials." });
+            console.error('Login error:', error)
+            this.setState({ error: "Login failed. Please check your credentials." })
         }
     }
 
     // Logout Function
     handleLogout = () => {
-        localStorage.clear();
-        sessionStorage.clear();
-        this.setState({ isLoggedIn: false });
+        localStorage.clear()
+        sessionStorage.clear()
+        this.setState({ isLoggedIn: false })
     }
 
     componentDidMount() {
         // Check if user is logged in when component mounts
-        const token = localStorage.getItem('token');
-        const accessLevel = parseInt(localStorage.getItem('accessLevel')) || 0;
+        const token = localStorage.getItem('token')
+        // Converts the retrieved value into an integer
+        const accessLevel = parseInt(localStorage.getItem('accessLevel')) || 0
 
         if (token && accessLevel > 0) {
-            this.setState({ isLoggedIn: true });
+            this.setState({ isLoggedIn: true })
         } else {
-            localStorage.clear();
-            sessionStorage.clear();
-            this.setState({ isLoggedIn: false });
+            localStorage.clear()
+            sessionStorage.clear()
+            this.setState({ isLoggedIn: false })
         }
     }
 
     render() {
         if (this.state.isLoggedIn) {
-            return <Redirect to={this.state.redirectURL} />;
+            return <Redirect to={this.state.redirectURL} />
         }
 
         return (
@@ -122,7 +124,7 @@ class Login extends Component {
                     <button onClick={this.handleLogout}>Logout</button>
                 )}
             </div>
-        );
+        )
     }
 }
 

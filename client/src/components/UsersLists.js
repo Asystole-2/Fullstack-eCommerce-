@@ -42,7 +42,7 @@ export default class UsersList extends Component {
 
         console.log("Deleting user with ID:", id);
 
-        const token = localStorage.getItem("token"); // Retrieve JWT token
+        const token = localStorage.getItem("token");
 
         if (!token) {
             alert("You must be logged in to delete a user.");
@@ -54,7 +54,6 @@ export default class UsersList extends Component {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
                 },
             });
 

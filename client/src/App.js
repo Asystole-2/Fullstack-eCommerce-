@@ -11,7 +11,6 @@ import {SearchProvider} from "./components/SearchContext"
 import CartPage from './components/CartPage'
 import Navbar from "./components/Navbar"
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants"
-import AdminRoute from "./components/AdminRoute"
 import AboutPage from "./components/AboutPage"
 import Home from "./components/Home"
 import UsersLists from "./components/UsersLists"

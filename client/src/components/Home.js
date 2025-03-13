@@ -31,7 +31,6 @@ export default class MainPage extends Component {
     }
 
     render() {
-        const {products} = this.state;
 
         return (
             <div className="home-page">
