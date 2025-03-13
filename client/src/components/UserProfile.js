@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Redirect } from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import { SERVER_HOST } from "../config/global_constants";
+
 import DetailsDisplay from "./DetailsDisplay";
+import UsersList from "./UsersLists"
+
 import { ACCESS_LEVEL_ADMIN, ACCESS_LEVEL_USER } from "../config/global_constants";
 
 export default class UserProfile extends Component {
@@ -132,6 +135,8 @@ export default class UserProfile extends Component {
             errorMessage,
         } = this.state;
 
+        const userAccessLevel = localStorage.getItem("accessLevel");
+
         return (
             <div className="user-profile-container">
                 <h2>User Profile</h2>
@@ -222,6 +227,16 @@ export default class UserProfile extends Component {
                         </div>
                     )}
                 </div>
+
+                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
+                    <div className="view-users">
+                        <div className="view-users">
+                            <UsersList userAccessLevel={userAccessLevel} />
+                        </div>
+                    </div>
+                    :
+                    null
+                }
 
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
 

@@ -6,7 +6,6 @@ import {Link} from "react-router-dom"
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
-import UsersList from "./UsersLists"
 import SearchContext, {SearchProvider} from "./SearchContext"
 
 export default class Products extends Component {
@@ -202,24 +201,6 @@ export default class Products extends Component {
                 </div>
 
                 {/*<AddInstrument onAddProduct={this.handleAddProduct} />*/}
-                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
-                    <div className="add-new-product">
-                        <Link className="blue-button" to={"/AddInstrument"}>
-                            Add New Instrument
-                        </Link>
-                    </div>
-                    :
-                    null
-                }
-                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
-                    <div className="view-users">
-                        <Link className="blue-button" to={"/UsersLists"}>
-                            View Users
-                        </Link>
-                    </div>
-                    :
-                    null
-                }
                 <div>
                     <div className="sort-bar">
                     <SortProducts
@@ -242,6 +223,18 @@ export default class Products extends Component {
                         )}
                     </div>
                 </div>
+                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
+                    <div className="add-new-product">
+
+                        <div className="add-new-product">
+                            <Link className="blue-button" to={"/AddInstrument"}>
+                                Add New Instrument
+                            </Link>
+                        </div>
+                    </div>
+                    :
+                    null
+                }
             </div>
         )
     }
