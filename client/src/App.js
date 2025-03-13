@@ -5,7 +5,7 @@ import MainPage from "./components/MainPage"
 import Login from "./components/Login"
 import Register from "./components/Register"
 import AddInstrument from "./components/AddInstrument"
-import "./css/App.css"
+import "./scss/App.css"
 import EditInstrument from "./components/EditInstrument"
 import {SearchProvider} from "./components/SearchContext"
 import CartPage from './components/CartPage'
@@ -13,6 +13,7 @@ import Navbar from "./components/Navbar"
 import {ACCESS_LEVEL_GUEST} from "./config/global_constants"
 import AboutPage from "./components/AboutPage"
 import Home from "./components/Home"
+import UsersLists from "./components/UsersLists"
 
 import BuyProduct from "./components/BuyProduct";
 import PayPalMessage from "./components/PayPalMessage";
@@ -48,7 +49,9 @@ export default class App extends Component {
                             <Route exact path="/Aboutpage" component={AboutPage}/>
                             <Route exact path="/Home" component={Home}/>
                             <Route exact path="/UserProfile" component={UserProfile}/>
+                            <Route exact path="/UsersLists" component={UsersLists}/>
                             <Route component={Home}/>
+
                             <Route exact path="/cart" component={CartPage}/>
                             <Route path="*" component={Products}/>
                         </Switch>

@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { SERVER_HOST } from "../config/global_constants";
-import Instrument from "./Instrument";
-import "../css/home.css";
+import {Link} from "react-router-dom";
+import {SERVER_HOST} from "../config/global_constants";
+import "../scss/home.css";
+
 export default class MainPage extends Component {
     constructor(props) {
         super(props);
@@ -20,7 +20,7 @@ export default class MainPage extends Component {
                     const filteredProducts = res.data.filter(
                         (product) => product.reviews > 28
                     );
-                    this.setState({ products: filteredProducts });
+                    this.setState({products: filteredProducts});
                 } else {
                     console.log("No products found");
                 }
@@ -31,6 +31,7 @@ export default class MainPage extends Component {
     }
 
     render() {
+
         return (
             <div className="home-page">
                 {/* Background Video */}
@@ -42,7 +43,7 @@ export default class MainPage extends Component {
                         muted
                         playsInline
                     >
-                        <source src="/videos/background.mp4" type="video/mp4" />
+                        <source src="/videos/background.mp4" type="video/mp4"/>
                     </video>
 
                     <div className="shop-button-container">
@@ -61,13 +62,21 @@ export default class MainPage extends Component {
                     <div className="product-list2">
                         {this.state.products.length > 0 ? (
                             this.state.products.map((product) => (
-                                <div key={product._id} className="product-card2">
-                                    {/* Using the Instrument component to display the product details */}
-                                    <Instrument product={product} onDelete={() => {}} />
+                                < div className="product-card2">
+                                <div key={product._id} className="product-card">
+                                    {product.images && product.images.length > 0 ? (
+                                        <img src={product.images[0]} alt={product.name} />
+                                    ) : (
+                                        <div className="no-image">No Image Available</div>
+                                    )}
+                                    <h2>{product.name}</h2>
+                                    <p>Brand: {product.brand}</p>
+                                    <p>Rating: {product.rating}</p>
+                                    <p>Reviews: {product.reviews}</p></div>
                                 </div>
                             ))
                         ) : (
-                            <p>No products with more than 15 reviews found.</p>
+                            <p>No products found.</p>
                         )}
                     </div>
 

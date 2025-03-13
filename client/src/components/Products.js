@@ -6,8 +6,8 @@ import {Link} from "react-router-dom"
 import CategoryDropDown from "./CategoryDropDown"
 import BrandDropDown from "./BrandDropDown"
 import SortProducts from "./SortProducts"
-import UsersList from "./UsersLists"
-import SearchContext, {SearchProvider} from "./SearchContext"
+import SearchContext from "./SearchContext"
+
 
 export default class Products extends Component {
     constructor(props) {
@@ -26,20 +26,16 @@ export default class Products extends Component {
         this.handleDelete = this.handleDelete.bind(this)
         this.updateInstrument = this.updateInstrument.bind(this)
 
-        this.handleUpdateProduct = this.handleUpdateProduct.bind(this)
         this.handleCategoryChange = this.handleCategoryChange.bind(this)
         this.handleBrandChange = this.handleBrandChange.bind(this)
         this.handleSortChange = this.handleSortChange.bind(this)
     }
 
-    handleAddProduct = (newProduct) => {
-        this.setState({products: [...this.state.products, newProduct]})
-    }
     handleAddProduct = async () => {
         const token = localStorage.getItem("token");
 
         if (!token) {
-            console.error("User is not logged in"); // Log issue for debugging
+            console.error("User is not logged in");
             alert("Please log in to add instruments.");
             return;
         }
@@ -52,8 +48,7 @@ export default class Products extends Component {
                 stock: 5
             }, {
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}` // Ensure token is sent
+                    "Authorization": `Bearer ${token}`
                 }
             });
 
@@ -65,6 +60,7 @@ export default class Products extends Component {
 
     // Handle DELETE request
     handleDelete = async (id) => {
+        // If pop up isn't accepted it returns to the MainPage
         if (!window.confirm("Are you sure you want to delete this instrument?")) return
 
         try {
@@ -77,7 +73,6 @@ export default class Products extends Component {
 
 
             if (response.ok) {
-                alert("Instrument deleted successfully!")
                 if (this.state.products) {
                     this.setState({
                         products: this.state.products.filter((item) => item._id !== id),
@@ -97,13 +92,6 @@ export default class Products extends Component {
                 inst._id === updatedInstrument._id ? updatedInstrument : inst
             ),
         }))
-    }
-
-    handleUpdateProduct(updatedProduct) {
-        const updatedProducts = this.state.products.map((product) =>
-            product._id === updatedProduct._id ? updatedProduct : product
-        )
-        this.setState({products: updatedProducts})
     }
 
     componentDidMount() {
@@ -202,15 +190,6 @@ export default class Products extends Component {
                 </div>
 
                 {/*<AddInstrument onAddProduct={this.handleAddProduct} />*/}
-                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
-                    <div className="add-new-product">
-                        <Link className="blue-button" to={"/AddInstrument"}>
-                            Add New Instrument
-                        </Link>
-                    </div>
-                    :
-                    null
-                }
                 <div>
                     <div className="sort-bar">
                     <SortProducts
@@ -234,7 +213,14 @@ export default class Products extends Component {
                     </div>
                 </div>
                 {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
-                    <UsersList/>
+                    <div className="add-new-product">
+
+                        <div className="add-new-product">
+                            <Link className="blue-button" to={"/AddInstrument"}>
+                                Add New Instrument
+                            </Link>
+                        </div>
+                    </div>
                     :
                     null
                 }

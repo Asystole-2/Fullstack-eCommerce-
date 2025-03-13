@@ -5,7 +5,16 @@ const jwt = require("jsonwebtoken");
 const publicKey = fs.readFileSync(process.env.JWT_PUBLIC_KEY_FILENAME, "utf8");
 
 const authenticateJWT = (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
+
+    // Retrieves the value of Authorization header from the request
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ errorMessage: "User is not logged in" });
+    }
+
+    // Splits the authHeader string and retrieves the element at position 1
+    const token = authHeader.split(" ")[1];
 
     if (!token) {
         return res.status(403).json({ errorMessage: "Access denied. No token provided." });

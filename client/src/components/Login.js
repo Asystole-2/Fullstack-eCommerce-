@@ -12,17 +12,23 @@ class Login extends Component {
             error: '',
             isLoggedIn: false,
             redirectURL: "/MainPage",
-        };
+        }
     }
 
+    // Handle Login
     handleLogin = async (e) => {
-        e.preventDefault();
+        e.preventDefault()
+
+        console.log('Login with:', this.state.loginEmail, this.state.loginPassword)
+        console.log("User role: ", this.state.accessLevel)
+
         try {
             const res = await axios.post(`${SERVER_HOST}/users/login`, {
                 email: this.state.loginEmail,
                 password: this.state.loginPassword
-            });
+            })
 
+            // Handle successful login
             if (res.data.token) {
                 localStorage.setItem('token', res.data.token);
                 sessionStorage.setItem('token', res.data.token);
@@ -37,21 +43,30 @@ class Login extends Component {
             } else {
                 this.setState({ error: "Invalid response from server." });
             }
+
+            localStorage.setItem("name", res.data.name)
+            localStorage.setItem("accessLevel", res.data.accessLevel)
+            localStorage.setItem("token", res.data.token)
+
+
         } catch (error) {
             console.error('Login error:', error);
             this.setState({ error: "Your password or email is incorrect" });
         }
     }
 
+    // Logout Function
     handleLogout = () => {
-        localStorage.clear();
-        sessionStorage.clear();
-        this.setState({ isLoggedIn: false });
+        localStorage.clear()
+        sessionStorage.clear()
+        this.setState({ isLoggedIn: false })
     }
 
     componentDidMount() {
-        const token = localStorage.getItem('token');
-        const accessLevel = parseInt(localStorage.getItem('accessLevel')) || 0;
+        // Check if user is logged in when component mounts
+        const token = localStorage.getItem('token')
+        // Converts the retrieved value into an integer
+        const accessLevel = parseInt(localStorage.getItem('accessLevel')) || 0
 
         if (token && accessLevel > 0) {
             this.setState({ isLoggedIn: true });
@@ -97,10 +112,11 @@ class Login extends Component {
                         </form>
                         {this.state.error && <p style={{ color: "red" }}>{this.state.error}</p>}
 
+                        {/* Additional Links */}
                         <div style={{ marginLeft: 20 }}>
                             <p>Don't have an account?</p>
                             <Link to="/Register">Register</Link>
-                            <br/>
+                            <br /><br />
                         </div>
                     </div>
                 </div>
@@ -109,7 +125,7 @@ class Login extends Component {
                     <button onClick={this.handleLogout}>Logout</button>
                 )}
             </div>
-        );
+        )
     }
 }
 

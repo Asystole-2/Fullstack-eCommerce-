@@ -1,45 +1,58 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Redirect } from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import { SERVER_HOST } from "../config/global_constants";
 
-class UserProfile extends Component {
+import DetailsDisplay from "./DetailsDisplay";
+import UsersList from "./UsersLists"
+
+import { ACCESS_LEVEL_ADMIN, ACCESS_LEVEL_USER } from "../config/global_constants";
+
+export default class UserProfile extends Component {
     state = {
-        name: localStorage.getItem('name') || "",
-        email: localStorage.getItem('email') || "",
-        profilePhoto: localStorage.getItem('profilePhoto'),
+        name: localStorage.getItem("name") || "",
+        email: localStorage.getItem("email") || "",
+        profilePhoto: localStorage.getItem("profilePhoto"),
         editingField: null,
         newValue: "",
         newPassword: "",
         confirmPassword: "",
         errorMessage: "",
-        loggedOut: false
-    }
+        loggedOut: false,
+    };
 
     componentDidMount() {
-        axios.get(`${SERVER_HOST}/users/me`, {
-            headers: { Authorization: `Bearer ${localStorage.token}` }
-        })
-            .then(res => {
+        // Fetch user profile data
+        axios
+            .get(`${SERVER_HOST}/users/me`, {
+                headers: { Authorization: `Bearer ${localStorage.token}` },
+            })
+            .then((res) => {
                 const { name, email, profilePhoto } = res.data;
                 this.setState({
                     name: name || "",
                     email: email || "",
-                    profilePhoto: profilePhoto || ""
+                    profilePhoto: profilePhoto || "",
                 });
                 // Store in localStorage for consistency
                 localStorage.setItem("name", name || "");
                 localStorage.setItem("email", email || "");
                 localStorage.setItem("profilePhoto", profilePhoto || "");
             })
-            .catch(err => {
+            .catch((err) => {
                 console.error(err);
                 this.setState({ errorMessage: "Failed to fetch user data." });
             });
     }
 
     handleEdit = (field) => {
-        this.setState({ editingField: field, newValue: "", newPassword: "", confirmPassword: "", errorMessage: "" });
+        this.setState({
+            editingField: field,
+            newValue: "",
+            newPassword: "",
+            confirmPassword: "",
+            errorMessage: "",
+        });
     };
 
     handleSave = () => {
@@ -56,29 +69,46 @@ class UserProfile extends Component {
                 return;
             }
 
-            axios.put(`${SERVER_HOST}/users/update`, { password: newPassword },
-                { headers: { Authorization: `Bearer ${localStorage.token}` } }
-            ).then(res => {
-                this.setState({ editingField: null, errorMessage: "" });
-                alert("Password changed successfully.");
-            }).catch(err => {
-                this.setState({ errorMessage: err.response?.data?.error || "Error updating password." });
-            });
-
+            axios
+                .put(
+                    `${SERVER_HOST}/users/update`,
+                    { password: newPassword },
+                    { headers: { Authorization: `Bearer ${localStorage.token}` } }
+                )
+                .then((res) => {
+                    this.setState({ editingField: null, errorMessage: "" });
+                    alert("Password changed successfully.");
+                })
+                .catch((err) => {
+                    this.setState({
+                        errorMessage: err.response?.data?.error || "Error updating password.",
+                    });
+                });
         } else {
             if (newValue === this.state[editingField]) {
                 this.setState({ errorMessage: "New value must be different." });
                 return;
             }
 
-            axios.put(`${SERVER_HOST}/users/update`, { [editingField]: newValue }, // Fixed endpoint
-                { headers: { Authorization: `Bearer ${localStorage.token}` } }
-            ).then(res => {
-                localStorage.setItem(editingField, newValue);
-                this.setState({ [editingField]: newValue, editingField: null, errorMessage: "" });
-            }).catch(err => {
-                this.setState({ errorMessage: err.response?.data?.error || "Error updating profile." });
-            });
+            axios
+                .put(
+                    `${SERVER_HOST}/users/update`,
+                    { [editingField]: newValue },
+                    { headers: { Authorization: `Bearer ${localStorage.token}` } }
+                )
+                .then((res) => {
+                    localStorage.setItem(editingField, newValue);
+                    this.setState({
+                        [editingField]: newValue,
+                        editingField: null,
+                        errorMessage: "",
+                    });
+                })
+                .catch((err) => {
+                    this.setState({
+                        errorMessage: err.response?.data?.error || "Error updating profile.",
+                    });
+                });
         }
     };
 
@@ -94,36 +124,70 @@ class UserProfile extends Component {
             return <Redirect to="/Login" />;
         }
 
+        const {
+            name,
+            email,
+            profilePhoto,
+            editingField,
+            newValue,
+            newPassword,
+            confirmPassword,
+            errorMessage,
+        } = this.state;
+
+        const userAccessLevel = localStorage.getItem("accessLevel");
+
         return (
             <div className="user-profile-container">
                 <h2>User Profile</h2>
                 <div className="profile-section">
-                    {this.state.profilePhoto && (
+                    {profilePhoto && (
                         <div className="profile-photo-container">
-                            <img src={`data:;base64,${this.state.profilePhoto}`} alt="Profile" className="profile-photo" />
-                            <button className="edit-button" onClick={() => this.handleEdit("profilePhoto")}>Change Photo</button>
+                            <img
+                                src={`data:;base64,${profilePhoto}`}
+                                alt="Profile"
+                                className="profile-photo"
+                            />
+                            <button
+                                className="edit-button"
+                                onClick={() => this.handleEdit("profilePhoto")}
+                            >
+                                Change Photo
+                            </button>
                         </div>
                     )}
                 </div>
 
                 <div className="user-info">
-                    {['name', 'email'].map(field => (
+                    {["name", "email"].map((field) => (
                         <div className="info-item" key={field}>
                             <strong>{field.charAt(0).toUpperCase() + field.slice(1)}:</strong>
-                            {this.state.editingField === field ? (
+                            {editingField === field ? (
                                 <>
                                     <input
                                         type="text"
-                                        value={this.state.newValue}
-                                        onChange={e => this.setState({ newValue: e.target.value })}
+                                        value={newValue}
+                                        onChange={(e) => this.setState({ newValue: e.target.value })}
                                     />
-                                    <button className="save-button" onClick={this.handleSave}>Save</button>
-                                    <button className="cancel-button" onClick={() => this.setState({ editingField: null })}>Cancel</button>
+                                    <button className="save-button" onClick={this.handleSave}>
+                                        Save
+                                    </button>
+                                    <button
+                                        className="cancel-button"
+                                        onClick={() => this.setState({ editingField: null })}
+                                    >
+                                        Cancel
+                                    </button>
                                 </>
                             ) : (
                                 <>
                                     <span>{this.state[field]}</span>
-                                    <button className="edit-button" onClick={() => this.handleEdit(field)}>Edit</button>
+                                    <button
+                                        className="edit-button"
+                                        onClick={() => this.handleEdit(field)}
+                                    >
+                                        Edit
+                                    </button>
                                 </>
                             )}
                         </div>
@@ -131,35 +195,58 @@ class UserProfile extends Component {
                 </div>
 
                 <div className="password-section">
-                    <button className="edit-button" onClick={() => this.handleEdit("password")}>Change Password</button>
-                    {this.state.editingField === "password" && (
+                    <button
+                        className="edit-button"
+                        onClick={() => this.handleEdit("password")}
+                    >
+                        Change Password
+                    </button>
+                    {editingField === "password" && (
                         <div className="password-inputs">
                             <input
                                 type="password"
                                 placeholder="New Password"
-                                value={this.state.newPassword}
-                                onChange={e => this.setState({ newPassword: e.target.value })}
+                                value={newPassword}
+                                onChange={(e) => this.setState({ newPassword: e.target.value })}
                             />
                             <input
                                 type="password"
                                 placeholder="Confirm Password"
-                                value={this.state.confirmPassword}
-                                onChange={e => this.setState({ confirmPassword: e.target.value })}
+                                value={confirmPassword}
+                                onChange={(e) => this.setState({ confirmPassword: e.target.value })}
                             />
-                            <button className="save-button" onClick={this.handleSave}>Save</button>
-                            <button className="cancel-button" onClick={() => this.setState({ editingField: null })}>Cancel</button>
+                            <button className="save-button" onClick={this.handleSave}>
+                                Save
+                            </button>
+                            <button
+                                className="cancel-button"
+                                onClick={() => this.setState({ editingField: null })}
+                            >
+                                Cancel
+                            </button>
                         </div>
                     )}
                 </div>
 
-                {this.state.errorMessage && (
-                    <p className="error-message">{this.state.errorMessage}</p>
-                )}
+                {userAccessLevel >= ACCESS_LEVEL_ADMIN ?
+                    <div className="view-users">
+                        <div className="view-users">
+                            <UsersList userAccessLevel={userAccessLevel} />
+                        </div>
+                    </div>
+                    :
+                    null
+                }
 
-                <button className="logout-button" onClick={this.handleLogout}>Logout</button>
+                {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+                <button className="logout-button" onClick={this.handleLogout}>
+                    Logout
+                </button>
+
+                {/* Purchase History Section */}
+                <DetailsDisplay />
             </div>
         );
     }
 }
-
-export default UserProfile;

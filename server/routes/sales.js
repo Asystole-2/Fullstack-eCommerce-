@@ -67,5 +67,27 @@ router.post("/sales", async (req, res, next) => {
         res.status(500).json({ error: "Internal server error", details: err.message })
     }
 })
+// Fetch all sales (for admins)
+router.get("/sales", async (req, res) => {
+    try {
+        const sales = await salesModel.find({}).exec();
+        res.status(200).json({ success: true, data: sales });
+    } catch (error) {
+        console.error("Error fetching all sales:", error);
+        res.status(500).json({ success: false, error: "Internal server error" });
+    }
+});
+
+// Fetch sales for a specific user
+router.get("/sales/user/:userId", async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const sales = await salesModel.find({ userId: userId }).exec();
+        res.status(200).json({ success: true, data: sales });
+    } catch (error) {
+        console.error("Error fetching sales by userId:", error);
+        res.status(500).json({ success: false, error: "Internal server error" });
+    }
+});
 
 module.exports = router
