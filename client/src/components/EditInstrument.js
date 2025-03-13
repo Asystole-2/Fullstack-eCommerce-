@@ -14,8 +14,8 @@ export default class EditInstrument extends Component {
             stock: "",
             description: "",
             category: "",
-            images: [],  // Store multiple images as an array
-            newImageURL: "", // Store new image input
+            images: [],
+            newImageURL: "",
             errors: {},
             redirectToDisplayAllInstruments: false
         };
@@ -45,7 +45,7 @@ export default class EditInstrument extends Component {
                     stock: response.data.stock || "",
                     description: response.data.description || "",
                     category: response.data.category || "",
-                    images: response.data.images || [], // Ensure images is an array
+                    images: response.data.images || [],
                 });
             } else {
                 console.log("Record not found");
@@ -62,14 +62,15 @@ export default class EditInstrument extends Component {
     handleAddImage = () => {
         const { newImageURL, images } = this.state;
 
-        if (!/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(newImageURL)) {
+        // https://stackoverflow.com/questions/4098415/use-regex-to-get-image-url-in-html-js
+        if (!/(http[s]?:\/\/.*\.(?:png|jpg|gif|svg|jpeg))/i.test(newImageURL)) {
             this.setState({ errors: { images: "Invalid image URL format." } });
             return;
         }
 
         this.setState({
-            images: [...images, newImageURL],  // Add new image to array
-            newImageURL: "", // Reset input
+            images: [...images, newImageURL],
+            newImageURL: "",
             errors: {}
         });
     };
@@ -129,7 +130,7 @@ export default class EditInstrument extends Component {
             stock: Number(this.state.stock),
             description: this.state.description,
             category: this.state.category,
-            images: Array.isArray(this.state.images) ? this.state.images : [this.state.images],  // Ensure array format
+            images: Array.isArray(this.state.images) ? this.state.images : [this.state.images],
         };
 
         console.log("Updating instrument with data:", JSON.stringify(instrumentObject, null, 2));
@@ -140,7 +141,6 @@ export default class EditInstrument extends Component {
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
                     }
                 }
             );

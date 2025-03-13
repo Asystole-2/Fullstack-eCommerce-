@@ -28,7 +28,8 @@ export default class AddInstrument extends Component {
     handleAddImage = () => {
         const { newImageURL, images } = this.state;
 
-        if (!/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(newImageURL)) {
+        // https://stackoverflow.com/questions/4098415/use-regex-to-get-image-url-in-html-js
+        if (!/(http[s]?:\/\/.*\.(?:png|jpg|gif|svg|jpeg))/i.test(newImageURL)) {
             this.setState({ errors: { images: "Invalid image URL format." } });
             return;
         }

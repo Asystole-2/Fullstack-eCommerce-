@@ -1,8 +1,8 @@
-const url = "http://localhost:4000/instruments"; // Ensure API path includes `/api`
+const url = "http://localhost:4000/instruments";
 
 export default class InstrumentAPI {
     static async updateStock(id, amount, action) {
-        console.log(`Updating ${action} stock for ID:`, id); // Debugging
+        console.log(`Updating ${action} stock for ID:`, id);
 
         const token = localStorage.getItem("token");
 
@@ -18,7 +18,7 @@ export default class InstrumentAPI {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}` // Attach JWT token
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({ amount })
             });

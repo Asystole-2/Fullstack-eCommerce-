@@ -4,9 +4,6 @@ const InstrumentModel = require("../models/instruments");
 const { authenticateJWT } = require("../middleware/authMiddleware");
 console.log("Instrument model: ", InstrumentModel)
 const mongoose = require("mongoose")
-const fs = require("fs");
-
-const JWT_PRIVATE_KEY = fs.readFileSync(process.env.JWT_PRIVATE_KEY_FILENAME, 'utf8')
 
 // Read all instruments
 router.get("/instruments", async (req, res) => {
@@ -38,11 +35,20 @@ router.post("/instruments/add", authenticateJWT, async (req, res) => {
     try {
         const { name, brand, price, stock, description, images, category } = req.body;
 
-        // Allow query parameters (CDN images, image processing links)
-        const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i;
+        // https://stackoverflow.com/questions/4098415/use-regex-to-get-image-url-in-html-js
+        const imageUrlPattern = /(http[s]?:\/\/.*\.(?:png|jpg|gif|svg|jpeg))/i;
 
-        if (images && !imageUrlPattern.test(images)) {
-            return res.status(400).json({ error: "Invalid image URL format. Use a direct image link." });
+        // https://stackoverflow.com/questions/38633061/how-can-i-strip-the-dataimage-part-from-a-base64-string-of-any-image-type-in-ja
+        const base64Pattern = /^data:image\/(jpeg|png|gif|webp);base64,/;
+
+        if (Array.isArray(images)) {
+            for (let img of images) {
+                if (!imageUrlPattern.test(img) && !base64Pattern.test(img)) {
+                    return res.status(400).json({ error: "Invalid image format. Use a direct link or Base64-encoded image." });
+                }
+            }
+        } else if (images && !imageUrlPattern.test(images) && !base64Pattern.test(images)) {
+            return res.status(400).json({ error: "Invalid image format. Use a direct link or Base64-encoded image." });
         }
 
         const newInstrument = new InstrumentModel({
@@ -69,8 +75,10 @@ router.put("/instruments/:id", authenticateJWT, async (req, res) => {
         const { name, brand, price, stock, description, images, category } = req.body;
 
         // Validate URL
-        const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i;
+        // https://stackoverflow.com/questions/4098415/use-regex-to-get-image-url-in-html-js
+        const imageUrlPattern = /(http[s]?:\/\/.*\.(?:png|jpg|gif|svg|jpeg))/i;
 
+        // https://stackoverflow.com/questions/38633061/how-can-i-strip-the-dataimage-part-from-a-base64-string-of-any-image-type-in-ja
         const base64Pattern = /^data:image\/(jpeg|png|gif|webp);base64,/;
 
         if (Array.isArray(images)) {
@@ -134,15 +142,14 @@ router.put("/instruments/:id/increase",authenticateJWT, async (req, res) => {
             return res.status(400).json({error: "Invalid amount"});
         }
 
-        const updatedInstrument = await InstrumentModel.findByIdAndUpdate(
-            id,
-            {$inc: {stock: amount}},
-            {new: true}
-        );
+        const instrument = await InstrumentModel.findById(id);
 
-        if (!updatedInstrument) return res.status(404).json({error: "Instrument not found"});
+        if (!instrument) return res.status(404).json({error: "Instrument not found"});
 
-        res.json({message: "Stock increased", stock: updatedInstrument.stock});
+        instrument.stock += amount;
+        await instrument.save();
+
+        res.json({message: "Stock increased", stock: instrument.stock});
 
     } catch (error) {
         res.status(500).json({error: error.message});

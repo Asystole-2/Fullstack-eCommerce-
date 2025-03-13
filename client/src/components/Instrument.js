@@ -1,15 +1,12 @@
 import React, {Component} from "react"
 import InstrumentAPI from "../services/InstrumentAPI"
 import Modal from "./Modal"
-import {Link} from "react-router-dom"
-import axios from 'axios'
-import {ACCESS_LEVEL_ADMIN, ACCESS_LEVEL_USER} from "../config/global_constants";
 
 export default class Instrument extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            userRole: localStorage.getItem("role") || "guest", // Default to guest
+            userRole: localStorage.getItem("role") || "guest",
             showModal: false,
         }
 
@@ -73,7 +70,7 @@ export default class Instrument extends Component {
         }
 
         try {
-            console.log("Updating stock for ID:", product._id) // Debugging
+            console.log("Updating stock for ID:", product._id)
             const action = change > 0 ? "increase" : "decrease"
             const updatedProduct = await InstrumentAPI.updateStock(
                 product._id,

@@ -47,7 +47,7 @@ router.delete("/users/:id", authenticateJWT, async (req, res) => {
 // Get all users
 router.get("/users", async (req, res) => {
     try {
-        const users = await UserModel.find({}, {password: 0}); // Exclude password for security
+        const users = await UserModel.find({}, {password: 0});
         res.json(users);
     } catch (error) {
         console.error("Error fetching users:", error);
@@ -58,7 +58,7 @@ router.get("/users", async (req, res) => {
 // Get a single user by ID
 router.get("/users/:id", async (req, res) => {
     try {
-        const user = await UserModel.findById(req.params.id, {password: 0}); // Exclude password
+        const user = await UserModel.findById(req.params.id, {password: 0});
         if (!user) return res.status(404).json({error: "User not found"});
         res.json(user);
     } catch (error) {
@@ -115,7 +115,7 @@ router.post('/users/register', upload.single("profilePhoto"), async (req, res) =
                 name,
                 email,
                 password: hashPassword,
-                profilePhotoFilename: req.file.filename, // Save the filename in the database
+                profilePhotoFilename: req.file.filename,
             });
 
             await newUser.save();
@@ -131,7 +131,7 @@ router.post('/users/register', upload.single("profilePhoto"), async (req, res) =
 // Login
 router.post(`/users/login`, async (req, res) => {
     try {
-        const { email, password } = req.body; // Get login credentials from request body
+        const { email, password } = req.body;
 
         if (!isValidEmail(email)) {
             return res.status(400).json({ error: 'Invalid email format.' });
@@ -142,9 +142,9 @@ router.post(`/users/login`, async (req, res) => {
         }
 
         const user1 = await UserModel.findOne({ email: "admin@example.com" });
-        console.log(user1.accessLevel); // Should be 'admin' for admin, 'user' for normal users
+        console.log(user1.accessLevel);
 
-        console.log("User role: ", user1.accessLevel); // Add this before sending response
+        console.log("User role: ", user1.accessLevel);
 
         // Find the user by email
         const user = await UserModel.findOne({ email });
@@ -183,7 +183,7 @@ router.post(`/users/login`, async (req, res) => {
 // Get user profile
 router.get('/users/me', authenticateJWT, async (req, res) => {
     try {
-        const user = await UserModel.findById(req.user.id).select('-password'); // Exclude password
+        const user = await UserModel.findById(req.user.id).select('-password');
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
