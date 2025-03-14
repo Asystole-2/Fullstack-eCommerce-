@@ -20,20 +20,29 @@ class Register extends React.Component {
     // Function to handle input changes
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
-    };
+    }
 
     handleFileChange = (e) => {
         this.setState({ selectedFile: e.target.files[0] });
-    };
+    }
 
     // Function to validate name
-    validateName = (name) => /^[a-zA-Z\s]{3,50}$/.test(name);
+    validateName = (name) =>
+    {
+        return /^[a-zA-Z\s]{3,50}$/.test(name);
+    }
 
     // Function to validate email
-    validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+    validateEmail = (email) =>
+    {
+        return /\S+@\S+\.\S+/.test(email);
+    }
 
     // Function to validate password
-    validatePassword = (password) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
+    validatePassword = (password) =>
+    {
+        return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/.test(password);
+    }
 
     // Function to handle form submission
     handleSubmit = async (e) => {
@@ -77,7 +86,7 @@ class Register extends React.Component {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
-            });
+            })
 
             if (res.data.errorMessage) {
                 this.setState({ errors: { server: res.data.errorMessage } });

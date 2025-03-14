@@ -6,8 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 const { authenticateJWT, authorizeAdmin } = require("../middleware/authMiddleware");
-const mongoose = require("mongoose");
-const express = require("express");
+
 
 // Set up multer to handle image uploads
 const upload = multer({ dest: process.env.UPLOADED_FILES_FOLDER || './uploads' });
@@ -19,31 +18,6 @@ const isValidPassword = (password) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]
 const isValidName = (name) => /^[a-zA-Z\s]{3,50}$/.test(name);
 
 
-// Delete user
-router.delete("/users/:id", authenticateJWT, async (req, res) => {
-    try {
-        console.log("Deleting user with ID:", req.params.id);
-
-        // Validate MongoDB ObjectId
-        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-            return res.status(400).json({ error: "Invalid user ID format" });
-        }
-
-        const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
-
-        if (!deletedUser) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        console.log("User deleted successfully:", deletedUser);
-        res.json({ message: "User deleted successfully" });
-
-    } catch (error) {
-        console.error("Error deleting user:", error);
-        res.status(500).json({ error: "Internal Server Error", details: error.message });
-    }
-});
-
 // Get all users
 router.get("/users", async (req, res) => {
     try {
@@ -53,20 +27,7 @@ router.get("/users", async (req, res) => {
         console.error("Error fetching users:", error);
         res.status(500).json({error: "Internal Server Error"});
     }
-});
-
-// Get a single user by ID
-router.get("/users/:id", async (req, res) => {
-    try {
-        const user = await UserModel.findById(req.params.id, {password: 0});
-        if (!user) return res.status(404).json({error: "User not found"});
-        res.json(user);
-    } catch (error) {
-        console.error("Error fetching user:", error);
-        res.status(500).json({error: "Internal Server Error"});
-    }
-});
-
+})
 
 // Register user with validation and image upload
 router.post('/users/register', upload.single("profilePhoto"), async (req, res) => {
@@ -125,10 +86,9 @@ router.post('/users/register', upload.single("profilePhoto"), async (req, res) =
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
-});
+})
 
 // User login with validation
-// Login
 router.post(`/users/login`, async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -165,14 +125,14 @@ router.post(`/users/login`, async (req, res) => {
             { id: user._id, email: user.email, accessLevel: user.accessLevel, role: user.role },
             JWT_PRIVATE_KEY,
             { algorithm: "RS256", expiresIn: process.env.JWT_EXPIRY }
-        );
+        )
 
         res.json({
             name: user.name,
             accessLevel: user.accessLevel,
             role: user.role,
             token: token,
-        });
+        })
 
     } catch (error) {
         console.error("Login error:", error);

@@ -30,14 +30,6 @@ class Login extends Component {
 
             // Handle successful login
             if (res.data.token) {
-                localStorage.setItem('token', res.data.token);
-                sessionStorage.setItem('token', res.data.token);
-                localStorage.setItem("name", res.data.name);
-                localStorage.setItem("email", res.data.email);
-                localStorage.setItem("role", res.data.role);
-                localStorage.setItem("accessLevel", res.data.accessLevel);
-                sessionStorage.setItem("accessLevel", res.data.accessLevel);
-
                 this.setState({ isLoggedIn: true, error: '' });
                 window.location.href = "/MainPage";
             } else {
